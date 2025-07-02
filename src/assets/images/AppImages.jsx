@@ -8,5 +8,6 @@ export default AppImages = {
     APPLE: require('./apple.png'),
     GOOGLE: require('./google.png'),
     FACEBOOK: require('./facebook.png'),
-    IMAGES: require('./images.png')
+    IMAGES: require('./images.png'),
+    SPORTS: require('./sports.png')
 } 

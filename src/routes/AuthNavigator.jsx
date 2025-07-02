@@ -8,11 +8,12 @@ import SignUp from '../screens/auth/SignUp';
 import UploadPicture from '../screens/auth/UploadPicture';
 import AddSports from '../screens/auth/sports/AddSports';
 import AddSportsSkills from '../screens/auth/sports/AddSportsSkills';
+import ProfileCreated from '../screens/auth/ProfileCreated';
 
 const Stack = createStackNavigator();
 const AuthNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName='AddSports' screenOptions={{headerShown:false}}>
+    <Stack.Navigator initialRouteName='ProfileCreated' screenOptions={{headerShown:false}}>
       <Stack.Screen name="IntroScreen" component={IntroScreen} />
       <Stack.Screen name="ReadyToJoin" component={ReadyToJoin} />
       <Stack.Screen name="Login" component={Login} />
@@ -20,9 +21,7 @@ const AuthNavigator = () => {
       <Stack.Screen name="UploadPicture" component={UploadPicture} />
       <Stack.Screen name="AddSports" component={AddSports} />
       <Stack.Screen name="AddSportsSkills" component={AddSportsSkills} />
-
-      
-
+      <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
       
     </Stack.Navigator>
   );
