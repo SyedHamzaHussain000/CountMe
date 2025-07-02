@@ -5,4 +5,8 @@ export default AppImages = {
     AUTHBG: require('./authbg.png'),
     STARTBG: require('./startedbg.png'),
     LOGO: require('./logo.png'),
+    APPLE: require('./apple.png'),
+    GOOGLE: require('./google.png'),
+    FACEBOOK: require('./facebook.png'),
+    IMAGES: require('./images.png')
 } 

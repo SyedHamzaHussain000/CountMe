@@ -5,11 +5,12 @@ import AppColors from '../utils/Other/AppColors';
 type props = {
   bgColour?: any;
   Icon?: any;
+  handlePress?: () => void
 };
 
-const RoundButton = ({ Icon, bgColour }: props) => {
+const RoundButton = ({ Icon, bgColour,handlePress }: props) => {
   return (
-  <TouchableOpacity style={[styles.containerStyle,{backgroundColor: bgColour || AppColors.PRIMARY}]}>
+  <TouchableOpacity onPress={handlePress} style={[styles.containerStyle,{backgroundColor: bgColour || AppColors.PRIMARY}]}>
     {Icon}
   </TouchableOpacity>
   )

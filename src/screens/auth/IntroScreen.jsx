@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import IntroSlides from '../../components/IntroSlides';
 import AppImages from '../../assets/images/AppImages';
@@ -10,7 +10,13 @@ import {
 } from '../../utils/Other/Responsive_Dimensions';
 import RoundButton from '../../components/RoundButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-const IntroScreen = () => {
+import { SvgFromXml } from 'react-native-svg';
+import Appsvgicon from '../../assets/icons/Appsvgicon';
+
+const IntroScreen = ({ navigation }) => {
+  const sliderRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const slides = [
     {
       key: 1,
@@ -35,14 +41,25 @@ const IntroScreen = () => {
     },
   ];
 
+  const handleNext = () => {
+    if (activeIndex < slides.length - 1) {
+      sliderRef.current?.goToSlide(activeIndex + 1, true);
+    } else {
+      navigation.replace('ReadyToJoin'); // or your target screen
+    }
+  };
+
   return (
     <AppIntroSlider
       data={slides}
+      ref={sliderRef}
       renderItem={({ item }) => {
-        console.log('item', item);
         return <IntroSlides data={item} />;
       }}
-      onDone={() => console.log('res')}
+      onSlideChange={(currentIndex, prevIndex) =>
+
+        setActiveIndex(currentIndex)
+      }
       dotStyle={[styles.dotStyle, { backgroundColor: AppColors.YELLOWIS }]}
       activeDotStyle={[
         styles.dotStyle,
@@ -82,11 +99,12 @@ const IntroScreen = () => {
             </View>
 
             <RoundButton
+              handlePress={handleNext}
               Icon={
-                <AntDesign
-                  name={'arrow-right'}
-                  size={responsiveFontSize(2)}
-                  color={AppColors.WHITE}
+                <SvgFromXml
+                  xml={Appsvgicon.RightArrow}
+                  height={20}
+                  width={20}
                 />
               }
             />
