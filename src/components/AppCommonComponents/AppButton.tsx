@@ -8,13 +8,14 @@ import AppText from './AppText'
 type props ={
     title?: string;
     marginTop?: number;
+    handlePress?:  () => void
 
 }
 
 
-const AppButton = ({title, marginTop}: props) => {
+const AppButton = ({title, marginTop, handlePress}: props) => {
   return (
-    <TouchableOpacity style={{marginTop: marginTop || 0}} >
+    <TouchableOpacity onPress={handlePress} style={{marginTop: marginTop || 0}} >
             <LinearGradient colors={[AppColors.PRIMARY, AppColors.SECONDARY]}  start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={[styles.linearGradient, {width:responsiveWidth(90)}]}>
                 <AppText title={title} textSize={2.5} textFontWeight textColor={AppColors.WHITE}/>
             </LinearGradient>

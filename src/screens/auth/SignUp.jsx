@@ -11,7 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { SvgFromXml } from 'react-native-svg';
 import Appsvgicon from '../../assets/icons/Appsvgicon';
 import BackButton from '../../components/AppCommonComponents/BackButton';
-const SignUp = () => {
+const SignUp = ({navigation}) => {
   return (
     <Container backgroundImage={AppImages.AUTHBG}>
       <View style={{ gap: 20 }}>
@@ -51,7 +51,7 @@ const SignUp = () => {
 
         <View style={{marginTop:20, gap:10}}>
         <AppText title={"By registering you agree to Terms & Condition and Privacy Policy"} textSize={2}/>
-        <AppButton title='Continue'/>
+        <AppButton title='Continue' handlePress={()=> navigation.navigate("UploadPicture")}/>
         </View>
       </View>
     </Container>

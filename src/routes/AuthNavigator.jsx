@@ -13,7 +13,7 @@ import ProfileCreated from '../screens/auth/ProfileCreated';
 const Stack = createStackNavigator();
 const AuthNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName='ProfileCreated' screenOptions={{headerShown:false}}>
+    <Stack.Navigator initialRouteName='IntroScreen' screenOptions={{headerShown:false}}>
       <Stack.Screen name="IntroScreen" component={IntroScreen} />
       <Stack.Screen name="ReadyToJoin" component={ReadyToJoin} />
       <Stack.Screen name="Login" component={Login} />

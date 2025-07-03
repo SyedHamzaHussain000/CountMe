@@ -13,7 +13,7 @@ import Appsvgicon from '../../assets/icons/Appsvgicon';
 import BackButton from '../../components/AppCommonComponents/BackButton';
 import { responsiveHeight } from '../../utils/Other/Responsive_Dimensions';
 
-const UploadPicture = () => {
+const UploadPicture = ({navigation}) => {
   return (
        <Container backgroundImage={AppImages.AUTHBG}>
       <View style={{ gap: 20 }}>
@@ -48,7 +48,7 @@ const UploadPicture = () => {
 
         <View style={{marginTop:20, gap:10}}>
 
-        <AppButton title='Continue'/>
+        <AppButton title='Continue' handlePress={()=> navigation.navigate("ProfileCreated")}/>
         </View>
       </View>
     </Container>

@@ -9,7 +9,7 @@ import {
 import AppButton from '../../components/AppCommonComponents/AppButton';
 import AppColors from '../../utils/Other/AppColors';
 
-const ProfileCreated = () => {
+const ProfileCreated = ({navigation}) => {
   return (
     <ImageBackground
       source={AppImages.STARTBG}
@@ -44,7 +44,7 @@ const ProfileCreated = () => {
         />
       </View>
 
-      <AppButton title="Get Started" />
+      <AppButton title="Get Started" handlePress={()=> navigation.navigate("MainNavigator")} />
     </ImageBackground>
   );
 };

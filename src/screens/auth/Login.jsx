@@ -17,7 +17,7 @@ import Separator from '../../components/AppCommonComponents/Separator';
 import AuthSmallButtons from '../../components/AppCommonComponents/AuthSmallButtons';
 import Container from '../../components/AppCommonComponents/Container';
 
-const Login = () => {
+const Login = ({navigation}) => {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }}>
       <Container backgroundImage={AppImages.AUTHBG}>
@@ -68,7 +68,7 @@ const Login = () => {
             textFontWeight
             textSize={2}
           />
-          <AppButton title="Sign In" marginTop={30} />
+          <AppButton title="Sign In" marginTop={30} handlePress={()=> navigation.navigate("MainNavigator")}/>
 
           <View style={{ marginTop: 20 }}>
             <Separator title={'or Signin with?'} lineWidth={25} />
@@ -96,7 +96,7 @@ const Login = () => {
             }}
           >
             <AppText title={"Don't have an account?"} textSize={2} />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=> navigation.navigate("SignUp")}>
               <AppText
                 title={'Sign Up'}
                 textColor={'blue'}

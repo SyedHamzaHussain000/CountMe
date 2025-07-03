@@ -6,7 +6,7 @@ import { responsiveHeight } from '../../utils/Other/Responsive_Dimensions';
 import AppButton from '../../components/AppCommonComponents/AppButton';
 import AppColors from '../../utils/Other/AppColors';
 
-const ReadyToJoin = () => {
+const ReadyToJoin = ({navigation}) => {
   return (
     <ImageBackground
       source={AppImages.STARTBG}
@@ -28,7 +28,7 @@ const ReadyToJoin = () => {
       >
         <AppText title={'Time To Get Started'} textSize={2.5} textFontWeight />
       </View>
-      <AppButton title="Ready to Join the Game?" />
+      <AppButton title="Ready to Join the Game?"  handlePress={()=> navigation.navigate("Login")}/>
 
       <View style={{ flexDirection: 'row', marginTop: 20 }}>
         <AppText
