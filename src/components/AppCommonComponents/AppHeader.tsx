@@ -1,0 +1,31 @@
+import { View, Text, Image } from 'react-native'
+import React from 'react'
+import AppImages from '../../assets/images/AppImages'
+import AppText from './AppText'
+import { SvgXml } from 'react-native-svg'
+import Appsvgicon from '../../assets/icons/Appsvgicon'
+
+type props = {
+
+}
+
+
+const AppHeader = () => {
+  return (
+    <View style={{padding:20, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderBottomWidth:0.5}}>
+        <View style={{flexDirection:'row', alignItems:'center', gap:5}}>
+            <Image source={AppImages.SLOGO}  style={{height:30, width:30, resizeMode:'contain'}}/>
+            <AppText title={"Count Me"} textSize={3} textFontWeight/>
+        </View>
+
+        <View style={{flexDirection:'row', alignItems:'center', gap:10}}>   
+            <SvgXml xml={Appsvgicon.Notification}/>
+            <SvgXml xml={Appsvgicon.Setting}/>
+
+        </View>
+      
+    </View>
+  )
+}
+
+export default AppHeader

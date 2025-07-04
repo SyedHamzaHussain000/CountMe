@@ -11,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import AppColors from '../utils/Other/AppColors';
 import { responsiveWidth } from '../utils/Other/Responsive_Dimensions';
+import { SvgXml } from 'react-native-svg';
+import Appsvgicon from '../assets/icons/Appsvgicon';
 
 const Tab = createBottomTabNavigator();
 const MainNavigator = () => {
@@ -30,16 +32,36 @@ const MainNavigator = () => {
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
 
+  // Icon mapping for each tab
+  const getTabIcon = (routeName, isFocused) => {
+    console.log("routeName",routeName)
+    switch (routeName) {
+      case 'Home':
+        return isFocused ? Appsvgicon.HomeW : Appsvgicon.HomeB;
+      case 'Chats':
+        return isFocused ? Appsvgicon.ChatW : Appsvgicon.ChatB;
+      case 'Maps':
+        return isFocused ? Appsvgicon.MapW : Appsvgicon.MapB;
+      case 'Search':
+        return isFocused ? Appsvgicon.SearchW : Appsvgicon.SearchB;
+      case 'Profile':
+        return isFocused ? Appsvgicon.ProfileW : Appsvgicon.ProfileB;
+      default:
+        return Appsvgicon.HomeB;
+    }
+  };
+
   return (
-    <LinearGradient colors={[AppColors.PRIMARY, AppColors.SECONDARY]} start={{x: 0, y: 0}} end={{x: 1, y: 0}}  style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
+    <LinearGradient
+      colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={[styles.tabBar, { paddingBottom: insets.bottom }]}
+    >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
+          options.tabBarLabel ?? options.title ?? route.name;
 
         const isFocused = state.index === index;
 
@@ -61,6 +83,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             onPress={onPress}
             style={styles.tabItem}
           >
+            <SvgXml xml={getTabIcon(route.name, isFocused)} />
             <Text style={{ color: isFocused ? AppColors.WHITE : AppColors.BLACK }}>
               {label}
             </Text>
