@@ -12,6 +12,12 @@ import badmiton from './badmiton.svg'
 import pennyb from './pennyb.svg'
 import pfpb from './pfpb.svg'
 import club from './club.svg'
+import searchb from './searchb.svg'
+import backb from './backb.svg'
+import camera from './camera.svg'
+import dots from './dots.svg'
+import attachment from './attachment.svg'
+import sendmsg from './sendmsg.svg'
 export const SvgIcons = {
   searchW,
   Penny,
@@ -26,5 +32,11 @@ export const SvgIcons = {
   badmiton,
   pennyb,
   pfpb,
-  club
+  club,
+  searchb,
+  backb,
+  camera,
+  dots,
+  attachment,
+  sendmsg
 };

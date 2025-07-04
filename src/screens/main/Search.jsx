@@ -114,7 +114,7 @@ const Search = () => {
       <AppHeader />
 
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 200 }}
+        contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 0 }}
       >
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.yellowButtons}>
@@ -218,7 +218,7 @@ const Search = () => {
       <FlatList
         data={sportsPosts}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap:20, paddingBottom:responsiveHeight(40)}}
+        contentContainerStyle={{gap:20, paddingBottom:responsiveHeight(20)}}
         renderItem={({ item }) => {
 
           return (

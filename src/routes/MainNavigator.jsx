@@ -13,11 +13,27 @@ import AppColors from '../utils/Other/AppColors';
 import { responsiveWidth } from '../utils/Other/Responsive_Dimensions';
 import { SvgXml } from 'react-native-svg';
 import Appsvgicon from '../assets/icons/Appsvgicon';
+import Conversation from '../screens/main/Stack/Conversation';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
 const MainNavigator = () => {
   return (
-     <Tab.Navigator initialRouteName='Home' 
+   <Stack.Navigator initialRouteName='TabBars' screenOptions={{headerShown:false}}>
+      <Stack.Screen name="TabBars" component={TabBars} />
+      <Stack.Screen name="Conversation" component={Conversation} />
+      
+    </Stack.Navigator>
+
+  )
+}
+
+const TabBars = () => {
+  return (
+    
+      <Tab.Navigator initialRouteName='Home' 
      screenOptions={{headerShown:false,  }}
           tabBar={(props) => <CustomTabBar {...props} />}>
       <Tab.Screen name="Home" component={Home} />
@@ -26,8 +42,8 @@ const MainNavigator = () => {
       <Tab.Screen name="Chats" component={Chats} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
-  )
-}
+  );
+};
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();

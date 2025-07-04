@@ -5,4 +5,5 @@ export default AppColors = {
     SECONDARY: "#FF5722",
     YELLOWIS: "#FE990B",
     PURPLE: "#062240",
+    GRAY:"#666666"
 }
