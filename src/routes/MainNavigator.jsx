@@ -108,7 +108,9 @@ const styles = StyleSheet.create({
     width:responsiveWidth(90),
     borderRadius:10, 
     alignSelf:'center',
-    marginBottom:20
+    position:'absolute',
+    zIndex:1, 
+    bottom:20
 
   },
   tabItem: {

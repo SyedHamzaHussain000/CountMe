@@ -8,7 +8,7 @@ import MainNavigator from './MainNavigator';
 const Stack = createStackNavigator();
 const Routes = () => {
   return (
-     <Stack.Navigator initialRouteName='AuthNavigator' screenOptions={{headerShown:false}}>
+     <Stack.Navigator initialRouteName='MainNavigator' screenOptions={{headerShown:false}}>
       <Stack.Screen name="AuthNavigator" component={AuthNavigator} />
       <Stack.Screen name="MainNavigator" component={MainNavigator} />
     </Stack.Navigator>

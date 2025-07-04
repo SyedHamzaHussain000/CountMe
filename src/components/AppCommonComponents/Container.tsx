@@ -5,10 +5,11 @@ import AppImages from '../../assets/images/AppImages';
 type props = {
   children?: React.ReactNode;
   backgroundImage?: any;
+  padding?: any
 };
-const Container = ({ children, backgroundImage }: props) => {
+const Container = ({ children, backgroundImage ,padding}: props) => {
   return (
-    <ImageBackground source={backgroundImage} style={{ flex: 1, padding: 20 }}>
+    <ImageBackground source={backgroundImage} style={{ flex: 1, padding: padding ? padding :20 }}>
       {children}
     </ImageBackground>
   );

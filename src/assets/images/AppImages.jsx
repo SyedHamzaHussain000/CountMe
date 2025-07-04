@@ -12,5 +12,20 @@ export default AppImages = {
     SPORTS: require('./sports.png'),
     SLOGO: require('./slogo.png'),
     POSTPICTURE: require('./postpic.png'),
-    JOINERS: require('./joiners.png')
+    JOINERS: require('./joiners.png'),
+    GOOGLEMAP: require('./googlemap.png'),
+    User: require('./user.png'),
+    searchbg: require('./searchbg.png'),
+    cardbg: require('./cardbg.png'),
+
+    sport1: require('./Sportslogo/sport1.png'),
+    sport2: require('./Sportslogo/sport2.png'),
+    sport3: require('./Sportslogo/sport3.png'),
+    sport4: require('./Sportslogo/sport4.png'),
+    sport5: require('./Sportslogo/sport5.png'),
+    sport6: require('./Sportslogo/sport6.png'),
+    sport7: require('./Sportslogo/sport7.png'),
+    sport8: require('./Sportslogo/sport8.png'),
+
+   
 } 
