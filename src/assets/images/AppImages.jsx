@@ -10,5 +10,7 @@ export default AppImages = {
     FACEBOOK: require('./facebook.png'),
     IMAGES: require('./images.png'),
     SPORTS: require('./sports.png'),
-    SLOGO: require('./slogo.png')
+    SLOGO: require('./slogo.png'),
+    POSTPICTURE: require('./postpic.png'),
+    JOINERS: require('./joiners.png')
 } 

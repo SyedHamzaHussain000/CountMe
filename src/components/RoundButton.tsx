@@ -5,12 +5,13 @@ import AppColors from '../utils/Other/AppColors';
 type props = {
   bgColour?: any;
   Icon?: any;
-  handlePress?: () => void
+  handlePress?: () => void,
+  marginBottom?: number
 };
 
-const RoundButton = ({ Icon, bgColour,handlePress }: props) => {
+const RoundButton = ({ Icon, bgColour,handlePress, marginBottom}: props) => {
   return (
-  <TouchableOpacity onPress={handlePress} style={[styles.containerStyle,{backgroundColor: bgColour || AppColors.PRIMARY}]}>
+  <TouchableOpacity onPress={handlePress} style={[styles.containerStyle,{backgroundColor: bgColour || AppColors.PRIMARY, marginBottom: 0,}]}>
     {Icon}
   </TouchableOpacity>
   )
@@ -24,7 +25,6 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 200,
     alignSelf: 'center',
-    marginBottom: 50,
     alignItems:'center',
     justifyContent:'center'
   },

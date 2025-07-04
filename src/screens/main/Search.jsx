@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import AppHeader from '../../components/AppCommonComponents/AppHeader'
 
 const Search = () => {
   return (
     <View>
-      <Text>Search</Text>
+      <AppHeader />
     </View>
   )
 }
