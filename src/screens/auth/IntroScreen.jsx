@@ -71,7 +71,7 @@ const IntroScreen = ({ navigation }) => {
       showSkipButton={false}
       renderPagination={activeIndex => {
         return (
-          <View style={{ backgroundColor: AppColors.WHITE }}>
+          <View style={{ backgroundColor: AppColors.WHITE, paddingBottom:20 }}>
             <View
               style={{
                 flexDirection: 'row',
