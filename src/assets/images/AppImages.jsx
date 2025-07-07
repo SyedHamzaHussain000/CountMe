@@ -27,5 +27,7 @@ export default AppImages = {
     sport7: require('./Sportslogo/sport7.png'),
     sport8: require('./Sportslogo/sport8.png'),
 
+    cover: require('./cover.png'),
+    profileimg: require('./profileimg.png'),
    
 } 

@@ -10,7 +10,7 @@ import Chats from '../screens/main/Chats';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import AppColors from '../utils/Other/AppColors';
-import { responsiveWidth } from '../utils/Other/Responsive_Dimensions';
+import { responsiveHeight, responsiveWidth } from '../utils/Other/Responsive_Dimensions';
 import { SvgXml } from 'react-native-svg';
 import Appsvgicon from '../assets/icons/Appsvgicon';
 import Conversation from '../screens/main/Stack/Conversation';
@@ -118,7 +118,7 @@ export default MainNavigator
 const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
-    height: 60,
+    height: responsiveHeight(8),
     justifyContent: 'space-around',
     alignItems: 'center',
     width:responsiveWidth(90),

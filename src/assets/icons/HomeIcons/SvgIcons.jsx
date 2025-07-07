@@ -18,6 +18,18 @@ import camera from './camera.svg'
 import dots from './dots.svg'
 import attachment from './attachment.svg'
 import sendmsg from './sendmsg.svg'
+import cameraW from './cameraW.svg'
+import starthumb from './starthumb.svg'
+import blueprofile from './blueprofile.svg'
+import edit from './edit.svg'
+
+import arrow from './arrow.svg'
+import clock from './clock.svg'
+import run from './run.svg'
+import us from './us.svg'
+import wifi from './wifi.svg'
+
+
 export const SvgIcons = {
   searchW,
   Penny,
@@ -38,5 +50,14 @@ export const SvgIcons = {
   camera,
   dots,
   attachment,
-  sendmsg
+  sendmsg,
+  cameraW,
+  starthumb,
+  blueprofile,
+  edit,
+  arrow,
+  clock,
+  wifi,
+  run,
+  us
 };
