@@ -23,6 +23,8 @@ const AppTextInput = ({keyboardType,onChangeText,password,placeholder,secureText
             placeholder={placeholder}
             style={{width:responsiveWidth(70), height:50}}
             secureTextEntry={secureTextEntry}
+            onChangeText={onChangeText}
+            value={value}
             />
         </View>
 

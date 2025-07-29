@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "58356223634",
+    "project_id": "countme-b729a",
+    "storage_bucket": "countme-b729a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58356223634:android:5b123f3fa31c710a83e04b",
+        "android_client_info": {
+          "package_name": "com.countme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWHWoQaqL9_-sONTQsHQ6x-q4evpdQaQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
