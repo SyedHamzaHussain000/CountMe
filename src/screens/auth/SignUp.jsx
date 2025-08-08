@@ -29,8 +29,6 @@ const SignUp = ({ navigation }) => {
   const [loader, setLoader] = useState(false);
 
   const CreateAccount = () => {
-
-    
     if (
       !credientials.email ||
       !credientials.full_name ||

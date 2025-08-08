@@ -29,7 +29,7 @@ const Stack = createStackNavigator();
 const MainNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="UploadPicture"
+      initialRouteName="AddSports"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="TabBars" component={TabBars} />
