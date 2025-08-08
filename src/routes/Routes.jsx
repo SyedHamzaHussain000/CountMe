@@ -29,7 +29,7 @@ const Routes = () => {
 
 
   return (
-     <Stack.Navigator initialRouteName='AuthNavigator' screenOptions={{headerShown:false}}>
+     <Stack.Navigator  screenOptions={{headerShown:false}}>
       {
         user ?
         <Stack.Screen name="MainNavigator" component={MainNavigator} />

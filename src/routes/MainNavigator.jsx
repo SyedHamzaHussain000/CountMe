@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import IntroScreen from '../screens/auth/IntroScreen';
 import Home from '../screens/main/Home';
@@ -10,32 +10,45 @@ import Chats from '../screens/main/Chats';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import AppColors from '../utils/Other/AppColors';
-import { responsiveHeight, responsiveWidth } from '../utils/Other/Responsive_Dimensions';
+import {
+  responsiveHeight,
+  responsiveWidth,
+} from '../utils/Other/Responsive_Dimensions';
 import { SvgXml } from 'react-native-svg';
 import Appsvgicon from '../assets/icons/Appsvgicon';
 import Conversation from '../screens/main/Stack/Conversation';
 import { createStackNavigator } from '@react-navigation/stack';
+import UploadPicture from '../screens/auth/UploadPicture';
+import AddSports from '../screens/auth/sports/AddSports';
+import AddSportsSkills from '../screens/auth/sports/AddSportsSkills';
+import ProfileCreated from '../screens/auth/ProfileCreated';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
   return (
-   <Stack.Navigator initialRouteName='TabBars' screenOptions={{headerShown:false}}>
+    <Stack.Navigator
+      initialRouteName="UploadPicture"
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="TabBars" component={TabBars} />
       <Stack.Screen name="Conversation" component={Conversation} />
-      
+      <Stack.Screen name="UploadPicture" component={UploadPicture} />
+      <Stack.Screen name="AddSports" component={AddSports} />
+      <Stack.Screen name="AddSportsSkills" component={AddSportsSkills} />
+      <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
     </Stack.Navigator>
-
-  )
-}
+  );
+};
 
 const TabBars = () => {
   return (
-    
-      <Tab.Navigator initialRouteName='Home' 
-     screenOptions={{headerShown:false,  }}
-          tabBar={(props) => <CustomTabBar {...props} />}>
+    <Tab.Navigator
+      initialRouteName="UploadPicture"
+      screenOptions={{ headerShown: false }}
+      tabBar={props => <CustomTabBar {...props} />}
+    >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Maps" component={Maps} />
       <Tab.Screen name="Search" component={Search} />
@@ -50,7 +63,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
   // Icon mapping for each tab
   const getTabIcon = (routeName, isFocused) => {
-    console.log("routeName",routeName)
+    console.log('routeName', routeName);
     switch (routeName) {
       case 'Home':
         return isFocused ? Appsvgicon.HomeW : Appsvgicon.HomeB;
@@ -76,8 +89,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel ?? options.title ?? route.name;
+        const label = options.tabBarLabel ?? options.title ?? route.name;
 
         const isFocused = state.index === index;
 
@@ -100,7 +112,9 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             style={styles.tabItem}
           >
             <SvgXml xml={getTabIcon(route.name, isFocused)} />
-            <Text style={{ color: isFocused ? AppColors.WHITE : AppColors.BLACK }}>
+            <Text
+              style={{ color: isFocused ? AppColors.WHITE : AppColors.BLACK }}
+            >
               {label}
             </Text>
           </TouchableOpacity>
@@ -110,10 +124,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   );
 };
 
-
-
-export default MainNavigator
-
+export default MainNavigator;
 
 const styles = StyleSheet.create({
   tabBar: {
@@ -121,13 +132,12 @@ const styles = StyleSheet.create({
     height: responsiveHeight(8),
     justifyContent: 'space-around',
     alignItems: 'center',
-    width:responsiveWidth(90),
-    borderRadius:10, 
-    alignSelf:'center',
-    position:'absolute',
-    zIndex:1, 
-    bottom:20
-
+    width: responsiveWidth(90),
+    borderRadius: 10,
+    alignSelf: 'center',
+    position: 'absolute',
+    zIndex: 1,
+    bottom: 20,
   },
   tabItem: {
     flex: 1,
@@ -135,4 +145,3 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
 });
-

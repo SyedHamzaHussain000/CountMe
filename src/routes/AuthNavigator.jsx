@@ -18,10 +18,7 @@ const AuthNavigator = () => {
       <Stack.Screen name="ReadyToJoin" component={ReadyToJoin} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SignUp" component={SignUp} />
-      <Stack.Screen name="UploadPicture" component={UploadPicture} />
-      <Stack.Screen name="AddSports" component={AddSports} />
-      <Stack.Screen name="AddSportsSkills" component={AddSportsSkills} />
-      <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
+  
       
     </Stack.Navigator>
   );

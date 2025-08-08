@@ -1,7 +1,5 @@
-// import database from '@react-native-firebase/database';
+import database from '@react-native-firebase/database';
 
-// const BaseUrl = () => {
-//     database()
-// }
+export const UsersDbRef = database().ref('/Users');
 
-// export default BaseUrl
+

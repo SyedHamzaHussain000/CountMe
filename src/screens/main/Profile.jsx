@@ -153,9 +153,10 @@ const Profile = () => {
 
 
   return (
-    <View>
+    <View style={{backgroundColor:AppColors.WHITE}}>
       <AppHeader />
 
+    <ScrollView contentContainerStyle={{flexGrow:1, paddingBottom:responsiveHeight(20)}} nestedScrollEnabled>
       <View>
         <Image source={AppImages.cover} style={styles.cover} />
         <View style={styles.pfpImgContainer}>
@@ -167,7 +168,6 @@ const Profile = () => {
         </View>
       </View>
       <LinearGradient colors={["#7EFF57", AppColors.WHITE]}  start={{x:5, y:0}} style={{height:responsiveHeight(100), padding:20}}>
-    <ScrollView contentContainerStyle={{flexGrow:1, paddingBottom:responsiveHeight(50)}} nestedScrollEnabled>
         <View style={{alignSelf:'flex-end', backgroundColor:AppColors.WHITE, padding:10}}>
           <IconText title='Rating 4/5' Icon={<SvgIcons.starthumb/>}/>
         </View>
@@ -235,8 +235,8 @@ const Profile = () => {
         }}
       />
 
-      </ScrollView>
       </LinearGradient>
+      </ScrollView>
 
     </View>
   );

@@ -15,6 +15,9 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
 } from '@react-native-firebase/auth';
+import { UsersDbRef } from '../../utils/BaseUrls/BaseUrl';
+import Toast from 'react-native-toast-message';
+import ShowToast from '../../utils/Other/ShowToast';
 
 const SignUp = ({ navigation }) => {
   const [credientials, setCredientials] = useState({
@@ -26,30 +29,56 @@ const SignUp = ({ navigation }) => {
   const [loader, setLoader] = useState(false);
 
   const CreateAccount = () => {
-    setLoader(true);
 
-    createUserWithEmailAndPassword(
-      getAuth(),
-      credientials.email,
-      credientials.passord,
-    )
-      .then(() => {
-        console.log('User account created & signed in!');
-        // navigation.navigate('UploadPicture')
-        setLoader(false);
-      })
-      .catch(error => {
-        setLoader(false);
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
+    
+    if (
+      !credientials.email ||
+      !credientials.full_name ||
+      !credientials.passord ||
+      !credientials.re_type_password
+    ) {
+      ShowToast('error', 'All fields are required');
+    } else if (credientials.passord !== credientials.re_type_password) {
+      ShowToast('error', 'Password does not match');
+    } else {
+      setLoader(true);
+      createUserWithEmailAndPassword(
+        getAuth(),
+        credientials.email,
+        credientials.passord,
+      )
+        .then(() => {
+          console.log('User account created & signed in!');
+          ShowToast('success', 'User account created & signed in!');
+          // navigation.navigate('UploadPicture')
 
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
+          UsersDbRef.set({
+            full_name: credientials.full_name,
+            email: credientials.email
+          })
+            .then(res => {
+              setLoader(false);
+              
+            })
+            .catch(error => {
+              console.log('signup db error', error);
+            });
+        })
+        .catch(error => {
+          setLoader(false);
+          if (error.code === 'auth/email-already-in-use') {
+            console.log('That email address is already in use!');
+            ShowToast('error', 'That email address is already in use!');
+          }
 
-        console.error(error);
-      });
+          if (error.code === 'auth/invalid-email') {
+            console.log('That email address is invalid!');
+            ShowToast('error', 'That email address is invalid!');
+          }
+
+          console.error(error);
+        });
+    }
   };
 
   return (
@@ -119,7 +148,11 @@ const SignUp = ({ navigation }) => {
               }
               textSize={2}
             />
-            <AppButton title="Continue" handlePress={() => CreateAccount()} loading={loader}  />
+            <AppButton
+              title="Continue"
+              handlePress={() => CreateAccount()}
+              loading={loader}
+            />
           </View>
         </View>
       </ScrollView>
