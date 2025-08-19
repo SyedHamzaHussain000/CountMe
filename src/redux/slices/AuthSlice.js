@@ -1,26 +1,32 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  value: 0,
-}
+  ProfileImage: null,
+  FavouriteSports: [],
+  SportsSkills: [],
+  SignupFlowCompleted: false,
+};
 
 export const AuthSlice = createSlice({
   name: 'Auth',
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value += 1
+    setProfilePicture: (state, actions) => {
+      state.ProfileImage = actions.payload;
     },
-    decrement: (state) => {
-      state.value -= 1
+    setFavouriteSports: (state, actions) => {
+      state.ProfileImage = actions.payload;
     },
-    incrementByAmount: (state, action) => {
-      state.value += action.payload
+    setSportsSkills: (state, actions) => {
+      state.ProfileImage = actions.payload;
+    },
+    setSignupFlowCompleted: (state, actions) => {
+      state.ProfileImage = actions.payload;
     },
   },
-})
+});
 
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount } = AuthSlice.actions
+export const { setProfilePicture, setFavouriteSports, setSportsSkills, setSignupFlowCompleted } = AuthSlice.actions;
 
-export default AuthSlice.reducer
+export default AuthSlice.reducer;
