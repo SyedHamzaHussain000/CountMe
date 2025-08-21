@@ -37,7 +37,7 @@ const ReadyToJoin = ({navigation}) => {
           textFontWeight
         />
         <AppText
-          title={' login here'}
+          title={'login here'}
           textSize={2}
           textFontWeight
           textColor={AppColors.PRIMARY}

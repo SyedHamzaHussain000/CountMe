@@ -13,12 +13,18 @@ import Appsvgicon from '../../assets/icons/Appsvgicon';
 import BackButton from '../../components/AppCommonComponents/BackButton';
 import { responsiveHeight } from '../../utils/Other/Responsive_Dimensions';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setProfilePicture } from '../../redux/slices/AuthSlice';
+import { getAuth } from '@react-native-firebase/auth';
 
 const UploadPicture = ({ navigation }) => {
   const dispatch = useDispatch();
   const [imageUri, setImageUri] = useState(null);
+
+  const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
+  const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
+
+  console.log("MyFavSports", MyFavSports, MySportsSkills)
 
   const openLibrary = async () => {
     const result = await launchImageLibrary({
@@ -81,6 +87,8 @@ const UploadPicture = ({ navigation }) => {
             title="Continue"
             handlePress={() => navigation.navigate('AddSports')}
           />
+
+          <AppButton title="Logout" handlePress={()=> getAuth().signOut()} />
         </View>
       </View>
     </Container>

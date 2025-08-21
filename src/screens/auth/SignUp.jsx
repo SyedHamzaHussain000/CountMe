@@ -15,16 +15,16 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
 } from '@react-native-firebase/auth';
-import { UsersDbRef } from '../../utils/BaseUrls/BaseUrl';
+import { UserId, UsersDbRef } from '../../utils/BaseUrls/BaseUrl';
 import Toast from 'react-native-toast-message';
 import ShowToast from '../../utils/Other/ShowToast';
 
 const SignUp = ({ navigation }) => {
   const [credientials, setCredientials] = useState({
-    full_name: '',
-    email: '',
-    passord: '',
-    re_type_password: '',
+    full_name: 'test',
+    email: 'test@gmail.com',
+    passord: '1234567890',
+    re_type_password: '1234567890',
   });
   const [loader, setLoader] = useState(false);
 
@@ -50,10 +50,19 @@ const SignUp = ({ navigation }) => {
           ShowToast('success', 'User account created & signed in!');
           // navigation.navigate('UploadPicture')
 
-          UsersDbRef.set({
+
+          
+
+          UsersDbRef.child(UserId).set({
             full_name: credientials.full_name,
-            email: credientials.email
+            email: credientials.email,
+            device_Token: "",
+            ProfilePicture: "",
+            Sports: [],
+            SportsSkills: [],
+            ProfileCreated: false
           })
+
             .then(res => {
               setLoader(false);
               

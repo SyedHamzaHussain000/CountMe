@@ -15,13 +15,13 @@ export const AuthSlice = createSlice({
       state.ProfileImage = actions.payload;
     },
     setFavouriteSports: (state, actions) => {
-      state.ProfileImage = actions.payload;
+      state.FavouriteSports = actions.payload;
     },
     setSportsSkills: (state, actions) => {
-      state.ProfileImage = actions.payload;
+      state.SportsSkills = actions.payload;
     },
     setSignupFlowCompleted: (state, actions) => {
-      state.ProfileImage = actions.payload;
+      state.SignupFlowCompleted = actions.payload;
     },
   },
 });

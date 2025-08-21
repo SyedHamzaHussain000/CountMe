@@ -11,6 +11,8 @@ import IconText from '../../components/AppCommonComponents/IconText'
 import { SvgIcons } from '../../assets/icons/HomeIcons/SvgIcons'
 import Line from '../../components/AppCommonComponents/Line'
 import Participants from '../../components/AppCommonComponents/Participants'
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
+
 const Maps = () => {
   const data = [
     {id:1, name:"Alex Hales", type: "Organizer"},
@@ -20,13 +22,30 @@ const Maps = () => {
     {id:5, name:"Jhon", type: "participant"},
     {id:6, name:"Slot available", type: "Join now"},
   ]
+
+
   return (
     <View style={{backgroundColor:AppColors.PURPLE, flex:1}}>
       <AppHeader />
     <ScrollView contentContainerStyle={{flexGrow:1, paddingBottom:responsiveHeight(20)}}>
-      <ImageBackground source={AppImages.GOOGLEMAP} style={{height:responsiveHeight(50), width:responsiveWidth(100), borderBottomRightRadius:50, borderBottomLeftRadius:50, overflow:'hidden', }} >     
 
-        <View style={{position:'absolute', zIndex:0, bottom:0 ,backgroundColor:AppColors.WHITE,width:responsiveWidth(100), alignSelf:'center', padding:20, flexDirection:'row', justifyContent:'space-between', opacity:0.8}}>
+      <View>
+
+    <MapView
+       provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+       style={{height:400, width:responsiveWidth(100), borderBottomRightRadius:30, borderBottomLeftRadius:30, overflow:'hidden'}}
+       region={{
+         latitude: 37.78825,
+         longitude: -122.4324,
+         latitudeDelta: 0.015,
+         longitudeDelta: 0.0121,
+        }}
+        >
+        
+     </MapView>
+
+
+        <View style={{position:'absolute', zIndex:0, bottom:0 ,backgroundColor:AppColors.WHITE,width:responsiveWidth(100), alignSelf:'center', padding:20, flexDirection:'row', justifyContent:'space-between', opacity:0.8, borderBottomRightRadius:30, borderBottomLeftRadius:30}}>
           <View>
           <AppText title={"Activities near me"} textSize={2.5} textFontWeight/>
           <AppText title={"200m - 300m"}textSize={2} />
@@ -36,7 +55,11 @@ const Maps = () => {
               <SvgIcons.searchW  />
           </View>
         </View>
-      </ImageBackground>
+
+
+       </View>
+
+      
 
       <View style={{padding:20, gap:20}}>
 

@@ -22,22 +22,30 @@ import UploadPicture from '../screens/auth/UploadPicture';
 import AddSports from '../screens/auth/sports/AddSports';
 import AddSportsSkills from '../screens/auth/sports/AddSportsSkills';
 import ProfileCreated from '../screens/auth/ProfileCreated';
+import { useSelector } from 'react-redux';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
+  const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
+  const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
+
   return (
-    <Stack.Navigator
-      initialRouteName="UploadPicture"
-      screenOptions={{ headerShown: false }}
-    >
-      <Stack.Screen name="TabBars" component={TabBars} />
-      <Stack.Screen name="Conversation" component={Conversation} />
-      <Stack.Screen name="UploadPicture" component={UploadPicture} />
-      <Stack.Screen name="AddSports" component={AddSports} />
-      <Stack.Screen name="AddSportsSkills" component={AddSportsSkills} />
-      <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
+    <Stack.Navigator  screenOptions={{ headerShown: false }}>
+      {MyFavSports?.length > 0 && MySportsSkills?.length > 0 ? (
+        <>
+          <Stack.Screen name="TabBars" component={TabBars} />
+          <Stack.Screen name="Conversation" component={Conversation} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="UploadPicture" component={UploadPicture} />
+          <Stack.Screen name="AddSports" component={AddSports} />
+          <Stack.Screen name="AddSportsSkills" component={AddSportsSkills} />
+          <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
+        </>
+      )}
     </Stack.Navigator>
   );
 };
@@ -45,7 +53,7 @@ const MainNavigator = () => {
 const TabBars = () => {
   return (
     <Tab.Navigator
-      initialRouteName="UploadPicture"
+      initialRouteName="Home"
       screenOptions={{ headerShown: false }}
       tabBar={props => <CustomTabBar {...props} />}
     >

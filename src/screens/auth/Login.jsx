@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import AppImages from '../../assets/images/AppImages';
 import AppText from '../../components/AppCommonComponents/AppText';
 import AppColors from '../../utils/Other/AppColors';
@@ -16,8 +16,27 @@ import AppButton from '../../components/AppCommonComponents/AppButton';
 import Separator from '../../components/AppCommonComponents/Separator';
 import AuthSmallButtons from '../../components/AppCommonComponents/AuthSmallButtons';
 import Container from '../../components/AppCommonComponents/Container';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from '@react-native-firebase/auth';
+import ShowToast from '../../utils/Other/ShowToast';
 
-const Login = ({navigation}) => {
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('1234567890');
+
+  const LoginApi = () => {
+    if (email == '' || password == '') {
+      ShowToast('error', 'Please enter your email and password');
+      return;
+    }
+
+    signInWithEmailAndPassword(getAuth(), email, password).then(() => {
+      ShowToast('success', 'Successfully logged in');
+    });
+  };
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }}>
       <Container backgroundImage={AppImages.AUTHBG}>
@@ -68,7 +87,11 @@ const Login = ({navigation}) => {
             textFontWeight
             textSize={2}
           />
-          <AppButton title="Sign In" marginTop={30} handlePress={()=> navigation.navigate("MainNavigator")}/>
+          <AppButton
+            title="Sign In"
+            marginTop={30}
+            handlePress={() => LoginApi()}
+          />
 
           <View style={{ marginTop: 20 }}>
             <Separator title={'or Signin with?'} lineWidth={25} />
@@ -96,7 +119,7 @@ const Login = ({navigation}) => {
             }}
           >
             <AppText title={"Don't have an account?"} textSize={2} />
-            <TouchableOpacity onPress={()=> navigation.navigate("SignUp")}>
+            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
               <AppText
                 title={'Sign Up'}
                 textColor={'blue'}

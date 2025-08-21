@@ -1,13 +1,12 @@
-import AuthReducer from '../slices/AuthSlice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistReducer, persistStore } from 'redux-persist';
-
+import AuthReducer from '../slices/AuthSlice';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth'], // ✅ Persist both slices
+  whitelist: ['auth'], // only auth slice will persist
 };
 
 const rootReducer = combineReducers({
@@ -20,9 +19,8 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: false, // needed for redux-persist
     }),
-  devTools: process.env.NODE_ENV !== 'production',
 });
 
 export const persistor = persistStore(store);
