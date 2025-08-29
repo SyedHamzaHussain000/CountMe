@@ -1,9 +1,11 @@
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 import React from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AddInputAndUpload from '../../components/AppCommonComponents/AddInputAndUpload';
 import SocialMediaPost from '../../components/SocialMediaPost';
 import { responsiveHeight } from '../../utils/Other/Responsive_Dimensions';
+import Create from './CreatePost/Create';
+import AppButton from '../../components/AppCommonComponents/AppButton';
 
 const Home = () => {
  const sportsPosts = [
@@ -137,15 +139,17 @@ const Home = () => {
     TotalJoiners: ['SamuelHughes', 'NoraLong'],
     TotalJoinerRemain: 0,
   },
-];
+  ];
 
 
   return (
-    <View>
+    <View style={{flex:1, }} >
+      {/* <AppButton title="Logout" handlePress={()=> getAuth().signOut()} /> */}
       <AppHeader />
 
       <View style={{ marginTop: 15 }}>
         <AddInputAndUpload />
+        <Create/>
       </View>
 
     <View style={{padding:20}}>

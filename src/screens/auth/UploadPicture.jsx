@@ -88,7 +88,7 @@ const UploadPicture = ({ navigation }) => {
             handlePress={() => navigation.navigate('AddSports')}
           />
 
-          <AppButton title="Logout" handlePress={()=> getAuth().signOut()} />
+          
         </View>
       </View>
     </Container>

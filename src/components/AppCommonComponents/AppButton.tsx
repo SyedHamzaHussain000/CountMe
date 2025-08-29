@@ -19,9 +19,10 @@ type props = {
   marginTop?: number;
   handlePress?: () => void;
   loading?: boolean;
+  width?:number 
 };
 
-const AppButton = ({ title, marginTop, handlePress, loading }: props) => {
+const AppButton = ({ title, marginTop, handlePress, loading ,width}: props) => {
   return (
     <>
       {loading == true ? (
@@ -44,7 +45,7 @@ const AppButton = ({ title, marginTop, handlePress, loading }: props) => {
             colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={[styles.linearGradient, { width: responsiveWidth(90) }]}
+            style={[styles.linearGradient, { width: responsiveWidth(width?width:90) }]}
           >
             <AppText
               title={title}

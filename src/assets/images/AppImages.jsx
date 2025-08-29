@@ -30,4 +30,11 @@ export default AppImages = {
     cover: require('./cover.png'),
     profileimg: require('./profileimg.png'),
    
+
+    runner: require('./runner.png'),
+    location: require('./location.png'),
+    live: require('./live.png'),
+    link: require('./link.png'),
+    photo: require('./photo.png'),
+    poll: require('./poll.png'),
 } 
