@@ -3,5 +3,5 @@ import database from '@react-native-firebase/database';
 
 export const UsersDbRef = database().ref('/Users');
 
-export const UserId = getAuth()?.app?.auth()?.currentUser?.uid
+export const UserId = getAuth()?.currentUser?.uid
 

@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import { View, Text } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,6 +9,11 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './redux/store/Store';
 
 import { PersistGate } from 'redux-persist/integration/react';
+
+
+
+
+
 
 const App = () => {
   return (

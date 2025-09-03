@@ -14,6 +14,10 @@ import AppText from '../../components/AppCommonComponents/AppText';
 import ScoreCard from '../../components/ScoreCard';
 import AddInputAndUpload from '../../components/AppCommonComponents/AddInputAndUpload';
 import SocialMediaPost from '../../components/SocialMediaPost';
+import { getAuth } from '@react-native-firebase/auth';
+import { SignOut } from '../../redux/slices/AuthSlice';
+import { useDispatch } from 'react-redux';
+import AppButton from '../../components/AppCommonComponents/AppButton';
 
 const Profile = () => {
 
@@ -38,7 +42,7 @@ const Profile = () => {
     PostDescription: 'Volleyball team forming in LA for a weekend tournament. Need 4 players!',
     PostPicture: 'https://example.com/posts/volleyball1.jpg',
     Likes: ['OliviaMartinez', 'DanielLee'],
-    Comment: ['Count me in!', 'Location?'],
+    Comment: ['Countme!', 'Location?'],
     Share: ['EllaHall'],
     JoiningPost: false,
     TotalJoiners: ['MasonHarris'],
@@ -150,7 +154,7 @@ const Profile = () => {
   },
 ];
 
-
+const dispatch = useDispatch()
 
   return (
     <View style={{backgroundColor:AppColors.WHITE}}>
@@ -173,6 +177,12 @@ const Profile = () => {
         </View>
 
         <View >
+          <AppButton
+                  title="Logout"
+                  handlePress={() => {
+                    dispatch(SignOut()), getAuth().signOut();
+                  }}
+                />
 
           <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginTop:20}}>
               <AppText title={"Caretta"} textSize={3} textFontWeight/>
@@ -189,7 +199,7 @@ const Profile = () => {
               <IconText Icon={<SvgIcons.edit />} title='Edit Profile' textFontWeight/>
           </View>
  
-          <AppText title={"Any sport, any time just count me Kicking it every weekend"} textSize={2} textFontWeight textwidth={80}/>
+          <AppText title={"Any sport, any time just Countme Kicking it every weekend"} textSize={2} textFontWeight textwidth={80}/>
 
           <View style={{marginTop:20}}>
             <IconText Icon={<SvgIcons.us />} title='Lives In New York' textFontWeight/>

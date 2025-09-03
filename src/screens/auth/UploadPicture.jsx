@@ -24,7 +24,6 @@ const UploadPicture = ({ navigation }) => {
   const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
   const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
 
-  console.log("MyFavSports", MyFavSports, MySportsSkills)
 
   const openLibrary = async () => {
     const result = await launchImageLibrary({

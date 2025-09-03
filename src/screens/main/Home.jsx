@@ -1,180 +1,224 @@
-import { View, Text, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AddInputAndUpload from '../../components/AppCommonComponents/AddInputAndUpload';
 import SocialMediaPost from '../../components/SocialMediaPost';
 import { responsiveHeight } from '../../utils/Other/Responsive_Dimensions';
 import Create from './CreatePost/Create';
 import AppButton from '../../components/AppCommonComponents/AppButton';
+import { getAuth } from '@react-native-firebase/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { SignOut } from '../../redux/slices/AuthSlice';
+import GetAllPosts from '../../global/main/PostsRelatedFunctions/GetAllPosts';
+import moment from 'moment';
+import {
+  getDatabase,
+  ref,
+  remove,
+  runTransaction,
+  set,
+} from '@react-native-firebase/database';
+import GetAllPostLikes from '../../global/main/PostsRelatedFunctions/GetAllPostLikes';
+import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
 
 const Home = () => {
- const sportsPosts = [
-  {
-    pfp: 'https://example.com/profiles/mike.jpg',
-    name: 'Mike Johnson',
-    ago: '1h ago',
-    PostDescription: 'Looking for 2 players to join our basketball match this evening in Brooklyn.',
-    PostPicture: '',
-    Likes: ['JamesSmith', 'EmmaBrown', 'LucasTaylor'],
-    Comment: ['I’m down!', 'What time?', 'Can I bring a friend?'],
-    Share: ['ChrisWilson'],
-    JoiningPost: true,
-    TotalJoiners: ['JacobMiller', 'SophiaAnderson'],
-    TotalJoinerRemain: 2,
-  },
-  {
-    pfp: 'https://example.com/profiles/sarah.jpg',
-    name: 'Sarah Williams',
-    ago: '3h ago',
-    PostDescription: 'Volleyball team forming in LA for a weekend tournament. Need 4 players!',
-    PostPicture: 'https://example.com/posts/volleyball1.jpg',
-    Likes: ['OliviaMartinez', 'DanielLee'],
-    Comment: ['Count me in!', 'Location?'],
-    Share: ['EllaHall'],
-    JoiningPost: false,
-    TotalJoiners: ['MasonHarris'],
-    TotalJoinerRemain: 3,
-  },
-  {
-    pfp: 'https://example.com/profiles/tyler.jpg',
-    name: 'Tyler Davis',
-    ago: '5h ago',
-    PostDescription: 'Pickup soccer game at Central Park. All skill levels welcome!',
-    PostPicture: '',
-    Likes: ['AidenYoung', 'GraceNelson'],
-    Comment: ['Time?', 'I’ll bring the ball'],
-    Share: [],
-    JoiningPost: true,
-    TotalJoiners: ['LiamKing', 'ChloeWright'],
-    TotalJoinerRemain: 4,
-  },
-  {
-    pfp: 'https://example.com/profiles/emily.jpg',
-    name: 'Emily Clark',
-    ago: '1d ago',
-    PostDescription: 'Looking for a few teammates for a co-ed softball game this Saturday.',
-    PostPicture: 'https://example.com/posts/softball1.jpg',
-    Likes: ['JacksonLopez'],
-    Comment: ['I’m interested!', 'Which park?'],
-    Share: ['HenryScott'],
-    JoiningPost: false,
-    TotalJoiners: ['AveryHill'],
-    TotalJoinerRemain: 5,
-  },
-  {
-    pfp: 'https://example.com/profiles/jacob.jpg',
-    name: 'Jacob Moore',
-    ago: '4h ago',
-    PostDescription: 'Organizing a friendly flag football match. Need 3 more players.',
-    PostPicture: '',
-    Likes: ['MadisonGreen', 'EthanAdams'],
-    Comment: ['Sounds fun!', 'Can I join?'],
-    Share: [],
-    JoiningPost: true,
-    TotalJoiners: ['IsabellaBaker', 'NoahRivera'],
-    TotalJoinerRemain: 1,
-  },
-  {
-    pfp: 'https://example.com/profiles/grace.jpg',
-    name: 'Grace Lewis',
-    ago: '2d ago',
-    PostDescription: 'Tennis doubles practice. Need a partner!',
-    PostPicture: 'https://example.com/posts/tennis1.jpg',
-    Likes: ['LillianCox'],
-    Comment: ['I can play this weekend'],
-    Share: [],
-    JoiningPost: false,
-    TotalJoiners: ['ElijahWard'],
-    TotalJoinerRemain: 0,
-  },
-  {
-    pfp: 'https://example.com/profiles/ryan.jpg',
-    name: 'Ryan Walker',
-    ago: '30m ago',
-    PostDescription: 'Looking to create a 3v3 basketball team for a local league.',
-    PostPicture: '',
-    Likes: ['NatalieMorgan'],
-    Comment: ['I’m a shooter 🔥'],
-    Share: ['ZacharyReed'],
-    JoiningPost: true,
-    TotalJoiners: ['BenjaminBailey'],
-    TotalJoinerRemain: 2,
-  },
-  {
-    pfp: 'https://example.com/profiles/ava.jpg',
-    name: 'Ava Martinez',
-    ago: '6h ago',
-    PostDescription: 'Anyone interested in a women’s soccer scrimmage this Sunday?',
-    PostPicture: 'https://example.com/posts/soccer2.jpg',
-    Likes: ['VictoriaKelly', 'LunaSanders'],
-    Comment: ['Yes please!', 'Where’s the field?'],
-    Share: [],
-    JoiningPost: false,
-    TotalJoiners: ['HarperFlores', 'StellaBell'],
-    TotalJoinerRemain: 3,
-  },
-  {
-    pfp: 'https://example.com/profiles/josh.jpg',
-    name: 'Josh White',
-    ago: '8h ago',
-    PostDescription: 'Need 2 more players for our Ultimate Frisbee squad!',
-    PostPicture: '',
-    Likes: ['DavidPrice'],
-    Comment: ['Frisbee legend reporting 😎'],
-    Share: ['JulianBarnes'],
-    JoiningPost: true,
-    TotalJoiners: ['AaronReyes'],
-    TotalJoinerRemain: 1,
-  },
-  {
-    pfp: 'https://example.com/profiles/lily.jpg',
-    name: 'Lily Brooks',
-    ago: '20m ago',
-    PostDescription: 'Who’s up for a cycling group ride tomorrow morning?',
-    PostPicture: 'https://example.com/posts/cycling1.jpg',
-    Likes: ['HaileyCooper', 'LeviWard'],
-    Comment: ['I’ll bring coffee at the end 😄'],
-    Share: [],
-    JoiningPost: false,
-    TotalJoiners: ['SamuelHughes', 'NoraLong'],
-    TotalJoinerRemain: 0,
-  },
-  ];
+  const [VisibleModal, SetVisibleModal] = useState(false);
+  const [allLocalPost, setAllLocalPosts] = useState([]);
+  const [likes, setLikes] = useState([]); 
+  const [joines, setJoines] = useState([]); 
+  const dispatch = useDispatch();
 
+  const userId = getAuth()?.currentUser?.uid;
+  const userDetail = useSelector(state => state?.auth);
+
+  useEffect(() => {
+    getAllNewPost();
+  }, []);
+
+  const getAllNewPost = async () => {
+    const GetPostAndSetToLocalState = await GetAllPosts();
+    const getPostLikes = await GetAllPostLikes();
+    const getPostJoins = await GetAllPostJoins();
+
+    const normalizedLikes = normalizeLikes(getPostLikes);
+    const normalizedJoins = normalizeLikes(getPostJoins);
+
+
+    setAllLocalPosts(GetPostAndSetToLocalState);
+    setLikes(normalizedLikes);
+    setJoines(normalizedJoins)
+  };
+
+  const normalizeLikes = snapshot => {
+    //converting array into object for faster access
+    const result = {};
+    snapshot.forEach(likeObj => {
+      const value = Object.values(likeObj)[0];
+      const { postId, userId } = value;
+
+      if (!result[postId]) result[postId] = {};
+      result[postId][userId] = value;
+    });
+    return result;
+  };
+
+  const toggleLike = async (postId, isLiked) => {
+    setAllLocalPosts(prev =>
+      prev.map(p =>
+        p.postId === postId
+          ? {
+              ...p,
+              likesCount: p.likesCount + (isLiked ? -1 : 1),
+              isLiked: !isLiked,
+            }
+          : p,
+      ),
+    );
+
+    setLikes(prev => {
+      const updated = { ...prev };
+
+      if (isLiked) {
+        // remove like
+        delete updated[postId][userId];
+        if (Object.keys(updated[postId]).length === 0) {
+          delete updated[postId];
+        }
+      } else {
+        if (!updated[postId]) updated[postId] = {};
+        updated[postId][userId] = {
+          userId,
+          postId,
+          name: userDetail.full_name,
+          createdAt: Date.now(),
+        };
+      }
+
+      return updated;
+    });
+
+    const db = getDatabase();
+    const likeRef = ref(db, `likes/${postId}/${userId}`);
+    const postRef = ref(db, `posts/${postId}/likesCount`);
+
+    if (isLiked) {
+      await remove(likeRef);
+      await runTransaction(postRef, count => (count || 1) - 1);
+    } else {
+      await set(likeRef, {
+        userId,
+        name: userDetail.full_name,
+        postId: postId,
+        createdAt: Date.now(),
+      });
+      await runTransaction(postRef, count => (count || 0) + 1);
+    }
+  };
+
+  const toggleJoin = async (postId, isJoined) => {
+    setAllLocalPosts(prev =>
+      prev.map(p =>
+        p.postId === postId
+          ? {
+              ...p,
+              joinedCount: p.joinedCount + (isJoined ? -1 : 1),
+              isJoined: !isJoined,
+            }
+          : p,
+      ),
+    );
+
+    setJoines(prev => {
+      const updated = { ...prev };
+
+      if (isJoined) {
+        // remove like
+        delete updated[postId][userId];
+        if (Object.keys(updated[postId]).length === 0) {
+          delete updated[postId];
+        }
+      } else {
+        if (!updated[postId]) updated[postId] = {};
+        updated[postId][userId] = {
+          userId,
+          postId,
+          name: userDetail.full_name,
+          createdAt: Date.now(),
+        };
+      }
+
+      return updated;
+    });
+
+    const db = getDatabase();
+    const joinsRef = ref(db, `joins/${postId}/${userId}`);
+    const postRef = ref(db, `posts/${postId}/joinedCount`);
+
+    if (isJoined) {
+      await remove(joinsRef);
+      await runTransaction(postRef, count => (count || 1) - 1);
+    } else {
+      await set(joinsRef, {
+        userId,
+        name: userDetail.full_name,
+        postId: postId,
+        createdAt: Date.now(),
+      });
+      await runTransaction(postRef, count => (count || 0) + 1);
+    }
+  }
 
   return (
-    <View style={{flex:1, }} >
-      {/* <AppButton title="Logout" handlePress={()=> getAuth().signOut()} /> */}
+    <View style={{ flex: 1 }}>
       <AppHeader />
 
       <View style={{ marginTop: 15 }}>
-        <AddInputAndUpload />
-        <Create/>
+        <AddInputAndUpload onOpenTextInput={res => SetVisibleModal(true)} />
+        <Create
+          onClosePress={() => SetVisibleModal(false)}
+          value={VisibleModal}
+        />
       </View>
 
-    <View style={{padding:20}}>
-      <FlatList
-        data={sportsPosts}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap:20, paddingBottom:responsiveHeight(40)}}
-        renderItem={({ item }) => {
+      <View style={{ padding: 20 }}>
+        <FlatList
+          data={allLocalPost}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            gap: 20,
+            paddingBottom: responsiveHeight(40),
+          }}
+          renderItem={({ item }) => {
+            const isLiked = !!likes?.[item?.postId]?.[userId];
+            const isJoined = !!joines?.[item?.postId]?.[userId];
 
-          return (
-            <SocialMediaPost
-              name={item.name}
-              ago={item.ago}
-              PostDescription={item.PostDescription}
-              PostPicture={item.PostPicture}
-              JoiningPost={item.JoiningPost}
-              Likes={item.Likes}
-              Comment={item.Comment}
-              Share={item.Share}
-              TotalJoiners={item.TotalJoiners}
-              TotalJoinerRemain={item.TotalJoinerRemain}
-            />
-          );
-        }}
-      />
+            return (
+              <SocialMediaPost
+                name={item?.authorName}
+                ago={moment(item?.createdAt).fromNow()}
+                PostDescription={item?.caption}
+                PostPicture={item?.PostPicture}
+                JoiningPost={item?.totalPlayers > 0 ? true : false}
+                IsJoined={isJoined}
+                Likes={item?.likesCount}
+                Comment={item?.commentsCount}
+                Share={item?.sharesCount}
+                TotalJoiners={item?.totalPlayers}
+                TotalJoinerRemain={item?.joinedCount}
+                onLikePress={() => toggleLike(item?.postId, isLiked)}
+                onJoinTeamPress={() => toggleJoin(item?.postId, isJoined)}
+              />
+            );
+          }}
+        />
       </View>
     </View>
   );

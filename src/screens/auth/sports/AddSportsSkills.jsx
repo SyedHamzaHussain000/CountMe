@@ -14,15 +14,28 @@ import { setSportsSkills } from '../../../redux/slices/AuthSlice';
 import { UserId, UsersDbRef } from '../../../utils/BaseUrls/BaseUrl';
 import ShowToast from '../../../utils/Other/ShowToast';
 
-const AddSportsSkills = ({navigation}) => {
+const AddSportsSkills = ({ navigation }) => {
   const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
   const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
   const ProfilePicture = useSelector(state => state?.auth?.ProfileImage);
+  const email = useSelector(state => state?.auth?.email);
+  const full_name = useSelector(state => state?.auth?.full_name);
+  const device_token = useSelector(state => state?.auth?.device_token);
 
-  console.log("MyFavSports",MyFavSports ,MySportsSkills,ProfilePicture )
+  console.log(
+    'MyFavSports',
+    MyFavSports,
+    MySportsSkills,
+    ProfilePicture,
+    email,
+    full_name,
+    device_token,
+  );
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [selectedSports, setSelectedSports] = useState([]);
+
+  console.log("selectedSports",selectedSports)
 
   const Sports = [
     {
@@ -550,26 +563,26 @@ const AddSportsSkills = ({navigation}) => {
   };
 
 
-    useEffect(()=>{
-      dispatch(setSportsSkills(selectedSports))
-    },[selectedSports])
-
-
-    const CreateProfile = () => {
-
-      UsersDbRef.child(UserId).update({
-          ProfilePicture: "",
-            Sports: MyFavSports,
-            SportsSkills: MySportsSkills,
-            ProfileCreated: true
-      }).then(()=>{
-
-        navigation.navigate("ProfileCreated")
-      }).catch((error)=>{
-        ShowToast("error", "Internet connect lost")
+  const CreateProfile = () => {
+    UsersDbRef.child(UserId)
+    .set({
+      email: email,
+      full_name: full_name,
+      ProfilePicture: '',
+      device_token: device_token,
+      Sports: MyFavSports,
+      SportsSkills: selectedSports,
+      ProfileCreated: true,
+    })
+    .then(() => {
+      console.log("created")
+      // navigation.navigate('ProfileCreated');
+      dispatch(setSportsSkills(selectedSports));
       })
-
-    }
+      .catch(error => {
+        ShowToast('error', 'Internet connect lost');
+      });
+  };
   return (
     <Container backgroundImage={AppImages.AUTHBG}>
       <ScrollView style={{ gap: 20 }}>
@@ -625,7 +638,7 @@ const AddSportsSkills = ({navigation}) => {
           />
         </View>
       </ScrollView>
-      <AppButton title="Continue" handlePress={()=> CreateProfile()} />
+      <AppButton title="Continue" handlePress={() => CreateProfile()} />
     </Container>
   );
 };

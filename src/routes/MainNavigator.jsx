@@ -32,7 +32,7 @@ const MainNavigator = () => {
   const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
 
   return (
-    <Stack.Navigator  screenOptions={{ headerShown: false }}>
+    <Stack.Navigator   screenOptions={{ headerShown: false }}>
       {MyFavSports?.length > 0 && MySportsSkills?.length > 0 ? (
         <>
           <Stack.Screen name="TabBars" component={TabBars} />
@@ -71,7 +71,6 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
   // Icon mapping for each tab
   const getTabIcon = (routeName, isFocused) => {
-    console.log('routeName', routeName);
     switch (routeName) {
       case 'Home':
         return isFocused ? Appsvgicon.HomeW : Appsvgicon.HomeB;

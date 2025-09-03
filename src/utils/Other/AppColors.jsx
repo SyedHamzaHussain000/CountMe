@@ -6,5 +6,6 @@ export default AppColors = {
     YELLOWIS: "#FE990B",
     PURPLE: "#062240",
     GRAY:"#666666",
-    PINK: "#FD26D9"
+    PINK: "#FD26D9",
+    LIGHTGRAY: "#FAFAFA"
 }

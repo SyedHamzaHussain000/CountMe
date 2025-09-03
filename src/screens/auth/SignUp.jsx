@@ -18,8 +18,12 @@ import {
 import { UserId, UsersDbRef } from '../../utils/BaseUrls/BaseUrl';
 import Toast from 'react-native-toast-message';
 import ShowToast from '../../utils/Other/ShowToast';
+import { useDispatch } from 'react-redux';
+import { setUserDetails } from '../../redux/slices/AuthSlice';
 
 const SignUp = ({ navigation }) => {
+
+  const dispatch = useDispatch()
   const [credientials, setCredientials] = useState({
     full_name: 'test',
     email: 'test@gmail.com',
@@ -45,31 +49,15 @@ const SignUp = ({ navigation }) => {
         credientials.email,
         credientials.passord,
       )
-        .then(() => {
+        .then(async() => {
           console.log('User account created & signed in!');
-          ShowToast('success', 'User account created & signed in!');
-          // navigation.navigate('UploadPicture')
-
-
-          
-
-          UsersDbRef.child(UserId).set({
-            full_name: credientials.full_name,
+          dispatch(setUserDetails({
             email: credientials.email,
-            device_Token: "",
-            ProfilePicture: "",
-            Sports: [],
-            SportsSkills: [],
-            ProfileCreated: false
-          })
-
-            .then(res => {
-              setLoader(false);
-              
-            })
-            .catch(error => {
-              console.log('signup db error', error);
-            });
+            full_name: credientials.full_name,
+            device_token: null
+          }))
+          ShowToast('success', 'User account created & signed in!');
+        setLoader(false)
         })
         .catch(error => {
           setLoader(false);

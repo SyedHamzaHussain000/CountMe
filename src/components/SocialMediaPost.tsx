@@ -21,6 +21,7 @@ type props = {
   Comment?: any;
   Share?: any;
   JoiningPost?: boolean;
+  IsJoined?: boolean;
   TotalJoiners?: number;
   TotalJoinerRemain?: number;
   onLikePress?: () => void;
@@ -39,6 +40,7 @@ const SocialMediaPost = ({
   Comment,
   Share,
   JoiningPost,
+  IsJoined,
   TotalJoiners,
   TotalJoinerRemain,
   onCommentPress,
@@ -47,7 +49,7 @@ const SocialMediaPost = ({
   onSharePress,
   onViewProfilePress,
 }: props) => {
-
+  console.log("Likes",Likes)
   return (
     <View style={{gap:10}}>
       <View style={styles.PostHeaderContainer}>
@@ -74,9 +76,9 @@ const SocialMediaPost = ({
             <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginTop:10, marginBottom:10}}>
                 <View style={{flexDirection:'row', alignItems:'center', gap:5}}>
                     <Image source={AppImages.JOINERS} style={{height:20, width:20, resizeMode:'contain'}}/>
-                        <AppText title={"3/6 Joined"} textFontWeight textSize={2}/>
+                        <AppText title={`${TotalJoinerRemain}/${TotalJoiners} Joined`} textFontWeight textSize={2}/>
                 </View>
-                <SmallButtons title='Join Now' icon={<SvgXml xml={Appsvgicon.Send} height={18} width={18}/>}/>
+                <SmallButtons title={IsJoined ? 'Leave Now': 'Join Now'} icon={IsJoined ? null: <SvgXml xml={Appsvgicon.Send} height={18} width={18}/>} handlePress={onJoinTeamPress}/>
                 
             </View>
         )
@@ -84,7 +86,7 @@ const SocialMediaPost = ({
 
       <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
         <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
-            <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.LIKE} />}/>
+            <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.LIKE} />} onPress={onLikePress}/>
             <PostFooter Counts={Comment} icon={<SvgXml xml={Appsvgicon.ChatBubble} />}/>
             <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.ChatB} height={17} width={17} />} iconTwo={<SvgXml xml={Appsvgicon.Runner} height={17} width={17} />}/>
         </View>
