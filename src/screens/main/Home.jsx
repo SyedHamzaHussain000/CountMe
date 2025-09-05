@@ -28,47 +28,40 @@ import {
 } from '@react-native-firebase/database';
 import GetAllPostLikes from '../../global/main/PostsRelatedFunctions/GetAllPostLikes';
 import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
+import NormalizeData from '../../global/utils/NormalizeData';
 
-const Home = () => {
+const Home = ({ navigation }) => {
   const [VisibleModal, SetVisibleModal] = useState(false);
   const [allLocalPost, setAllLocalPosts] = useState([]);
-  const [likes, setLikes] = useState([]); 
-  const [joines, setJoines] = useState([]); 
+  const [likes, setLikes] = useState([]);
+  const [joines, setJoines] = useState([]);
   const dispatch = useDispatch();
 
   const userId = getAuth()?.currentUser?.uid;
   const userDetail = useSelector(state => state?.auth);
 
   useEffect(() => {
-    getAllNewPost();
-  }, []);
+    const nav = navigation.addListener('focus', () => {
+
+      getAllNewPost();
+    })
+
+    return nav
+  }, [navigation]);
 
   const getAllNewPost = async () => {
     const GetPostAndSetToLocalState = await GetAllPosts();
     const getPostLikes = await GetAllPostLikes();
     const getPostJoins = await GetAllPostJoins();
 
-    const normalizedLikes = normalizeLikes(getPostLikes);
-    const normalizedJoins = normalizeLikes(getPostJoins);
-
+    const normalizedLikes = NormalizeData(getPostLikes);
+    const normalizedJoins = NormalizeData(getPostJoins);
 
     setAllLocalPosts(GetPostAndSetToLocalState);
     setLikes(normalizedLikes);
-    setJoines(normalizedJoins)
+    setJoines(normalizedJoins);
   };
 
-  const normalizeLikes = snapshot => {
-    //converting array into object for faster access
-    const result = {};
-    snapshot.forEach(likeObj => {
-      const value = Object.values(likeObj)[0];
-      const { postId, userId } = value;
-
-      if (!result[postId]) result[postId] = {};
-      result[postId][userId] = value;
-    });
-    return result;
-  };
 
   const toggleLike = async (postId, isLiked) => {
     setAllLocalPosts(prev =>
@@ -174,19 +167,23 @@ const Home = () => {
       });
       await runTransaction(postRef, count => (count || 0) + 1);
     }
-  }
+  };
+
+
 
   return (
     <View style={{ flex: 1 }}>
       <AppHeader />
 
-      <View style={{ marginTop: 15 }}>
-        <AddInputAndUpload onOpenTextInput={res => SetVisibleModal(true)} />
-        <Create
-          onClosePress={() => SetVisibleModal(false)}
-          value={VisibleModal}
-        />
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => {
+          navigation.navigate('Create');
+        }}
+        style={{ marginTop: 15 }}
+      >
+        <AddInputAndUpload editable={false} />
+      </TouchableOpacity>
 
       <View style={{ padding: 20 }}>
         <FlatList
@@ -215,6 +212,7 @@ const Home = () => {
                 TotalJoinerRemain={item?.joinedCount}
                 onLikePress={() => toggleLike(item?.postId, isLiked)}
                 onJoinTeamPress={() => toggleJoin(item?.postId, isJoined)}
+                onCommentPress={() => navigation.navigate('PostComment',{postId:item?.postId})}
               />
             );
           }}

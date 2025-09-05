@@ -23,6 +23,8 @@ const Maps = () => {
     {id:6, name:"Slot available", type: "Join now"},
   ]
 
+  
+
 
   return (
     <View style={{backgroundColor:AppColors.PURPLE, flex:1}}>

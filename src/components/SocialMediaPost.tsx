@@ -49,7 +49,6 @@ const SocialMediaPost = ({
   onSharePress,
   onViewProfilePress,
 }: props) => {
-  console.log("Likes",Likes)
   return (
     <View style={{gap:10}}>
       <View style={styles.PostHeaderContainer}>
@@ -87,7 +86,7 @@ const SocialMediaPost = ({
       <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
         <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
             <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.LIKE} />} onPress={onLikePress}/>
-            <PostFooter Counts={Comment} icon={<SvgXml xml={Appsvgicon.ChatBubble} />}/>
+            <PostFooter Counts={Comment} icon={<SvgXml xml={Appsvgicon.ChatBubble} />} onPress={onCommentPress}/>
             <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.ChatB} height={17} width={17} />} iconTwo={<SvgXml xml={Appsvgicon.Runner} height={17} width={17} />}/>
         </View>
 

@@ -23,6 +23,9 @@ import AddSports from '../screens/auth/sports/AddSports';
 import AddSportsSkills from '../screens/auth/sports/AddSportsSkills';
 import ProfileCreated from '../screens/auth/ProfileCreated';
 import { useSelector } from 'react-redux';
+import Create from '../screens/main/CreatePost/Create';
+import PostComment from '../screens/main/CreatePost/PostComment';
+import AddLocation from '../screens/main/CreatePost/AddLocation';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -37,6 +40,19 @@ const MainNavigator = () => {
         <>
           <Stack.Screen name="TabBars" component={TabBars} />
           <Stack.Screen name="Conversation" component={Conversation} />
+          <Stack.Screen name="Create" component={Create} 
+          options={{presentation: 'modal'}}
+          />
+          <Stack.Screen name="PostComment" component={PostComment} 
+          options={{presentation: 'modal'}}
+          />
+          <Stack.Screen name="AddLocation" component={AddLocation} 
+          options={{presentation: 'modal'}}
+          />
+
+          
+
+          
         </>
       ) : (
         <>

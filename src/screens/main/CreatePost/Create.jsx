@@ -25,21 +25,33 @@ import SelectableButtons from '../../../components/AppCommonComponents/Selectabl
 import CountMeComponent from '../../../components/CountMeComponent';
 import BackButton from '../../../components/AppCommonComponents/BackButton';
 import NormalBlackButton from '../../../components/AppCommonComponents/NormalBlackButton';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import GooglePlacesTextInput from 'react-native-google-places-textinput';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
 
-const Create = ({ value, onClosePress }) => {
+const Create = ({ navigation }) => {
   const userId = getAuth()?.currentUser?.uid;
   const [Caption, setCaption] = useState('');
   const [postType, setPostType] = useState(''); //Count me //Poll //general //link //location
   const [CountMeDetails, setCountMeDetails] = useState({
     sport: '',
     totalPlayers: '',
+    amount: '',
   });
-  const [postLink, setPostLink] = useState('')
+  const [postLink, setPostLink] = useState('');
   const [Loader, setLoader] = useState(false);
+
+  //date
+  const [date, setDate] = useState(new Date());
+  const [show, setShow] = useState(false);
+
+  console.log('CountMeDetails', CountMeDetails);
+
   const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
   const UserData = useSelector(state => state?.auth);
+  const AddressDetail = useSelector(state => state?.auth?.Address);
 
+  console.log("AddressDetail",AddressDetail)
 
   const createPostApiCall = async () => {
     if (Caption == '') {
@@ -47,16 +59,37 @@ const Create = ({ value, onClosePress }) => {
       return;
     }
 
-
-    setLoader(true)
-    await CreatePostApi(UserData, userId, Caption, CountMeDetails, postLink, '' );
-    setLoader(false)
+    setLoader(true);
+    await CreatePostApi(
+      UserData,
+      userId,
+      Caption,
+      CountMeDetails,
+      postLink,
+      date,
+      AddressDetail,
+      '',
+    );
+    setLoader(false);
   };
 
-  
-
   return (
-    <ReactNativeModal isVisible={value} style={{ margin: 0 }}>
+    <View style={{ flex: 1 }}>
+      <DatePicker
+        modal
+        date={date}
+        open={show}
+        mode="datetime"
+        minimumDate={new Date()}
+        onConfirm={selectedDate => {
+          setDate(selectedDate);
+          setShow(false);
+        }}
+        onCancel={() => {
+          setShow(false);
+        }}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1, backgroundColor: AppColors.WHITE }}
@@ -65,7 +98,7 @@ const Create = ({ value, onClosePress }) => {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-between' }}
           >
-            <TouchableOpacity onPress={onClosePress}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <AntDesign name={'close'} size={20} color={AppColors.BLACK} />
             </TouchableOpacity>
 
@@ -93,82 +126,31 @@ const Create = ({ value, onClosePress }) => {
             }}
             value={CountMeDetails.sport}
             handleNormalButtonPress={() => setPostType('')}
-            onChangeText={txt => setCountMeDetails({...CountMeDetails, totalPlayers: txt})}
+            onChangeText={txt =>
+              setCountMeDetails({ ...CountMeDetails, totalPlayers: txt })
+            }
             textValue={CountMeDetails.totalPlayers}
+            onChangeAmount={txt =>
+              setCountMeDetails({ ...CountMeDetails, amount: txt })
+            }
+            AmountValue={CountMeDetails.amount}
+            onDatePickerPress={() => setShow(true)}
+            dateValue={date}
+            show={show}
           />
-        ): postType == 'link' ? (
-          <View style={{padding:20, paddingBottom:100, gap:30}}>
-            <NormalBlackButton onPress={() => setPostType('')}/>
-            <AppTextInput 
-              title='Enter Link'
+        ) : postType == 'link' ? (
+          <View style={{ padding: 20, paddingBottom: 100, gap: 30 }}>
+            <NormalBlackButton onPress={() => setPostType('')} />
+            <AppTextInput
+              title="Enter Link"
               titleColour={AppColors.BLACK}
               TextInputColour={AppColors.LIGHTGRAY}
-              placeholder='Https://'
+              placeholder="Https://"
               onChangeText={txt => setPostLink(txt)}
               value={postLink}
             />
           </View>
-        ) : postType == 'location' ? (
-          <View style={{padding:20, paddingBottom:100, gap:30}}>
-            <NormalBlackButton onPress={() => setPostType('')}/>
-         <GooglePlacesAutocomplete
-            placeholder="Add Location"
-            // ref={googlePlacesRef}
-            query={{
-              key: 'AIzaSyAZAvDyEDcbRLt0RI0KhwDQbPmh-ehS65o', // REPLACE WITH YOUR ACTUAL API KEY
-              language: 'en',
-              //   types: 'geocode',
-            }}
-            styles={{
-              textInput: {
-                backgroundColor: '#F0F0F0', // :white_check_mark: BG color here
-                color: '#000', // text color
-                borderRadius: 8,
-                paddingHorizontal: 10,
-                height: 45,
-              },
-              description: {
-                color: '#000', // suggestions text
-              },
-              listView: {
-                backgroundColor: 'white', // dropdown bg
-              },
-            }}
-            autoFillOnNotFound={false}
-            currentLocation={false}
-            currentLocationLabel="Current location"
-            debounce={400}
-            disableScroll={false}
-            enableHighAccuracyLocation={true}
-            enablePoweredByContainer={true}
-            fetchDetails={true}
-            isRowScrollable={true}
-            keyboardShouldPersistTaps="always"
-            listUnderlayColor="#C8C7CC"
-            minLength={1}
-            onPress={(data, details = null) => {
-              if (details) {
-                const lat = details.geometry.location.lat;
-                const lng = details.geometry.location.lng;
-                const address = details.formatted_address || data.description;
-              }
-            }}
-            predefinedPlaces={[]}
-            textInputProps={{}}
-            timeout={20000}
-            // renderRightButton={() => (
-            //   <TouchableOpacity
-            //     onPress={() => googlePlacesRef.current?.setAddressText('')}
-            //     style={{justifyContent: 'center', paddingHorizontal: 8}}>
-            //     <Icon name="close" size={22} color="#000" />
-            //   </TouchableOpacity>
-            // )}
-            // ref={ref => {
-            //   this.googlePlacesRef = ref;
-            // }}
-          />
-          </View>
-        ) : (
+        )  : (
           <View style={{ paddingHorizontal: 10, gap: 10 }}>
             <PostFeatureBar
               img={AppImages.runner}
@@ -180,6 +162,7 @@ const Create = ({ value, onClosePress }) => {
               title="Add Photos/videos"
               onHandlePress={() => setPostType('Photos/videos')}
             />
+
             <PostFeatureBar
               img={AppImages.poll}
               title="Add poll"
@@ -192,14 +175,14 @@ const Create = ({ value, onClosePress }) => {
             />
             <PostFeatureBar
               img={AppImages.location}
-              title="Add location"
-              onHandlePress={() => setPostType('location')}
+              title={ "Add location"}
+              onHandlePress={() => navigation.navigate('AddLocation')}
             />
             {/* <PostFeatureBar img={AppImages.live} title="Live Video" /> */}
           </View>
         )}
       </KeyboardAvoidingView>
-    </ReactNativeModal>
+    </View>
   );
 };
 

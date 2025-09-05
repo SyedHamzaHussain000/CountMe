@@ -2,7 +2,7 @@ import { getDatabase, ref, push, set, serverTimestamp } from "@react-native-fire
 
 const db = getDatabase();
 
-export async function CreatePostApi(UserData,userId, caption,CountMeDetails,postLink, imageUrl, ) {
+export async function CreatePostApi(UserData,userId, caption,CountMeDetails,postLink, matchDateAndTime,AddressDetail, imageUrl ) {
   
 
   try {
@@ -24,9 +24,13 @@ export async function CreatePostApi(UserData,userId, caption,CountMeDetails,post
       sharesCount: 0,
       createdAt: Date.now(),
       totalPlayers: CountMeDetails?.totalPlayers ? JSON.parse(CountMeDetails?.totalPlayers) : 0,
+      amount:CountMeDetails?.amount,
+      matchDateAndTime:matchDateAndTime,
       joinedCount: 0,
       sport:CountMeDetails?.sport,
-
+      latitude:AddressDetail?.latitude,
+      longitude:AddressDetail?.longitude,
+      address:AddressDetail?.address,
     });
 
     console.log("✅ Post created successfully:", newPostRef.key);

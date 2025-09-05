@@ -14,9 +14,13 @@ type props = {
     secureTextEntry?: boolean;
     titleColour?:string;
     TextInputColour?:string;
+    TextColour?: string;
     maxLength?: number;
+    editable?: boolean;
+    borderRadius?: number;
+    width?: number;
 }
-const AppTextInput = ({keyboardType,onChangeText,password,placeholder,secureTextEntry,title,value,titleColour,TextInputColour,maxLength}:props) => {
+const AppTextInput = ({keyboardType,onChangeText,password,placeholder,secureTextEntry,title,value,titleColour,TextInputColour,maxLength, editable, borderRadius, width,TextColour}:props) => {
   return (
     <View style={{gap:5}}>
       {
@@ -24,16 +28,17 @@ const AppTextInput = ({keyboardType,onChangeText,password,placeholder,secureText
           <AppText title={title} textSize={2} textColor={titleColour ? titleColour : AppColors.WHITE}/>
         )
       }
-        <View style={{backgroundColor:TextInputColour ? TextInputColour : AppColors.WHITE, flexDirection:'row', borderRadius:10, paddingHorizontal:10}}>
+        <View style={{backgroundColor:TextInputColour ? TextInputColour : AppColors.WHITE, flexDirection:'row', borderRadius: borderRadius ? borderRadius:10, paddingHorizontal:10, width: responsiveWidth(width)}}>
 
             <TextInput
               placeholder={placeholder}
-              style={{width:responsiveWidth(70), height:50}}
+              style={{color: TextColour?  AppColors.WHITE : AppColors.BLACK, width:responsiveWidth(width ? 100 : 70), height:50}}
               secureTextEntry={secureTextEntry}
               onChangeText={onChangeText}
               value={value}
               keyboardType={keyboardType}
               maxLength={maxLength ? maxLength : undefined}
+              editable={editable}
             />
         </View>
 
