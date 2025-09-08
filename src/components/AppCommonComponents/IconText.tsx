@@ -11,7 +11,7 @@ type props = {
 }
 const IconText = ({Icon,title, titleColour, textFontWeight}: props) => {
   return (
-    <View style={{flexDirection:'row', alignItems:'center', gap:5}}>
+    <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
         
         {
             Icon

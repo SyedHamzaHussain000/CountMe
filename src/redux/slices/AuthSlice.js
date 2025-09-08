@@ -8,7 +8,8 @@ const initialState = {
   FavouriteSports: [],
   SportsSkills: [],
   SignupFlowCompleted: false,
-  Address: null
+  Address: null,
+  AllNearbyPosts: []
 };
 
 export const AuthSlice = createSlice({
@@ -35,6 +36,10 @@ export const AuthSlice = createSlice({
     setAddress: (state, actions) => {
       state.Address = actions.payload;
     },
+    setNearbyPosts:(state, action) => {
+      console.log("state", action.payload)
+      state.AllNearbyPosts = action.payload
+    } ,
     SignOut: (state,)=> {
       state.FavouriteSports = []
       state.SportsSkills = []
@@ -45,6 +50,6 @@ export const AuthSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setUserDetails,setProfilePicture, setFavouriteSports, setSportsSkills,setAddress, setSignupFlowCompleted, SignOut } = AuthSlice.actions;
+export const { setUserDetails,setProfilePicture, setFavouriteSports, setSportsSkills,setAddress, setSignupFlowCompleted,setNearbyPosts, SignOut } = AuthSlice.actions;
 
 export default AuthSlice.reducer;

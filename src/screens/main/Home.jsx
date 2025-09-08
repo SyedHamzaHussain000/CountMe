@@ -116,7 +116,13 @@ const Home = ({ navigation }) => {
     }
   };
 
-  const toggleJoin = async (postId, isJoined) => {
+  const toggleJoin = async (postId, isJoined, authorId) => {
+
+    // if(authorId == userId){
+    //   console.log("you are the author you can't join this post")
+    //   return
+    // }
+
     setAllLocalPosts(prev =>
       prev.map(p =>
         p.postId === postId
@@ -211,7 +217,7 @@ const Home = ({ navigation }) => {
                 TotalJoiners={item?.totalPlayers}
                 TotalJoinerRemain={item?.joinedCount}
                 onLikePress={() => toggleLike(item?.postId, isLiked)}
-                onJoinTeamPress={() => toggleJoin(item?.postId, isJoined)}
+                onJoinTeamPress={() => toggleJoin(item?.postId, isJoined, item?.authorId)}
                 onCommentPress={() => navigation.navigate('PostComment',{postId:item?.postId})}
               />
             );
