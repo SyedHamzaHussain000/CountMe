@@ -16,10 +16,14 @@ import AddInputAndUpload from '../../components/AppCommonComponents/AddInputAndU
 import SocialMediaPost from '../../components/SocialMediaPost';
 import { getAuth } from '@react-native-firebase/auth';
 import { SignOut } from '../../redux/slices/AuthSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AppButton from '../../components/AppCommonComponents/AppButton';
 
 const Profile = () => {
+
+    const userDetail = useSelector(state => state?.auth);
+
+    console.log("userDetail",userDetail)
 
    const sportsPosts = [
   {
@@ -171,10 +175,10 @@ const dispatch = useDispatch()
           <SvgIcons.cameraW />
         </View>
       </View>
-      <LinearGradient colors={["#7EFF57", AppColors.WHITE]}  start={{x:5, y:0}} style={{height:responsiveHeight(100), padding:20}}>
-        <View style={{alignSelf:'flex-end', backgroundColor:AppColors.WHITE, padding:10}}>
+      <LinearGradient colors={["#7EFF57", AppColors.WHITE]}  start={{x:5, y:0}} style={{height:responsiveHeight(100), padding:20, paddingTop:100}}>
+        {/* <View style={{alignSelf:'flex-end', backgroundColor:AppColors.WHITE, padding:10}}>
           <IconText title='Rating 4/5' Icon={<SvgIcons.starthumb/>}/>
-        </View>
+        </View> */}
 
         <View >
           <AppButton
@@ -185,7 +189,7 @@ const dispatch = useDispatch()
                 />
 
           <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginTop:20}}>
-              <AppText title={"Caretta"} textSize={3} textFontWeight/>
+              <AppText title={userDetail?.full_name} textSize={3} textFontWeight/>
 
               <View style={{flexDirection:'row' , alignItems:'center', gap:10}}>
                 <SvgIcons.badmiton height={30}/>
@@ -209,17 +213,17 @@ const dispatch = useDispatch()
             <IconText Icon={<SvgIcons.arrow />} title='See About Your Info' textFontWeight/>
           </View>
           
-          <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20}}>
+          {/* <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20}}>
               <ScoreCard ScoreTitle='Matches Played' TotalScore={50}/>
               <ScoreCard ScoreTitle='Wins' TotalScore={30}/>
               <ScoreCard ScoreTitle='Teams Formed' TotalScore={30}/>
-          </View>
+          </View> */}
 
         </View>
 
 
             <View style={{ marginTop: 15, marginBottom:10 }}>
-        <AddInputAndUpload />
+        {/* <AddInputAndUpload /> */}
       </View>
 
 

@@ -12,9 +12,12 @@ const GetAllPosts = async() => {
 
     if (snapshot.exists()) {
       const data = snapshot.val();
+      console.log("posts Data",data)
       const postsArray = Object.values(data);
       // sort latest first
       postsArray.sort((a, b) => b.createdAt - a.createdAt);
+
+      console.log("postsArray",postsArray)
       return postsArray;
     } else {
       return [];

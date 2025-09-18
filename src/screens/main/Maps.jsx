@@ -35,8 +35,7 @@ const Maps = ({ navigation }) => {
 
   const [postIndex, setPostIndex] = useState(0);
   const [AllPostJoinersState, setAllPostJoinersState] = useState([]);
-  const [JoinerLoader, setJoinerLoader] = useState(false)
-
+  const [JoinerLoader, setJoinerLoader] = useState(false);
 
   const data = [
     { id: 1, name: 'Alex Hales', type: 'Organizer' },
@@ -50,7 +49,6 @@ const Maps = ({ navigation }) => {
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
       getNearbyLocations();
-      // getAllJoiners(AllNearbyPosts);
     });
 
     return nav;
@@ -64,21 +62,14 @@ const Maps = ({ navigation }) => {
     await getNearbyPosts(40.7579747, -73.9855426, 300, dispatch);
   };
 
-  const getAllJoiners = async AllNearbyPosts => {
-    setJoinerLoader(true)
-    const getPostJoiners = await GetAllJoinerByPost(AllNearbyPosts[postIndex]?.postId);
-
-
-    const author = {
-     userId:  AllNearbyPosts[postIndex]?.authorId,
-     postId: AllNearbyPosts[postIndex]?.postId,
-     name: AllNearbyPosts[postIndex]?.authorName,
-     createdAt: AllNearbyPosts[postIndex]?.createdAt
-    }
-
+  const getAllJoiners = async (AllNearbyPosts, i) => {
+    setJoinerLoader(true);
+    const getPostJoiners = await GetAllJoinerByPost(
+      AllNearbyPosts[i ? i :postIndex]?.postId,
+    );
 
     setAllPostJoinersState(getPostJoiners);
-    setJoinerLoader(false)
+    setJoinerLoader(false);
   };
 
   return (
@@ -103,22 +94,26 @@ const Maps = ({ navigation }) => {
             region={{
               latitude: 40.7579747,
               longitude: -73.9855426,
-              latitudeDelta: 0.015,
-              longitudeDelta: 0.0121,
+              latitudeDelta: 0.3,
+              longitudeDelta: 0.3,
             }}
           >
             {AllNearbyPosts.length > 0 &&
-              AllNearbyPosts.map(res => (
-                <Marker
-                  key={res.postId}
-                  coordinate={{
-                    latitude: res.latitude,
-                    longitude: res.longitude,
-                  }}
-                  title={res.caption}
-                  description={res.address}
-                />
-              ))}
+              AllNearbyPosts.map((res, index) => {
+                return (
+
+                  <Marker
+                    key={res.postId}
+                    coordinate={{
+                      latitude: res.latitude,
+                      longitude: res.longitude,
+                    }}
+                    title={res.caption}
+                    description={res.address}
+                    onPress={()=> {setPostIndex(index), getAllJoiners(AllNearbyPosts, index)}}
+                  />
+                );
+              })}
           </MapView>
 
           <View
@@ -231,33 +226,42 @@ const Maps = ({ navigation }) => {
         </View>
 
         <Line />
-          {
-            JoinerLoader == true ? (
-              <View style={{marginTop:20, alignItems:'center', justifyContent:'center', gap:10}}>
-              <ActivityIndicator size={'large'} color={AppColors.WHITE}/>
-              <AppText title={"Fetching participants"} textColor={AppColors.WHITE} textAlignment={'center'} textSize={1.7}/>
-              </View>
-            ):(
-
-              <FlatList
-                data={AllPostJoinersState}
-                contentContainerStyle={{
-                  paddingHorizontal: 20,
-                  gap: 10,
-                  marginTop: 20,
-                }}
-                renderItem={({ item }) => {
-                  return (
-                    <Participants
-                      name={item.name}
-                      pfp={AppImages.User}
-                      type={'participant'}
-                    />
-                  );
-                }}
-              />
-            )
-          }
+        {JoinerLoader == true ? (
+          <View
+            style={{
+              marginTop: 20,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+            }}
+          >
+            <ActivityIndicator size={'large'} color={AppColors.WHITE} />
+            <AppText
+              title={'Fetching participants'}
+              textColor={AppColors.WHITE}
+              textAlignment={'center'}
+              textSize={1.7}
+            />
+          </View>
+        ) : (
+          <FlatList
+            data={AllPostJoinersState}
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              gap: 10,
+              marginTop: 20,
+            }}
+            renderItem={({ item }) => {
+              return (
+                <Participants
+                  name={item.name}
+                  pfp={AppImages.User}
+                  type={'participant'}
+                />
+              );
+            }}
+          />
+        )}
       </ScrollView>
     </View>
   );

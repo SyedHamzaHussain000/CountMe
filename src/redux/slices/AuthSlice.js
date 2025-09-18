@@ -9,7 +9,7 @@ const initialState = {
   SportsSkills: [],
   SignupFlowCompleted: false,
   Address: null,
-  AllNearbyPosts: []
+   AllNearbyPosts : []
 };
 
 export const AuthSlice = createSlice({
@@ -37,7 +37,7 @@ export const AuthSlice = createSlice({
       state.Address = actions.payload;
     },
     setNearbyPosts:(state, action) => {
-      console.log("state", action.payload)
+
       state.AllNearbyPosts = action.payload
     } ,
     SignOut: (state,)=> {
