@@ -27,7 +27,7 @@ import { setFavouriteSports, setProfilePicture, setSignupFlowCompleted, setSport
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('test@gmail.com');
+  const [email, setEmail] = useState('test01@gmail.com');
   const [password, setPassword] = useState('1234567890');
   const LoginApi = () => {
     if (email == '' || password == '') {

@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
 import AppImages from '../assets/images/AppImages';
 import { responsiveHeight, responsiveWidth } from '../utils/Other/Responsive_Dimensions';
@@ -10,8 +10,10 @@ import Line from './AppCommonComponents/Line';
 import AppColors from '../utils/Other/AppColors';
 import AppButton from './AppCommonComponents/AppButton';
 import SmallButtons from './AppCommonComponents/SmallButtons';
+import { useNavigation } from '@react-navigation/native';
 
 type props = {
+  AuthorId?: any,
   pfp?: any;
   name?: string;
   ago?: string;
@@ -24,13 +26,17 @@ type props = {
   IsJoined?: boolean;
   TotalJoiners?: number;
   TotalJoinerRemain?: number;
+  isAutherPost?: boolean,
   onLikePress?: () => void;
   onCommentPress?: () => void;
   onSharePress?: () => void;
   onJoinTeamPress?: () => void;
   onViewProfilePress?: () => void;
+  onRunnerPress?:()=> void;
+  navigation?: any
 };
 const SocialMediaPost = ({
+  AuthorId,
   pfp,
   name,
   ago,
@@ -43,22 +49,27 @@ const SocialMediaPost = ({
   IsJoined,
   TotalJoiners,
   TotalJoinerRemain,
+  isAutherPost,
   onCommentPress,
   onJoinTeamPress,
   onLikePress,
   onSharePress,
   onViewProfilePress,
+  onRunnerPress,
+  navigation
 }: props) => {
+
+
   return (
     <View style={{gap:10}}>
       <View style={styles.PostHeaderContainer}>
-        <View style={styles.PostHeaderChild}>
+        <TouchableOpacity onPress={()=> navigation.navigate("OtherUserProfile", {FriendId: AuthorId })}  style={styles.PostHeaderChild}>
             <Image source={AppImages.IMAGES} style={styles.pfp} />
             <View>
                 <AppText title={name} textSize={2} textFontWeight/>
                 <AppText title={ago}/>
             </View>
-        </View>
+        </TouchableOpacity>
         <SvgXml xml={Appsvgicon.Dots}/>
       </View>
 
@@ -66,6 +77,7 @@ const SocialMediaPost = ({
 
       {
         PostPicture && (
+          
             <Image source={AppImages.POSTPICTURE} style={styles.img}/>
         )
       }
@@ -77,7 +89,12 @@ const SocialMediaPost = ({
                     <Image source={AppImages.JOINERS} style={{height:20, width:20, resizeMode:'contain'}}/>
                         <AppText title={`${TotalJoinerRemain}/${TotalJoiners} Joined`} textFontWeight textSize={2}/>
                 </View>
-                <SmallButtons title={IsJoined ? 'Leave Now': 'Join Now'} icon={IsJoined ? null: <SvgXml xml={Appsvgicon.Send} height={18} width={18}/>} handlePress={onJoinTeamPress}/>
+                {
+                  !isAutherPost && (
+
+                    <SmallButtons title={IsJoined ? 'Leave Now': 'Join Now'} icon={IsJoined ? null: <SvgXml xml={Appsvgicon.Send} height={18} width={18}/>} handlePress={onJoinTeamPress}/>
+                  ) 
+                }
                 
             </View>
         )
@@ -87,11 +104,17 @@ const SocialMediaPost = ({
         <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
             <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.LIKE} />} onPress={onLikePress}/>
             <PostFooter Counts={Comment} icon={<SvgXml xml={Appsvgicon.ChatBubble} />} onPress={onCommentPress}/>
-            <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.ChatB} height={17} width={17} />} iconTwo={<SvgXml xml={Appsvgicon.Runner} height={17} width={17} />}/>
+            <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.ChatB} height={17} width={17} />} iconTwo={<SvgXml xml={Appsvgicon.Runner} height={17} width={17} />} onPress={onRunnerPress}/>
         </View>
 
+      
         <View>
-            <PostFooter Counts={Share} icon={<SvgXml xml={Appsvgicon.Share} />}/>
+          {
+            !isAutherPost && (
+
+              <PostFooter Counts={Share} icon={<SvgXml xml={Appsvgicon.Share} />} onPress={onSharePress}/>
+            )
+          }
         </View>
       </View>
 

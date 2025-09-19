@@ -8,7 +8,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AppImages from '../../assets/images/AppImages';
 import {
@@ -27,10 +27,10 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'; // remove 
 import { getNearbyPosts } from '../../global/main/mapsScreenFunctions/GetNearbyPosts';
 import { useDispatch, useSelector } from 'react-redux';
 import GetAllJoinerByPost from '../../global/main/mapsScreenFunctions/GetAllJoinerByPost';
-import { useFocusEffect } from '@react-navigation/native';
 
 const Maps = ({ navigation }) => {
   const dispatch = useDispatch();
+  const mapRef = useRef();
   const AllNearbyPosts = useSelector(state => state?.auth?.AllNearbyPosts);
 
   const [postIndex, setPostIndex] = useState(0);
@@ -58,18 +58,45 @@ const Maps = ({ navigation }) => {
     getAllJoiners(AllNearbyPosts);
   }, [AllNearbyPosts]);
 
+  useEffect(() => {
+    if (AllNearbyPosts.length > 0) {
+      // Focus on the first post
+      animateToTheLocation(
+        AllNearbyPosts[0].latitude,
+        AllNearbyPosts[0].longitude,
+      );
+    }
+  }, [AllNearbyPosts]);
+
   const getNearbyLocations = async () => {
     await getNearbyPosts(40.7579747, -73.9855426, 300, dispatch);
   };
 
   const getAllJoiners = async (AllNearbyPosts, i) => {
+
+
     setJoinerLoader(true);
     const getPostJoiners = await GetAllJoinerByPost(
-      AllNearbyPosts[i ? i :postIndex]?.postId,
+      AllNearbyPosts[i == 0 || i > 0 ? i : postIndex]?.postId,
     );
+
 
     setAllPostJoinersState(getPostJoiners);
     setJoinerLoader(false);
+  };
+
+  const animateToTheLocation = (lat, lng) => {
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.01, // zoom level (smaller = more zoom)
+          longitudeDelta: 0.01,
+        },
+        2000, // duration in ms
+      );
+    }
   };
 
   return (
@@ -83,6 +110,7 @@ const Maps = ({ navigation }) => {
       >
         <View>
           <MapView
+            ref={mapRef}
             provider={PROVIDER_GOOGLE}
             style={{
               height: 400,
@@ -101,7 +129,6 @@ const Maps = ({ navigation }) => {
             {AllNearbyPosts.length > 0 &&
               AllNearbyPosts.map((res, index) => {
                 return (
-
                   <Marker
                     key={res.postId}
                     coordinate={{
@@ -110,7 +137,9 @@ const Maps = ({ navigation }) => {
                     }}
                     title={res.caption}
                     description={res.address}
-                    onPress={()=> {setPostIndex(index), getAllJoiners(AllNearbyPosts, index)}}
+                    onPress={() => {
+                      setPostIndex(index), getAllJoiners(AllNearbyPosts, index);
+                    }}
                   />
                 );
               })}
@@ -226,6 +255,15 @@ const Maps = ({ navigation }) => {
         </View>
 
         <Line />
+
+        <View style={{ padding: 20, paddingBottom: 0 }}>
+          <Participants
+            name={AllNearbyPosts[postIndex]?.authorName}
+            pfp={AppImages.User}
+            type={'Organizer'}
+          />
+        </View>
+
         {JoinerLoader == true ? (
           <View
             style={{
@@ -262,6 +300,14 @@ const Maps = ({ navigation }) => {
             }}
           />
         )}
+
+        <View style={{ padding: 20, paddingBottom: 0 }}>
+          <Participants
+            name={'Slot available'}
+            pfp={AppImages.User}
+            type={'Join Now'}
+          />
+        </View>
       </ScrollView>
     </View>
   );

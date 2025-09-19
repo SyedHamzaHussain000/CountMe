@@ -26,6 +26,8 @@ import { useSelector } from 'react-redux';
 import Create from '../screens/main/CreatePost/Create';
 import PostComment from '../screens/main/CreatePost/PostComment';
 import AddLocation from '../screens/main/CreatePost/AddLocation';
+import OtherUserProfile from '../screens/main/Stack/Profile/OtherUserProfile';
+import EditProfile from '../screens/main/Stack/Profile/EditProfile';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,7 +51,12 @@ const MainNavigator = () => {
           <Stack.Screen name="AddLocation" component={AddLocation} 
           options={{presentation: 'modal'}}
           />
+<Stack.Screen name="OtherUserProfile" component={OtherUserProfile} />
+          <Stack.Screen name="EditProfile" component={EditProfile} 
+          options={{presentation: 'card'}}
+          />
 
+        
           
 
           

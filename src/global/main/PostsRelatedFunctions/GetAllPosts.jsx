@@ -17,7 +17,7 @@ const GetAllPosts = async() => {
       // sort latest first
       postsArray.sort((a, b) => b.createdAt - a.createdAt);
 
-      console.log("postsArray",postsArray)
+      // console.log("postsArray",postsArray)
       return postsArray;
     } else {
       return [];

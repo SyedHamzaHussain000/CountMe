@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import React from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AppImages from '../../assets/images/AppImages';
@@ -19,7 +19,7 @@ import { SignOut } from '../../redux/slices/AuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AppButton from '../../components/AppCommonComponents/AppButton';
 
-const Profile = () => {
+const Profile = ({navigation}) => {
 
     const userDetail = useSelector(state => state?.auth);
 
@@ -200,7 +200,10 @@ const dispatch = useDispatch()
 
           <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20, marginBottom:20}}>
               <IconText Icon={<SvgIcons.blueprofile />} title='405 partners' textFontWeight/>
-              <IconText Icon={<SvgIcons.edit />} title='Edit Profile' textFontWeight/>
+
+                  <TouchableOpacity onPress={()=> navigation.navigate("EditProfile")}>
+              <IconText Icon={<SvgIcons.edit />} title='Edit Profile' textFontWeight />
+                  </TouchableOpacity>
           </View>
  
           <AppText title={"Any sport, any time just Countme Kicking it every weekend"} textSize={2} textFontWeight textwidth={80}/>

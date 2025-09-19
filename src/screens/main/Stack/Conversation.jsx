@@ -7,7 +7,12 @@ import AppText from '../../../components/AppCommonComponents/AppText';
 import AppColors from '../../../utils/Other/AppColors';
 import RoundButton from '../../../components/RoundButton';
 
-const Conversation = ({navigation}) => {
+const Conversation = ({navigation, route}) => {
+
+  const {friendId} = route.params
+
+  
+
   return (
     <View style={{justifyContent:'space-between',  flex:1}}>
       <View

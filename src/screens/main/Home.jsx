@@ -42,11 +42,10 @@ const Home = ({ navigation }) => {
 
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
-
       getAllNewPost();
-    })
+    });
 
-    return nav
+    return nav;
   }, [navigation]);
 
   const getAllNewPost = async () => {
@@ -61,7 +60,6 @@ const Home = ({ navigation }) => {
     setLikes(normalizedLikes);
     setJoines(normalizedJoins);
   };
-
 
   const toggleLike = async (postId, isLiked) => {
     setAllLocalPosts(prev =>
@@ -117,11 +115,10 @@ const Home = ({ navigation }) => {
   };
 
   const toggleJoin = async (postId, isJoined, authorId) => {
-
-    // if(authorId == userId){
-    //   console.log("you are the author you can't join this post")
-    //   return
-    // }
+    if (authorId == userId) {
+      console.log("you are the author you can't join this post");
+      return;
+    }
 
     setAllLocalPosts(prev =>
       prev.map(p =>
@@ -175,8 +172,49 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const sharePostAlert = async (postId, authorId) => {
+    Alert.alert(
+      'Share Post',
+      'Do you want to share this post?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('❌ Share cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Share',
+          onPress: () => {
+            sharePost()
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
 
+const sharePost = async (postId, authorId) => {
+  const db = getDatabase();
 
+  try {
+    // Save share record
+    const shareRef = push(ref(db, "shares"));
+    await set(shareRef, {
+      postId,
+      authorId,
+      sharedBy: userId,
+      sharedAt: Date.now(),
+    });
+
+    // Increment sharesCount
+    const postSharesCountRef = ref(db, `posts/${postId}/sharesCount`);
+    await runTransaction(postSharesCountRef, (count) => (count || 0) + 1);
+
+    console.log("✅ Post shared to feed");
+  } catch (err) {
+    console.error("❌ Error sharing post:", err);
+  }
+};
   return (
     <View style={{ flex: 1 }}>
       <AppHeader />
@@ -205,6 +243,7 @@ const Home = ({ navigation }) => {
 
             return (
               <SocialMediaPost
+                AuthorId={item?.authorId}
                 name={item?.authorName}
                 ago={moment(item?.createdAt).fromNow()}
                 PostDescription={item?.caption}
@@ -217,8 +256,24 @@ const Home = ({ navigation }) => {
                 TotalJoiners={item?.totalPlayers}
                 TotalJoinerRemain={item?.joinedCount}
                 onLikePress={() => toggleLike(item?.postId, isLiked)}
-                onJoinTeamPress={() => toggleJoin(item?.postId, isJoined, item?.authorId)}
-                onCommentPress={() => navigation.navigate('PostComment',{postId:item?.postId})}
+                onJoinTeamPress={() =>
+                  toggleJoin(item?.postId, isJoined, item?.authorId)
+                }
+                onCommentPress={() =>
+                  navigation.navigate('PostComment', {
+                    postId: item?.postId,
+                    runner: true,
+                  })
+                }
+                onRunnerPress={() =>
+                  navigation.navigate('PostComment', {
+                    postId: item?.postId,
+                    runner: true,
+                  })
+                }
+                onSharePress={() => sharePostAlert(item?.postId, item?.authorId)}
+                isAutherPost={item?.authorId == userId}
+                navigation={navigation}
               />
             );
           }}

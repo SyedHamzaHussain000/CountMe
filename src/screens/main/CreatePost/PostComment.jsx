@@ -28,7 +28,7 @@ import NormalizeData from '../../../global/utils/NormalizeData';
 import moment from 'moment';
 
 const PostComment = ({ navigation, route }) => {
-  const { postId } = route?.params;
+  const { postId, runner } = route?.params;
 
   const [TextComment, setTextComments] = useState('');
   const [comments, setComments] = useState([]);
@@ -38,7 +38,7 @@ const PostComment = ({ navigation, route }) => {
 
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
-      getAllComments();
+      getAllComments();      
     });
     return nav;
   }, [navigation]);
@@ -57,9 +57,10 @@ const PostComment = ({ navigation, route }) => {
       await set(newCommentRef, {
         userId: userId,
         name: userDetail.full_name,
-        comment: TextComment,
+        comment: text ? text :  TextComment,
         postId: postId,
         createdAt: Date.now(), // or serverTimestamp() if Firestore
+        runner: runner
       });
       await runTransaction(postRef, count => (count || 0) + 1);
       await getAllComments();
@@ -78,6 +79,14 @@ const PostComment = ({ navigation, route }) => {
 
       if (snapshot.exists()) {
         const data = snapshot.val();
+        const alreadyCommented = Object.values(data).some(
+          c => c.userId === userId && c.runner === true
+        );
+
+
+        if(alreadyCommented == false){
+          AddComment("Game on, I’m coming 🏃")
+        }
 
         const formatted = Object.keys(data).map(key => ({
           id: key,
