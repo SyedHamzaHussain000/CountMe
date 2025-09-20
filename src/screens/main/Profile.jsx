@@ -1,5 +1,13 @@
-import { View, Text, Image, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AppImages from '../../assets/images/AppImages';
 import {
@@ -18,244 +26,228 @@ import { getAuth } from '@react-native-firebase/auth';
 import { SignOut } from '../../redux/slices/AuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AppButton from '../../components/AppCommonComponents/AppButton';
+import GetOnlyMyPostApi from '../../global/main/PostsRelatedFunctions/GetOnlyMyPostApi';
+import moment from 'moment';
+import GetAllPostLikes from '../../global/main/PostsRelatedFunctions/GetAllPostLikes';
+import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
+import NormalizeData from '../../global/utils/NormalizeData';
 
-const Profile = ({navigation}) => {
+const Profile = ({ navigation }) => {
+  const dispatch = useDispatch();
 
-    const userDetail = useSelector(state => state?.auth);
+  const userId = getAuth()?.currentUser?.uid;
+  const userDetail = useSelector(state => state?.auth);
+  const [allLocalPost, setAllLocalPosts] = useState([]);
 
-    console.log("userDetail",userDetail)
+  const [likes, setLikes] = useState([]);
+  const [joines, setJoines] = useState([]);
 
-   const sportsPosts = [
-  {
-    pfp: 'https://example.com/profiles/mike.jpg',
-    name: 'Mike Johnson',
-    ago: '1h ago',
-    PostDescription: 'Looking for 2 players to join our basketball match this evening in Brooklyn.',
-    PostPicture: '',
-    Likes: ['JamesSmith', 'EmmaBrown', 'LucasTaylor'],
-    Comment: ['I’m down!', 'What time?', 'Can I bring a friend?'],
-    Share: ['ChrisWilson'],
-    JoiningPost: true,
-    TotalJoiners: ['JacobMiller', 'SophiaAnderson'],
-    TotalJoinerRemain: 2,
-  },
-  {
-    pfp: 'https://example.com/profiles/sarah.jpg',
-    name: 'Sarah Williams',
-    ago: '3h ago',
-    PostDescription: 'Volleyball team forming in LA for a weekend tournament. Need 4 players!',
-    PostPicture: 'https://example.com/posts/volleyball1.jpg',
-    Likes: ['OliviaMartinez', 'DanielLee'],
-    Comment: ['Countme!', 'Location?'],
-    Share: ['EllaHall'],
-    JoiningPost: false,
-    TotalJoiners: ['MasonHarris'],
-    TotalJoinerRemain: 3,
-  },
-  {
-    pfp: 'https://example.com/profiles/tyler.jpg',
-    name: 'Tyler Davis',
-    ago: '5h ago',
-    PostDescription: 'Pickup soccer game at Central Park. All skill levels welcome!',
-    PostPicture: '',
-    Likes: ['AidenYoung', 'GraceNelson'],
-    Comment: ['Time?', 'I’ll bring the ball'],
-    Share: [],
-    JoiningPost: true,
-    TotalJoiners: ['LiamKing', 'ChloeWright'],
-    TotalJoinerRemain: 4,
-  },
-  {
-    pfp: 'https://example.com/profiles/emily.jpg',
-    name: 'Emily Clark',
-    ago: '1d ago',
-    PostDescription: 'Looking for a few teammates for a co-ed softball game this Saturday.',
-    PostPicture: 'https://example.com/posts/softball1.jpg',
-    Likes: ['JacksonLopez'],
-    Comment: ['I’m interested!', 'Which park?'],
-    Share: ['HenryScott'],
-    JoiningPost: false,
-    TotalJoiners: ['AveryHill'],
-    TotalJoinerRemain: 5,
-  },
-  {
-    pfp: 'https://example.com/profiles/jacob.jpg',
-    name: 'Jacob Moore',
-    ago: '4h ago',
-    PostDescription: 'Organizing a friendly flag football match. Need 3 more players.',
-    PostPicture: '',
-    Likes: ['MadisonGreen', 'EthanAdams'],
-    Comment: ['Sounds fun!', 'Can I join?'],
-    Share: [],
-    JoiningPost: true,
-    TotalJoiners: ['IsabellaBaker', 'NoahRivera'],
-    TotalJoinerRemain: 1,
-  },
-  {
-    pfp: 'https://example.com/profiles/grace.jpg',
-    name: 'Grace Lewis',
-    ago: '2d ago',
-    PostDescription: 'Tennis doubles practice. Need a partner!',
-    PostPicture: 'https://example.com/posts/tennis1.jpg',
-    Likes: ['LillianCox'],
-    Comment: ['I can play this weekend'],
-    Share: [],
-    JoiningPost: false,
-    TotalJoiners: ['ElijahWard'],
-    TotalJoinerRemain: 0,
-  },
-  {
-    pfp: 'https://example.com/profiles/ryan.jpg',
-    name: 'Ryan Walker',
-    ago: '30m ago',
-    PostDescription: 'Looking to create a 3v3 basketball team for a local league.',
-    PostPicture: '',
-    Likes: ['NatalieMorgan'],
-    Comment: ['I’m a shooter 🔥'],
-    Share: ['ZacharyReed'],
-    JoiningPost: true,
-    TotalJoiners: ['BenjaminBailey'],
-    TotalJoinerRemain: 2,
-  },
-  {
-    pfp: 'https://example.com/profiles/ava.jpg',
-    name: 'Ava Martinez',
-    ago: '6h ago',
-    PostDescription: 'Anyone interested in a women’s soccer scrimmage this Sunday?',
-    PostPicture: 'https://example.com/posts/soccer2.jpg',
-    Likes: ['VictoriaKelly', 'LunaSanders'],
-    Comment: ['Yes please!', 'Where’s the field?'],
-    Share: [],
-    JoiningPost: false,
-    TotalJoiners: ['HarperFlores', 'StellaBell'],
-    TotalJoinerRemain: 3,
-  },
-  {
-    pfp: 'https://example.com/profiles/josh.jpg',
-    name: 'Josh White',
-    ago: '8h ago',
-    PostDescription: 'Need 2 more players for our Ultimate Frisbee squad!',
-    PostPicture: '',
-    Likes: ['DavidPrice'],
-    Comment: ['Frisbee legend reporting 😎'],
-    Share: ['JulianBarnes'],
-    JoiningPost: true,
-    TotalJoiners: ['AaronReyes'],
-    TotalJoinerRemain: 1,
-  },
-  {
-    pfp: 'https://example.com/profiles/lily.jpg',
-    name: 'Lily Brooks',
-    ago: '20m ago',
-    PostDescription: 'Who’s up for a cycling group ride tomorrow morning?',
-    PostPicture: 'https://example.com/posts/cycling1.jpg',
-    Likes: ['HaileyCooper', 'LeviWard'],
-    Comment: ['I’ll bring coffee at the end 😄'],
-    Share: [],
-    JoiningPost: false,
-    TotalJoiners: ['SamuelHughes', 'NoraLong'],
-    TotalJoinerRemain: 0,
-  },
-];
+  useEffect(() => {
+    const nav = navigation.addListener('focus', () => {
+      getAllMyPost();
+    });
 
-const dispatch = useDispatch()
+    return nav;
+  }, [navigation]);
+
+  const getAllMyPost = async () => {
+    const allMyPosts = await GetOnlyMyPostApi(userId);
+    const getPostLikes = await GetAllPostLikes();
+    const getPostJoins = await GetAllPostJoins();
+
+    const normalizedLikes = NormalizeData(getPostLikes);
+    const normalizedJoins = NormalizeData(getPostJoins);
+
+    setAllLocalPosts(allMyPosts);
+    setLikes(normalizedLikes);
+    setJoines(normalizedJoins);
+  };
 
   return (
-    <View style={{backgroundColor:AppColors.WHITE}}>
-      <AppHeader />
+    <View style={{ backgroundColor: AppColors.WHITE,  }}>
 
-    <ScrollView contentContainerStyle={{flexGrow:1, paddingBottom:responsiveHeight(20)}} nestedScrollEnabled>
-      <View>
-        <Image source={AppImages.cover} style={styles.cover} />
-        <View style={styles.pfpImgContainer}>
-          <Image source={AppImages.profileimg} style={styles.pfpImg} />
-        </View>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom:100,
+        }}
+        nestedScrollEnabled
+      >
+        <AppHeader />
+        <View>
+          <Image source={AppImages.cover} style={styles.cover} />
+          <View style={styles.pfpImgContainer}>
+            <Image source={AppImages.profileimg} style={styles.pfpImg} />
+          </View>
 
-        <View style={styles.cameraContainer}>
-          <SvgIcons.cameraW />
+          <View style={styles.cameraContainer}>
+            <SvgIcons.cameraW />
+          </View>
         </View>
-      </View>
-      <LinearGradient colors={["#7EFF57", AppColors.WHITE]}  start={{x:5, y:0}} style={{height:responsiveHeight(100), padding:20, paddingTop:100}}>
-        {/* <View style={{alignSelf:'flex-end', backgroundColor:AppColors.WHITE, padding:10}}>
+        <LinearGradient
+          colors={['#7EFF57', AppColors.WHITE]}
+          start={{ x: 5, y: 0 }}
+          style={{
+            padding: 20,
+            paddingTop: 100,
+          }}
+        >
+          {/* <View style={{alignSelf:'flex-end', backgroundColor:AppColors.WHITE, padding:10}}>
           <IconText title='Rating 4/5' Icon={<SvgIcons.starthumb/>}/>
         </View> */}
 
-        <View >
-          <AppButton
-                  title="Logout"
-                  handlePress={() => {
-                    dispatch(SignOut()), getAuth().signOut();
-                  }}
-                />
+          <View>
+            <AppButton
+              title="Logout"
+              handlePress={() => {
+                dispatch(SignOut()), getAuth().signOut();
+              }}
+            />
 
-          <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginTop:20}}>
-              <AppText title={userDetail?.full_name} textSize={3} textFontWeight/>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 20,
+              }}
+            >
+              <AppText
+                title={userDetail?.full_name}
+                textSize={3}
+                textFontWeight
+              />
 
-              <View style={{flexDirection:'row' , alignItems:'center', gap:10}}>
-                <SvgIcons.badmiton height={30}/>
-                <SvgIcons.helmet height={30}/>
-                <SvgIcons.basket height={30}/>
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+              >
+                <SvgIcons.badmiton height={30} />
+                <SvgIcons.helmet height={30} />
+                <SvgIcons.basket height={30} />
               </View>
-          </View>
+            </View>
 
-          <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20, marginBottom:20}}>
-              <IconText Icon={<SvgIcons.blueprofile />} title='405 partners' textFontWeight/>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 20,
+                marginBottom: 20,
+              }}
+            >
+              <IconText
+                Icon={<SvgIcons.blueprofile />}
+                title="405 partners"
+                textFontWeight
+              />
 
-                  <TouchableOpacity onPress={()=> navigation.navigate("EditProfile")}>
-              <IconText Icon={<SvgIcons.edit />} title='Edit Profile' textFontWeight />
-                  </TouchableOpacity>
-          </View>
- 
-          <AppText title={"Any sport, any time just Countme Kicking it every weekend"} textSize={2} textFontWeight textwidth={80}/>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <IconText
+                  Icon={<SvgIcons.edit />}
+                  title="Edit Profile"
+                  textFontWeight
+                />
+              </TouchableOpacity>
+            </View>
 
-          <View style={{marginTop:20}}>
-            <IconText Icon={<SvgIcons.us />} title='Lives In New York' textFontWeight/>
-            <IconText Icon={<SvgIcons.run />} title='Primary Sports: Cricket' textFontWeight/>
-            <IconText Icon={<SvgIcons.wifi />} title='Skill Level: Intermediate' textFontWeight/>
-            <IconText Icon={<SvgIcons.clock />} title='Availability: Weekends' textFontWeight/>
-            <IconText Icon={<SvgIcons.arrow />} title='See About Your Info' textFontWeight/>
-          </View>
-          
-          {/* <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20}}>
+            <AppText
+              title={userDetail?.Bio}
+              textSize={2}
+              textFontWeight
+              textwidth={80}
+            />
+
+            <View style={{ marginTop: 20 }}>
+              <IconText
+                Icon={<SvgIcons.us />}
+                title={`Lives In ${userDetail?.City}`}
+                textFontWeight
+              />
+              <IconText
+                Icon={<SvgIcons.run />}
+                title={`Primary Sports: ${userDetail?.Primary_sports}`}
+                textFontWeight
+              />
+              <IconText
+                Icon={<SvgIcons.wifi />}
+                title={`Skill Level: ${userDetail?.Skill_Level}`}
+                textFontWeight
+              />
+              <IconText
+                Icon={<SvgIcons.clock />}
+                title={`Availability: ${userDetail?.Availability}`}
+                textFontWeight
+              />
+            </View>
+
+            {/* <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20}}>
               <ScoreCard ScoreTitle='Matches Played' TotalScore={50}/>
               <ScoreCard ScoreTitle='Wins' TotalScore={30}/>
               <ScoreCard ScoreTitle='Teams Formed' TotalScore={30}/>
           </View> */}
+          </View>
 
-        </View>
-
-
-            <View style={{ marginTop: 15, marginBottom:10 }}>
-        {/* <AddInputAndUpload /> */}
-      </View>
+          <View style={{ marginTop: 15, marginBottom: 10 }}>
+            {/* <AddInputAndUpload /> */}
+          </View>
 
 
-      <FlatList
-        data={sportsPosts}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap:20}}
-        renderItem={({ item }) => {
-          return (
-            <SocialMediaPost
-              name={item.name}
-              ago={item.ago}
-              PostDescription={item.PostDescription}
-              PostPicture={item.PostPicture}
-              JoiningPost={item.JoiningPost}
-              Likes={item.Likes}
-              Comment={item.Comment}
-              Share={item.Share}
-              TotalJoiners={item.TotalJoiners}
-              TotalJoinerRemain={item.TotalJoinerRemain}
+            <FlatList
+              data={allLocalPost}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                gap: 20,
+                paddingBottom: 0,
+              }}
+              renderItem={({ item }) => {
+                const isLiked = !!likes?.[item?.postId]?.[userId];
+                const isJoined = !!joines?.[item?.postId]?.[userId];
+
+                return (
+                  <SocialMediaPost
+                    AuthorId={item?.authorId}
+                    name={item?.authorName}
+                    ago={moment(item?.createdAt).fromNow()}
+                    PostDescription={item?.caption}
+                    PostPicture={item?.PostPicture}
+                    JoiningPost={item?.totalPlayers > 0 ? true : false}
+                    IsJoined={isJoined}
+                    Likes={item?.likesCount}
+                    Comment={item?.commentsCount}
+                    Share={item?.sharesCount}
+                    TotalJoiners={item?.totalPlayers}
+                    TotalJoinerRemain={item?.joinedCount}
+                    onLikePress={() => toggleLike(item?.postId, isLiked)}
+                    onJoinTeamPress={() =>
+                      toggleJoin(item?.postId, isJoined, item?.authorId)
+                    }
+                    onCommentPress={() =>
+                      navigation.navigate('PostComment', {
+                        postId: item?.postId,
+                        runner: true,
+                      })
+                    }
+                    onRunnerPress={() =>
+                      navigation.navigate('PostComment', {
+                        postId: item?.postId,
+                        runner: true,
+                      })
+                    }
+                    onSharePress={() =>
+                      sharePostAlert(item?.postId, item?.authorId)
+                    }
+                    isAutherPost={item?.authorId == userId}
+                    navigation={navigation}
+                  />
+                );
+              }}
             />
-          );
-        }}
-      />
 
-      </LinearGradient>
+        </LinearGradient>
       </ScrollView>
-
-    </View>
+     </View>
   );
 };
 
