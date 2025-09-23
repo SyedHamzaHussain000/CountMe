@@ -65,7 +65,7 @@ const SocialMediaPost = ({
   return (
     <View style={{gap:10}}>
       <View style={styles.PostHeaderContainer}>
-        <TouchableOpacity onPress={()=> navigation.navigate("OtherUserProfile", {FriendId: AuthorId })}  style={styles.PostHeaderChild}>
+        <TouchableOpacity onPress={()=> isAutherPost ? navigation.navigate("Profile"):  navigation.navigate("OtherUserProfile", {FriendId: AuthorId })}  style={styles.PostHeaderChild}>
             <Image source={AppImages.IMAGES} style={styles.pfp} />
             <View>
                 <AppText title={name} textSize={2} textFontWeight/>

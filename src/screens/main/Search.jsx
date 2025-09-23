@@ -159,6 +159,7 @@ const Search = ({ navigation }) => {
     }
   };
 
+  const filteredPostBySport = AllSportPosts?.filter((res)=> res?.sport == selectedSports)
   return (
     <ImageBackground source={AppImages.searchbg} style={{ flex: 1 }}>
       <AppHeader />
@@ -265,9 +266,7 @@ const Search = ({ navigation }) => {
               >
                 {sportsArr.map((item, index) => (
                   <TouchableOpacity
-                    onPress={() => setSelectedSports(item.sportsName)}
-
-                  >
+                    onPress={() => setSelectedSports(item.sportsName)}>
                     <Image
                       key={index}
                       source={item.img}
@@ -281,36 +280,45 @@ const Search = ({ navigation }) => {
         </View>
 
         <View style={{ padding: 0 }}>
-          <FlatList
-            data={AllSportPosts.filter((res)=> res.sport == selectedSports)}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              gap: 20,
-              paddingBottom: responsiveHeight(20),
-            }}
-            renderItem={({ item }) => {
-              const isJoined = !!joines?.[item?.postId]?.[userId];
-              return (
-                <SocialMediaPost
-                  AuthorId={item?.authorId}
-                  name={item?.authorName}
-                  ago={moment(item?.createdAt).fromNow()}
-                  PostDescription={item?.caption}
-                  PostPicture={item?.PostPicture}
-                  JoiningPost={item?.totalPlayers > 0 ? true : false}
-                  IsJoined={isJoined}
-                  Likes={item?.likesCount}
-                  Comment={item?.commentsCount}
-                  Share={item?.sharesCount}
-                  TotalJoiners={item?.totalPlayers}
-                  TotalJoinerRemain={item?.joinedCount}
-                  isAutherPost={item?.authorId == userId}
-                  navigation={navigation}
-                  RemoveFunctionality={true}
-                />
-              );
-            }}
-          />
+          {
+            !filteredPostBySport.length > 0 ? (
+              <View style={{alignItems:'center', justifyContent:'center', paddingBottom:100}}>
+              <AppText title={"No match found related to this sports"} textColor={AppColors.BLACK} textSize={2} textFontWeight/>
+              </View>
+            ):(
+
+              <FlatList
+                data={filteredPostBySport}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{
+                  gap: 20,
+                  paddingBottom: responsiveHeight(20),
+                }}
+                renderItem={({ item }) => {
+                  const isJoined = !!joines?.[item?.postId]?.[userId];
+                  return (
+                    <SocialMediaPost
+                      AuthorId={item?.authorId}
+                      name={item?.authorName}
+                      ago={moment(item?.createdAt).fromNow()}
+                      PostDescription={item?.caption}
+                      PostPicture={item?.PostPicture}
+                      JoiningPost={item?.totalPlayers > 0 ? true : false}
+                      IsJoined={isJoined}
+                      Likes={item?.likesCount}
+                      Comment={item?.commentsCount}
+                      Share={item?.sharesCount}
+                      TotalJoiners={item?.totalPlayers}
+                      TotalJoinerRemain={item?.joinedCount}
+                      isAutherPost={item?.authorId == userId}
+                      navigation={navigation}
+                      RemoveFunctionality={true}
+                    />
+                  );
+                }}
+              />
+            )
+          }
         </View>
       </ScrollView>
     </ImageBackground>

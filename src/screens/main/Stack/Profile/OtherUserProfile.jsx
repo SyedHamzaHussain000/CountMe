@@ -26,12 +26,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import AppButton from '../../../../components/AppCommonComponents/AppButton';
 import BackButton from '../../../../components/AppCommonComponents/BackButton';
 import GetUserDataById from '../../../../global/main/users/GetUserDataById';
+import GetOnlyMyPostApi from '../../../../global/main/PostsRelatedFunctions/GetOnlyMyPostApi';
+import GetAllPostJoins from '../../../../global/main/PostsRelatedFunctions/GetAllPostJoins';
+import GetAllPostLikes from '../../../../global/main/PostsRelatedFunctions/GetAllPostLikes';
+import NormalizeData from '../../../../global/utils/NormalizeData';
+import moment from 'moment';
 
 const OtherUserProfile = ({ navigation, route }) => {
 
-    const {FriendId} = route.params
+  const {FriendId} = route.params
 
-    const [userDetail, setUserDetail] = useState()
+  const userId = getAuth()?.currentUser?.uid
+
+  const [userDetail, setUserDetail] = useState()
+  const [AllFriendsPost, setAllFriendsPosts] = useState([]);
+  const [likes, setLikes] = useState([]);
+  const [joines, setJoines] = useState([]);
 
 
   const sportsPosts = [
@@ -178,19 +188,29 @@ const OtherUserProfile = ({ navigation, route }) => {
 
   useEffect(()=>{
     const nav = navigation.addListener('focus',()=>{
-
         getUserDetails()
+        getAllMyPost()
     })
 
     return nav
   },[navigation])
 
-  const getUserDetails = async () => {
+    const getAllMyPost = async () => {
+    const allMyPosts = await GetOnlyMyPostApi(FriendId);
+    const getPostLikes = await GetAllPostLikes();
+    const getPostJoins = await GetAllPostJoins();
 
+    const normalizedLikes = NormalizeData(getPostLikes);
+    const normalizedJoins = NormalizeData(getPostJoins);
+
+    setAllFriendsPosts(allMyPosts);
+    setLikes(normalizedLikes);
+    setJoines(normalizedJoins);
+  };
+
+  const getUserDetails = async () => {
     const getUserDetailsById = await GetUserDataById(FriendId)
-    setUserDetail(getUserDetailsById)
-    console.log("getUserDetailsById",getUserDetailsById)
-    
+    setUserDetail(getUserDetailsById) 
   }
 
   return (
@@ -300,27 +320,56 @@ const OtherUserProfile = ({ navigation, route }) => {
             {/* <AddInputAndUpload /> */}
           </View>
 
-          <FlatList
-            data={sportsPosts}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ gap: 20 }}
-            renderItem={({ item }) => {
-              return (
-                <SocialMediaPost
-                  name={item.name}
-                  ago={item.ago}
-                  PostDescription={item.PostDescription}
-                  PostPicture={item.PostPicture}
-                  JoiningPost={item.JoiningPost}
-                  Likes={item.Likes}
-                  Comment={item.Comment}
-                  Share={item.Share}
-                  TotalJoiners={item.TotalJoiners}
-                  TotalJoinerRemain={item.TotalJoinerRemain}
-                />
-              );
-            }}
-          />
+            <FlatList
+              data={AllFriendsPost}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                gap: 20,
+                paddingBottom: 0,
+              }}
+              renderItem={({ item }) => {
+                const isLiked = !!likes?.[item?.postId]?.[userId];
+                const isJoined = !!joines?.[item?.postId]?.[userId];
+
+                return (
+                  <SocialMediaPost
+                    AuthorId={item?.authorId}
+                    name={item?.authorName}
+                    ago={moment(item?.createdAt).fromNow()}
+                    PostDescription={item?.caption}
+                    PostPicture={item?.PostPicture}
+                    JoiningPost={item?.totalPlayers > 0 ? true : false}
+                    IsJoined={isJoined}
+                    Likes={item?.likesCount}
+                    Comment={item?.commentsCount}
+                    Share={item?.sharesCount}
+                    TotalJoiners={item?.totalPlayers}
+                    TotalJoinerRemain={item?.joinedCount}
+                    onLikePress={() => toggleLike(item?.postId, isLiked)}
+                    onJoinTeamPress={() =>
+                      toggleJoin(item?.postId, isJoined, item?.authorId)
+                    }
+                    onCommentPress={() =>
+                      navigation.navigate('PostComment', {
+                        postId: item?.postId,
+                        runner: true,
+                      })
+                    }
+                    onRunnerPress={() =>
+                      navigation.navigate('PostComment', {
+                        postId: item?.postId,
+                        runner: true,
+                      })
+                    }
+                    onSharePress={() =>
+                      sharePostAlert(item?.postId, item?.authorId)
+                    }
+                    isAutherPost={item?.authorId == userId}
+                    navigation={navigation}
+                  />
+                );
+              }}
+            />
         </LinearGradient>
       </ScrollView>
     </View>

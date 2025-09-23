@@ -28,6 +28,7 @@ import NormalBlackButton from '../../../components/AppCommonComponents/NormalBla
 import GooglePlacesTextInput from 'react-native-google-places-textinput';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const Create = ({ navigation }) => {
   const userId = getAuth()?.currentUser?.uid;
@@ -75,21 +76,15 @@ const Create = ({ navigation }) => {
 
 
   return (
-    <View style={{ flex: 1 }}>
-      <DatePicker
-        modal
-        date={date}
-        open={show}
-        mode="datetime"
-
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+  
+         <DateTimePickerModal
+        isVisible={show}
         minimumDate={new Date()}
-        onConfirm={selectedDate => {
-          setDate(selectedDate);
-          setShow(false);
-        }}
-        onCancel={() => {
-          setShow(false);
-        }}
+        mode="datetime"
+        onConfirm={(selectedDate)=>{setDate(selectedDate), setShow(false)}}
+        onCancel={()=>{setShow(false)}}
+
       />
 
       <KeyboardAvoidingView
@@ -185,7 +180,7 @@ const Create = ({ navigation }) => {
           </View>
         )}
       </KeyboardAvoidingView>
-    </View>
+    </ScrollView>
   );
 };
 
