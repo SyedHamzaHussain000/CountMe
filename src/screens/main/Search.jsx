@@ -7,8 +7,9 @@ import {
   FlatList,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import Container from '../../components/AppCommonComponents/Container';
 import AppImages from '../../assets/images/AppImages';
@@ -28,87 +29,136 @@ import Appsvgicon from '../../assets/icons/Appsvgicon';
 import IconText from '../../components/AppCommonComponents/IconText';
 import Banners from '../../components/Banners';
 import SocialMediaPost from '../../components/SocialMediaPost';
+import { GetAllJoiningPost } from '../../global/main/PostsRelatedFunctions/GetAllJoiningPost';
+import { useDispatch } from 'react-redux';
+import moment from 'moment';
+import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
+import NormalizeData from '../../global/utils/NormalizeData';
+import {
+  getDatabase,
+  ref,
+  remove,
+  runTransaction,
+  set,
+} from '@react-native-firebase/database';
+import { getAuth } from '@react-native-firebase/auth';
+import { AllSports } from '../../utils/Other/AllSports';
 
-const Search = () => {
-  const data = [
-    { id: 1, gameType: 'basket', Icon: <SvgIcons.basket /> },
-    { id: 2, gameType: 'badminton', Icon: <SvgIcons.badmiton /> },
-    { id: 3, gameType: 'helmet', Icon: <SvgIcons.helmet /> },
-    { id: 4, gameType: 'helmet', Icon: <SvgIcons.helmet /> },
-    { id: 5, gameType: 'helmet', Icon: <SvgIcons.helmet /> },
-  ];
+const Search = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const userId = getAuth()?.currentUser?.uid;
+  const [RecentActivity, setRecentActivity] = useState([]);
+  const [AllSportPosts, setAllSportsPost] = useState([]);
+  const [joines, setJoines] = useState([]);
+
+  const [selectedSports, setSelectedSports] = useState("Football (Soccer)")
 
   const sportsArr = [
-    { id: 1, img: AppImages.sport1 },
-    { id: 2, img: AppImages.sport2 },
-    { id: 3, img: AppImages.sport3 },
-    { id: 4, img: AppImages.sport4 },
-    { id: 5, img: AppImages.sport5 },
-    { id: 6, img: AppImages.sport6 },
-    { id: 7, img: AppImages.sport7 },
-    { id: 8, img: AppImages.sport8 },
+    { id: 1, img: AppImages.sport1, sportsName: AllSports[3].name },
+    { id: 2, img: AppImages.sport2, sportsName: AllSports[1].name },
+    { id: 3, img: AppImages.sport3, sportsName: AllSports[52].name },
+    { id: 4, img: AppImages.sport4, sportsName: AllSports[20].name },
+    { id: 5, img: AppImages.sport5, sportsName: AllSports[4].name },
+    { id: 6, img: AppImages.sport6, sportsName: AllSports[29].name },
+    { id: 7, img: AppImages.sport7, sportsName: AllSports[19].name },
+    { id: 8, img: AppImages.sport8, sportsName: AllSports[0].name },
   ];
 
+  useEffect(() => {
+    const nav = navigation.addListener('focus', async () => {
+      const getAllSportsJoinedPost = await GetAllJoiningPost(dispatch);
 
-   const sportsPosts = [
-  
-  {
-    pfp: 'https://example.com/profiles/tyler.jpg',
-    name: 'Tyler Davis',
-    ago: '5h ago',
-    PostDescription: 'Pickup soccer game at Central Park. All skill levels welcome!',
-    PostPicture: '',
-    Likes: ['AidenYoung', 'GraceNelson'],
-    Comment: ['Time?', 'I’ll bring the ball'],
-    Share: [],
-    JoiningPost: true,
-    TotalJoiners: ['LiamKing', 'ChloeWright'],
-    TotalJoinerRemain: 4,
-  },
+      const getPostJoins = await GetAllPostJoins();
+      const normalizedJoins = NormalizeData(getPostJoins);
 
-  {
-    pfp: 'https://example.com/profiles/jacob.jpg',
-    name: 'Jacob Moore',
-    ago: '4h ago',
-    PostDescription: 'Organizing a friendly flag football match. Need 3 more players.',
-    PostPicture: '',
-    Likes: ['MadisonGreen', 'EthanAdams'],
-    Comment: ['Sounds fun!', 'Can I join?'],
-    Share: [],
-    JoiningPost: true,
-    TotalJoiners: ['IsabellaBaker', 'NoahRivera'],
-    TotalJoinerRemain: 1,
-  },
- 
-  {
-    pfp: 'https://example.com/profiles/ryan.jpg',
-    name: 'Ryan Walker',
-    ago: '30m ago',
-    PostDescription: 'Looking to create a 3v3 basketball team for a local league.',
-    PostPicture: '',
-    Likes: ['NatalieMorgan'],
-    Comment: ['I’m a shooter 🔥'],
-    Share: ['ZacharyReed'],
-    JoiningPost: true,
-    TotalJoiners: ['BenjaminBailey'],
-    TotalJoinerRemain: 2,
-  },
+      setAllSportsPost(getAllSportsJoinedPost);
+      CreateRecentActivity(getAllSportsJoinedPost);
+      setJoines(normalizedJoins);
+    });
 
-  {
-    pfp: 'https://example.com/profiles/josh.jpg',
-    name: 'Josh White',
-    ago: '8h ago',
-    PostDescription: 'Need 2 more players for our Ultimate Frisbee squad!',
-    PostPicture: '',
-    Likes: ['DavidPrice'],
-    Comment: ['Frisbee legend reporting 😎'],
-    Share: ['JulianBarnes'],
-    JoiningPost: true,
-    TotalJoiners: ['AaronReyes'],
-    TotalJoinerRemain: 1,
-  },
- 
-];
+    return nav;
+  }, [navigation]);
+
+  const CreateRecentActivity = SortStartingSoonPosts => {
+    const now = moment();
+    const oneWeekLater = moment().add(7, 'days');
+
+    const filtered = SortStartingSoonPosts.filter(post => {
+      if (!post.matchDateAndTime) return false;
+
+      const matchTime = moment(JSON.parse(post.matchDateAndTime));
+      return matchTime.isBetween(now, oneWeekLater);
+    });
+
+    const sorted = filtered.sort((a, b) => {
+      const timeA = moment(JSON.parse(a.matchDateAndTime));
+      const timeB = moment(JSON.parse(b.matchDateAndTime));
+      return timeA - timeB;
+    });
+
+    setRecentActivity(sorted);
+
+    return sorted;
+  };
+
+  const toggleJoin = async (postId, isJoined, authorId) => {
+    if (authorId == userId) {
+      console.log("you are the author you can't join this post");
+      return;
+    }
+
+    setAllSportsPost(prev =>
+      prev.map(p =>
+        p.postId === postId
+          ? {
+              ...p,
+              joinedCount: p.joinedCount + (isJoined ? -1 : 1),
+              isJoined: !isJoined,
+            }
+          : p,
+      ),
+    );
+
+    setJoines(prev => {
+      const updated = { ...prev };
+
+      if (isJoined) {
+        // remove like
+        delete updated[postId][userId];
+        if (Object.keys(updated[postId]).length === 0) {
+          delete updated[postId];
+        }
+      } else {
+        if (!updated[postId]) updated[postId] = {};
+        updated[postId][userId] = {
+          userId,
+          postId,
+          name: userDetail.full_name,
+          createdAt: Date.now(),
+        };
+      }
+
+      return updated;
+    });
+
+    const db = getDatabase();
+    const joinsRef = ref(db, `joins/${postId}/${userId}`);
+    const postRef = ref(db, `posts/${postId}/joinedCount`);
+
+    if (isJoined) {
+      await remove(joinsRef);
+      await runTransaction(postRef, count => (count || 1) - 1);
+    } else {
+      await set(joinsRef, {
+        userId,
+        name: userDetail.full_name,
+        postId: postId,
+        createdAt: Date.now(),
+      });
+      await runTransaction(postRef, count => (count || 0) + 1);
+    }
+  };
+
   return (
     <ImageBackground source={AppImages.searchbg} style={{ flex: 1 }}>
       <AppHeader />
@@ -116,17 +166,17 @@ const Search = () => {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 0 }}
       >
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.yellowButtons}>
+        {/* <View style={styles.buttonContainer}>
+          {/* <TouchableOpacity style={styles.yellowButtons}>
             <AppText
               title={'Add Activity'}
               textSize={2}
               textColor={AppColors.WHITE}
             />
             <SvgIcons.activity />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity>
+        {/* <TouchableOpacity>
             <LinearGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -140,8 +190,8 @@ const Search = () => {
                 textColor={AppColors.WHITE}
               />
             </LinearGradient>
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity> */}
+        {/* </View> */}
 
         <View style={{ marginTop: 20 }}>
           <AppText
@@ -152,12 +202,20 @@ const Search = () => {
           />
 
           <FlatList
-            data={data}
+            data={RecentActivity}
             horizontal
             contentContainerStyle={{ gap: 20 }}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => {
-              return <ActivityCard Icon={item.Icon} />;
+              return (
+                <ActivityCard
+                  ActivityName={item?.sport}
+                  TotalJoined={item?.joinedCount}
+                  TotalJoiner={item?.totalPlayers}
+                  JoiningFee={item?.amount}
+                  Icon={item.Icon}
+                />
+              );
             }}
           />
         </View>
@@ -173,21 +231,25 @@ const Search = () => {
             }}
           />
           <View style={{ position: 'absolute', zIndex: 1, padding: 20 }}>
-            <AppText
-              title={'Top 5 Baseball Activities'}
-              textSize={2.5}
-              textFontWeight
-            />
+            <AppText title={'Top 5 Sports'} textSize={2.5} textFontWeight />
 
             <FlatList
-              data={data}
+              data={RecentActivity}
               contentContainerStyle={{ gap: 10, marginTop: 10 }}
-              renderItem={() => {
-                return <TopActivityCard Icon={<SvgIcons.club />} />;
+              renderItem={({ item }) => {
+                return (
+                  <TopActivityCard
+                    Title={item?.sport}
+                    TotalJoined={item?.joinedCount}
+                    TotalJoiner={item?.totalPlayers}
+                    Icon={<SvgIcons.club />}
+                  />
+                );
               }}
             />
           </View>
-          <Banners />
+
+          <Banners data={RecentActivity} />
 
           <View style={{ marginTop: 10 }}>
             <AppText title={'Choose By Sports'} textSize={2.5} textFontWeight />
@@ -197,46 +259,58 @@ const Search = () => {
                 style={{
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  width:responsiveWidth(90)
+                  width: responsiveWidth(90),
+                  marginBottom:20
                 }}
               >
                 {sportsArr.map((item, index) => (
-                  <Image
-                    key={index}
-                    source={item.img}
-                    style={{ width:80, height:80, borderRadius: 10 }}
-                  />
+                  <TouchableOpacity
+                    onPress={() => setSelectedSports(item.sportsName)}
+
+                  >
+                    <Image
+                      key={index}
+                      source={item.img}
+                      style={{ width: 80, height: 80, borderRadius: 10,backgroundColor: item.sportsName == selectedSports ?  AppColors.PINK : null }}
+                    />
+                  </TouchableOpacity>
                 ))}
               </View>
             </ScrollView>
           </View>
+        </View>
 
-          </View>
-
-          
-    <View style={{padding:0}}>
-      <FlatList
-        data={sportsPosts}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap:20, paddingBottom:responsiveHeight(20)}}
-        renderItem={({ item }) => {
-
-          return (
-            <SocialMediaPost
-              name={item.name}
-              ago={item.ago}
-              PostDescription={item.PostDescription}
-              PostPicture={item.PostPicture}
-              JoiningPost={item.JoiningPost}
-              Likes={item.Likes}
-              Comment={item.Comment}
-              Share={item.Share}
-              TotalJoiners={item.TotalJoiners}
-              TotalJoinerRemain={item.TotalJoinerRemain}
-            />
-          );
-        }}
-      />
+        <View style={{ padding: 0 }}>
+          <FlatList
+            data={AllSportPosts.filter((res)=> res.sport == selectedSports)}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              gap: 20,
+              paddingBottom: responsiveHeight(20),
+            }}
+            renderItem={({ item }) => {
+              const isJoined = !!joines?.[item?.postId]?.[userId];
+              return (
+                <SocialMediaPost
+                  AuthorId={item?.authorId}
+                  name={item?.authorName}
+                  ago={moment(item?.createdAt).fromNow()}
+                  PostDescription={item?.caption}
+                  PostPicture={item?.PostPicture}
+                  JoiningPost={item?.totalPlayers > 0 ? true : false}
+                  IsJoined={isJoined}
+                  Likes={item?.likesCount}
+                  Comment={item?.commentsCount}
+                  Share={item?.sharesCount}
+                  TotalJoiners={item?.totalPlayers}
+                  TotalJoinerRemain={item?.joinedCount}
+                  isAutherPost={item?.authorId == userId}
+                  navigation={navigation}
+                  RemoveFunctionality={true}
+                />
+              );
+            }}
+          />
         </View>
       </ScrollView>
     </ImageBackground>

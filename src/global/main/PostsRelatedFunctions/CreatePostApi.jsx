@@ -46,9 +46,11 @@ const geoRef = ref(db, "geoPosts");
 const geoFire = new GeoFire(geoRef);
 
 export async function CreatePostApi(UserData, userId, caption, CountMeDetails, postLink, matchDateAndTime, AddressDetail, imageUrl) {
+
+
   try {
     const newPostRef = push(ref(db, "posts"));
-
+    
     const { latitude, longitude, address } = AddressDetail || {};
 
     const postData = {
@@ -66,9 +68,10 @@ export async function CreatePostApi(UserData, userId, caption, CountMeDetails, p
       createdAt: Date.now(),
       totalPlayers: CountMeDetails?.totalPlayers ? JSON.parse(CountMeDetails?.totalPlayers) : 0,
       amount: CountMeDetails?.amount,
-      matchDateAndTime,
+      matchDateAndTime: JSON.stringify(matchDateAndTime),
       joinedCount: 0,
       sport: CountMeDetails?.sport,
+      isJoiningPost: CountMeDetails?.sport ?  true : false,
       latitude,
       longitude,
       address,

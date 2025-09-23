@@ -25,11 +25,11 @@ const ActivityCard = ({ActivityName,Icon,JoiningFee,TotalJoined,TotalJoiner}: pr
             <SvgIcons.size/>
         </View>
 
-        <AppText title={"Activity Name"} textSize={3} textFontWeight/>
+        <AppText title={ActivityName} textSize={3} textFontWeight/>
 
         <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
-                <IconText Icon={<SvgIcons.pfpb/>} title='(5/6)' titleColour={AppColors.BLACK}/>
-                <IconText Icon={<SvgIcons.pennyb />} title='$200' titleColour={AppColors.BLACK}/>
+                <IconText Icon={<SvgIcons.pfpb/>} title={`(${TotalJoined}/${TotalJoiner})`} titleColour={AppColors.BLACK}/>
+                <IconText Icon={<SvgIcons.pennyb />} title={`$${JoiningFee}`} titleColour={AppColors.BLACK}/>
         </View>
     </View>
   )

@@ -9,7 +9,7 @@ const initialState = {
   SportsSkills: [],
   SignupFlowCompleted: false,
   Address: null,
-  AllNearbyPosts: [],
+  
   Gender: '',
   Birthday: '',
   Language: '',
@@ -20,6 +20,10 @@ const initialState = {
   Joined_CountMe: '',
   Contact_Number: '',
   Bio: '',
+
+  AllNearbyPosts: [],
+  AllJoiningPosts: [],
+
 };
 
 export const AuthSlice = createSlice({
@@ -63,6 +67,9 @@ export const AuthSlice = createSlice({
     setNearbyPosts: (state, action) => {
       state.AllNearbyPosts = action.payload;
     },
+    setAllJoiningPosts: (state, action)=>{
+ state.AllJoiningPosts = action.payload;
+    },
     SignOut: state => {
       (state.email = null),
         (state.full_name = null),
@@ -72,7 +79,6 @@ export const AuthSlice = createSlice({
         (state.SportsSkills = []),
         (state.SignupFlowCompleted = false),
         (state.Address = null),
-        (state.AllNearbyPosts = []),
         (state.Gender = ''),
         (state.Birthday = ''),
         (state.Language = ''),
@@ -83,6 +89,8 @@ export const AuthSlice = createSlice({
         (state.Joined_CountMe = ''),
         (state.Contact_Number = ''),
         (state.Bio = '');
+        state.AllNearbyPosts = [];
+        state.AllJoiningPosts = [];
     },
   },
 });
@@ -97,6 +105,7 @@ export const {
   setAddress,
   setSignupFlowCompleted,
   setNearbyPosts,
+  setAllJoiningPosts,
   SignOut,
 } = AuthSlice.actions;
 

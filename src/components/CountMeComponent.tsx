@@ -38,7 +38,7 @@ const CountMeComponent = ({
   onChangeAmount,
 }: props) => {
   const nav = useNavigation();
-  const AddressDetail = useSelector((state: any) => state.auth.Address)
+  const AddressDetail = useSelector((state: any) => state?.auth?.Address)
 
   return (
     <View style={{ paddingHorizontal: 10, paddingBottom: 50, gap: 30 }}>
@@ -109,10 +109,10 @@ const CountMeComponent = ({
           TextInputColour={AppColors.LIGHTGRAY}
           keyboardType={'number-pad'}
           value={
-          AddressDetail.address
+          AddressDetail?.address
           }
           placeholder={
-            AddressDetail.address ? AddressDetail.address : 'Add Location'
+            AddressDetail?.address ? AddressDetail?.address : 'Add Location'
           }
           editable={false}
         />

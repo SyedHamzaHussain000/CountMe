@@ -27,15 +27,18 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'; // remove 
 import { getNearbyPosts } from '../../global/main/mapsScreenFunctions/GetNearbyPosts';
 import { useDispatch, useSelector } from 'react-redux';
 import GetAllJoinerByPost from '../../global/main/mapsScreenFunctions/GetAllJoinerByPost';
+import moment from 'moment';
 
 const Maps = ({ navigation }) => {
   const dispatch = useDispatch();
   const mapRef = useRef();
   const AllNearbyPosts = useSelector(state => state?.auth?.AllNearbyPosts);
 
+
   const [postIndex, setPostIndex] = useState(0);
   const [AllPostJoinersState, setAllPostJoinersState] = useState([]);
   const [JoinerLoader, setJoinerLoader] = useState(false);
+
 
   const data = [
     { id: 1, name: 'Alex Hales', type: 'Organizer' },
@@ -72,9 +75,9 @@ const Maps = ({ navigation }) => {
     await getNearbyPosts(40.7579747, -73.9855426, 300, dispatch);
   };
 
+  // 40.9651419
+  // -73.6751251
   const getAllJoiners = async (AllNearbyPosts, i) => {
-
-
     setJoinerLoader(true);
     const getPostJoiners = await GetAllJoinerByPost(
       AllNearbyPosts[i == 0 || i > 0 ? i : postIndex]?.postId,
@@ -221,7 +224,7 @@ const Maps = ({ navigation }) => {
           <IconText
             title={
               AllNearbyPosts[postIndex]?.matchDateAndTime
-                ? AllNearbyPosts[postIndex]?.matchDateAndTime
+                ? moment(JSON.parse( AllNearbyPosts[postIndex]?.matchDateAndTime)).format("DD MMM YYYY hh:mm A")
                 : '-'
             }
             Icon={<SvgIcons.calender />}

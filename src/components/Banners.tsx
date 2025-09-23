@@ -10,7 +10,13 @@ import { SvgIcons } from '../assets/icons/HomeIcons/SvgIcons'
 import IconText from './AppCommonComponents/IconText'
 import AppImages from '../assets/images/AppImages'
 
-const Banners = () => {
+type props ={
+  data: any
+} 
+
+const Banners = ({data}: props) => {
+
+
   return (
              <ImageBackground
                source={AppImages.cardbg}
@@ -32,7 +38,7 @@ const Banners = () => {
                    }}
                  >
                    <AppText
-                     title={'Lorem Ipsum is simply'}
+                     title={data[0]?.sport}
                      textSize={2.2}
                      textFontWeight
                      textColor={AppColors.WHITE}
@@ -42,16 +48,16 @@ const Banners = () => {
                      icon={<SvgXml xml={Appsvgicon.Send} height={18} width={18} />}
                    />
                  </View>
-   
+
                  <IconText
                    Icon={<SvgIcons.pfp />}
-                   title="participants (5/6)"
+                   title={`participants (${data[0]?.joinedCount}/${data[0]?.totalPlayers})`}
                    titleColour={AppColors.WHITE}
                  />
                  <View>
                    <IconText
                      Icon={<SvgIcons.location />}
-                     title="Lorem Ipsum is simply"
+                     title={data[0]?.address}
                      titleColour={AppColors.WHITE}
                    />
                    <View

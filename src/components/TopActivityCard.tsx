@@ -21,8 +21,8 @@ const TopActivityCard = ({Icon,Title,TotalJoined,TotalJoiner}:props) => {
             }
             <View>
 
-            <AppText title={"Lorem Ipsum is simply"} textSize={2} textFontWeight/>
-            <AppText title={"5/6 joined"} textSize={2} />
+            <AppText title={Title} textSize={2} textFontWeight/>
+            <AppText title={`(${TotalJoined}/${TotalJoiner})`} textSize={2} />
             </View>
             </View>
 

@@ -8,28 +8,32 @@ const db = getDatabase();
 const geoRef = ref(db, "geoPosts");
 const geoFire = new GeoFire(geoRef);
 
-export function getNearbyPosts(lat, lng, radiusInM = 200, dispatch) {
+export function getNearbyPosts(lat, lng, radiusInM , dispatch) {
+
 
     
   return new Promise((resolve, reject) => {
     const geoQuery = geoFire.query({
       center: [lat, lng],
-      radius: radiusInM / 1000, // km
+      radius: 300, // km
     });
     
-
     const posts = [];
     const fetchPromises = [];
 
+
     geoQuery.on("key_entered", (key) => {
+
+      console.log("key",key)
       const p = get(ref(db, "posts/" + key)).then((snap) => {
         if (snap.exists()) {
-        //   console.log("snap", snap.val());
           posts.push(snap.val());
         }
       });
       fetchPromises.push(p);
     });
+
+
 
     geoQuery.on("ready", async () => {
         try {

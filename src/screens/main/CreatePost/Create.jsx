@@ -45,13 +45,13 @@ const Create = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
 
-  console.log('CountMeDetails', CountMeDetails);
+  console.log('CountMeDetails', date);
 
   const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
   const UserData = useSelector(state => state?.auth);
   const AddressDetail = useSelector(state => state?.auth?.Address);
 
-  console.log("AddressDetail",AddressDetail)
+
 
   const createPostApiCall = async () => {
     if (Caption == '') {
@@ -73,6 +73,7 @@ const Create = ({ navigation }) => {
     setLoader(false);
   };
 
+
   return (
     <View style={{ flex: 1 }}>
       <DatePicker
@@ -80,6 +81,7 @@ const Create = ({ navigation }) => {
         date={date}
         open={show}
         mode="datetime"
+
         minimumDate={new Date()}
         onConfirm={selectedDate => {
           setDate(selectedDate);
@@ -118,22 +120,23 @@ const Create = ({ navigation }) => {
           </View>
         </View>
 
+        
         {postType == 'Countme' ? (
           <CountMeComponent
             MyFavSports={MyFavSports}
             handlePressButton={item => {
               setCountMeDetails({ ...CountMeDetails, sport: item?.name });
             }}
-            value={CountMeDetails.sport}
+            value={CountMeDetails?.sport}
             handleNormalButtonPress={() => setPostType('')}
             onChangeText={txt =>
               setCountMeDetails({ ...CountMeDetails, totalPlayers: txt })
             }
-            textValue={CountMeDetails.totalPlayers}
+            textValue={CountMeDetails?.totalPlayers}
             onChangeAmount={txt =>
               setCountMeDetails({ ...CountMeDetails, amount: txt })
             }
-            AmountValue={CountMeDetails.amount}
+            AmountValue={CountMeDetails?.amount}
             onDatePickerPress={() => setShow(true)}
             dateValue={date}
             show={show}

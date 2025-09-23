@@ -34,6 +34,7 @@ type props = {
   onViewProfilePress?: () => void;
   onRunnerPress?:()=> void;
   navigation?: any
+  RemoveFunctionality?:boolean
 };
 const SocialMediaPost = ({
   AuthorId,
@@ -56,7 +57,8 @@ const SocialMediaPost = ({
   onSharePress,
   onViewProfilePress,
   onRunnerPress,
-  navigation
+  navigation,
+  RemoveFunctionality
 }: props) => {
 
 
@@ -100,6 +102,9 @@ const SocialMediaPost = ({
         )
       }
 
+        {
+          !RemoveFunctionality && (
+
       <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
         <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
             <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.LIKE} />} onPress={onLikePress}/>
@@ -117,6 +122,8 @@ const SocialMediaPost = ({
           }
         </View>
       </View>
+          )
+        }
 
       <View style={{marginTop:10}}>
         <Line colour={"lightgray"}/>
