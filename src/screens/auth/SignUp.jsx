@@ -25,10 +25,10 @@ const SignUp = ({ navigation }) => {
 
   const dispatch = useDispatch()
   const [credientials, setCredientials] = useState({
-    full_name: 'Hamza',
-    email: 'hamza@gmail.com',
-    passord: '1234567890',
-    re_type_password: '1234567890',
+    full_name: '',
+    email: '',
+    passord: '',
+    re_type_password: '',
   });
   const [loader, setLoader] = useState(false);
 
