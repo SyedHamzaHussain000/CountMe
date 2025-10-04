@@ -27,8 +27,8 @@ import { setFavouriteSports, setProfilePicture, setSignupFlowCompleted, setSport
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('test@gmail.com');
-  const [password, setPassword] = useState('1234567890');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const LoginApi = () => {
     if (email == '' || password == '') {
       ShowToast('error', 'Please enter your email and password');
@@ -102,12 +102,14 @@ const Login = ({ navigation }) => {
               marginBottom: 5,
             }}
           >
-            <AppTextInput title="Email" placeholder="abc@yahoo.com" />
+            <AppTextInput title="Email" placeholder="abc@yahoo.com" onChangeText={(txt)=> setEmail(txt)} value={email}/>
             <AppTextInput
               title="Password"
               placeholder="*************"
               password={true}
               secureTextEntry={true}
+              onChangeText={(txt)=> setPassword(txt)} 
+              value={password}
             />
           </View>
           <AppText

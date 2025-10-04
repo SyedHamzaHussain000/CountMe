@@ -6,6 +6,7 @@ import {
   Platform,
   Alert,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
@@ -21,6 +22,8 @@ import GetAllPosts from '../../global/main/PostsRelatedFunctions/GetAllPosts';
 import moment from 'moment';
 import {
   getDatabase,
+  off,
+  onValue,
   ref,
   remove,
   runTransaction,
@@ -29,16 +32,54 @@ import {
 import GetAllPostLikes from '../../global/main/PostsRelatedFunctions/GetAllPostLikes';
 import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
 import NormalizeData from '../../global/utils/NormalizeData';
+import {
+  AutoSkeletonView,
+  AutoSkeletonIgnoreView,
+} from 'react-native-auto-skeleton';
+import AppColors from '../../utils/Other/AppColors';
 
 const Home = ({ navigation }) => {
   const [VisibleModal, SetVisibleModal] = useState(false);
   const [allLocalPost, setAllLocalPosts] = useState([]);
   const [likes, setLikes] = useState([]);
   const [joines, setJoines] = useState([]);
+  const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
 
   const userId = getAuth()?.currentUser?.uid;
   const userDetail = useSelector(state => state?.auth);
+
+  // useEffect(() => {
+  //   const db = getDatabase();
+  //   const postsRef = ref(db, 'posts');
+
+  //   const unsubscribe = onValue(postsRef, snapshot => {
+  //     if (snapshot.exists()) {
+  //       const data = Object.values(snapshot.val());
+  //       setAllLocalPosts(data.reverse()); // latest first
+  //     }
+  //     setLoader(false);
+  //   });
+
+  //   return () => off(postsRef, 'value', unsubscribe);
+  // }, []);
+
+
+//   useEffect(() => {
+//   const db = getDatabase();
+//   const postsRef = ref(db, 'posts');
+
+//   const unsubscribe = onValue(postsRef, snapshot => {
+//     if (snapshot.exists()) {
+//       const data = Object.values(snapshot.val());
+//       setAllLocalPosts(data.reverse()); // latest first
+//     }
+//     setLoader(false);
+//   });
+
+//   // cleanup
+//   return () => unsubscribe();
+// }, []);
 
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
@@ -49,6 +90,7 @@ const Home = ({ navigation }) => {
   }, [navigation]);
 
   const getAllNewPost = async () => {
+    setLoader(true);
     const GetPostAndSetToLocalState = await GetAllPosts();
     const getPostLikes = await GetAllPostLikes();
     const getPostJoins = await GetAllPostJoins();
@@ -59,6 +101,7 @@ const Home = ({ navigation }) => {
     setAllLocalPosts(GetPostAndSetToLocalState);
     setLikes(normalizedLikes);
     setJoines(normalizedJoins);
+    setLoader(false);
   };
 
   const toggleLike = async (postId, isLiked) => {
@@ -185,7 +228,7 @@ const Home = ({ navigation }) => {
         {
           text: 'Share',
           onPress: () => {
-            sharePost()
+            sharePost();
           },
         },
       ],
@@ -193,30 +236,34 @@ const Home = ({ navigation }) => {
     );
   };
 
-const sharePost = async (postId, authorId) => {
-  const db = getDatabase();
+  const sharePost = async (postId, authorId) => {
+    const db = getDatabase();
 
-  try {
-    // Save share record
-    const shareRef = push(ref(db, "shares"));
-    await set(shareRef, {
-      postId,
-      authorId,
-      sharedBy: userId,
-      sharedAt: Date.now(),
-    });
+    try {
+      // Save share record
+      const shareRef = push(ref(db, 'shares'));
+      await set(shareRef, {
+        postId,
+        authorId,
+        sharedBy: userId,
+        sharedAt: Date.now(),
+      });
 
-    // Increment sharesCount
-    const postSharesCountRef = ref(db, `posts/${postId}/sharesCount`);
-    await runTransaction(postSharesCountRef, (count) => (count || 0) + 1);
+      // Increment sharesCount
+      const postSharesCountRef = ref(db, `posts/${postId}/sharesCount`);
+      await runTransaction(postSharesCountRef, count => (count || 0) + 1);
 
-    console.log("✅ Post shared to feed");
-  } catch (err) {
-    console.error("❌ Error sharing post:", err);
-  }
-};
+      console.log('✅ Post shared to feed');
+    } catch (err) {
+      console.error('❌ Error sharing post:', err);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
+
+
+
       <AppHeader />
 
       <TouchableOpacity
@@ -230,9 +277,22 @@ const sharePost = async (postId, authorId) => {
       </TouchableOpacity>
 
       <View style={{ padding: 20 }}>
+        {/* {loader && (
+          <AutoSkeletonView isLoading={loader}>
+            <SocialMediaPost />
+          </AutoSkeletonView>
+        )} */}
+
         <FlatList
           data={allLocalPost}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={loader}
+              onRefresh={() => getAllNewPost()}
+              colors={[AppColors.PINK]}
+            />
+          }
           contentContainerStyle={{
             gap: 20,
             paddingBottom: responsiveHeight(40),
@@ -271,7 +331,9 @@ const sharePost = async (postId, authorId) => {
                     runner: true,
                   })
                 }
-                onSharePress={() => sharePostAlert(item?.postId, item?.authorId)}
+                onSharePress={() =>
+                  sharePostAlert(item?.postId, item?.authorId)
+                }
                 isAutherPost={item?.authorId == userId}
                 navigation={navigation}
               />

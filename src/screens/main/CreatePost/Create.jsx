@@ -71,6 +71,7 @@ const Create = ({ navigation }) => {
       AddressDetail,
       '',
     );
+    navigation.goBack()
     setLoader(false);
   };
 

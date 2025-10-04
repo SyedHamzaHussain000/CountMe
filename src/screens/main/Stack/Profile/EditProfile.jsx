@@ -14,6 +14,8 @@ import { setUpdateUserDetails } from '../../../../redux/slices/AuthSlice';
 const EditProfile = ({ navigation }) => {
   const userDetail = useSelector(state => state.auth);
 
+  const [loader, setLoader] = useState()
+
   const [info, setInfo] = useState({
     full_name: userDetail?.full_name,
     Gender: userDetail?.Gender,
@@ -34,14 +36,16 @@ const EditProfile = ({ navigation }) => {
 
   const updateUserData = async () => {
     try {
+      setLoader(true)
       const db = getDatabase();
       const userRef = ref(db, `Users/${UserId}`);
 
       await update(userRef, info);
       dispatch(setUpdateUserDetails(info))
-
+      setLoader(false)
       console.log('✅ User data updated successfully');
     } catch (error) {
+      setLoader(false)
       console.error('❌ Error updating user data:', error);
     }
   };
@@ -153,7 +157,7 @@ const EditProfile = ({ navigation }) => {
           value={info.Bio}
         />
 
-        <AppButton title="Update" handlePress={()=>updateUserData()}/>
+        <AppButton title="Update" handlePress={()=>updateUserData()} loading={loader}/>
       </View>
     </ScrollView>
   );

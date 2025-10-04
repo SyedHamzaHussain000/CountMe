@@ -244,6 +244,10 @@ const OtherUserProfile = ({ navigation, route }) => {
         </View> */}
 
           <View>
+            <View style={{marginTop:20, alignSelf:'flex-end'}}>
+            <AppButton title='Chat' width={40}marginTop={20} handlePress={()=> navigation.navigate("Conversation",{friendId: FriendId, friendName: userDetail?.full_name})} />
+            </View>
+        
             <View
               style={{
                 flexDirection: 'row',
@@ -252,6 +256,7 @@ const OtherUserProfile = ({ navigation, route }) => {
                 marginTop: 20,
               }}
             >
+              
               <AppText title={userDetail?.full_name} textSize={3} textFontWeight />
 
               <View

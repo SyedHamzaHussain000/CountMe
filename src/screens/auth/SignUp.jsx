@@ -25,8 +25,8 @@ const SignUp = ({ navigation }) => {
 
   const dispatch = useDispatch()
   const [credientials, setCredientials] = useState({
-    full_name: 'test',
-    email: 'test@gmail.com',
+    full_name: 'Hamza',
+    email: 'hamza@gmail.com',
     passord: '1234567890',
     re_type_password: '1234567890',
   });

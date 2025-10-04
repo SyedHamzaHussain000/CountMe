@@ -6,30 +6,34 @@ import AppText from './AppCommonComponents/AppText'
 import AppColors from '../utils/Other/AppColors'
 import Line from './AppCommonComponents/Line'
 import { useNavigation } from '@react-navigation/native'
+import moment from 'moment'
 
 type props = {
     pfp?: any,
     name?: string,
     message?: string,
     time?:any,
+    FriendId?:any
 }
 
-const ConversationBar = ({message,name ,pfp,time, }:props) => {
+const ConversationBar = ({message,name ,pfp,time,FriendId }:props) => {
+
+
     const navigation = useNavigation()
   return (
     <>
     
-    <TouchableOpacity onPress={()=> navigation.navigate("Conversation")} style={{flexDirection:'row', alignItems:'center', width:responsiveWidth(90), alignSelf:'center', justifyContent:'space-between'}}>
+    <TouchableOpacity onPress={()=> navigation.navigate("Conversation",{friendId: FriendId, friendName: name})} style={{flexDirection:'row', alignItems:'center', width:responsiveWidth(90), alignSelf:'center', justifyContent:'space-between'}}>
         <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
             <Image source={AppImages.IMAGES} style={{height:responsiveHeight(6), width:responsiveHeight(6)}}/>
             <View>
-                <AppText title={"Mary Elizabeth"} textColor={AppColors.BLACK} textSize={2} textFontWeight/>
-                <AppText title={"mary: hello"} textColor={AppColors.GRAY} />
+                <AppText title={name} textColor={AppColors.BLACK} textSize={2} textFontWeight/>
+                <AppText title={message} textColor={AppColors.GRAY} />
             </View>
         </View>
 
 
-      <AppText title={"11:20 PM"} textColor={AppColors.GRAY} />
+      <AppText title={moment(time).format("hh:mm A")} textColor={AppColors.GRAY} />
 
       
     </TouchableOpacity>
