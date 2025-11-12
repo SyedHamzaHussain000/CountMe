@@ -20,24 +20,31 @@ useEffect(() => {
     .collection('chats')
     .orderBy('lastMessageAt', 'desc')
     .onSnapshot(snapshot => {
-      const filteredChats = snapshot?.docs?.map(doc => {
-  const data = doc?.data();
+      const filteredChats = snapshot?.docs
+        ?.map(doc => {
+          const data = doc?.data();
+          const amIExist = data?.participants?.some(p => p._id === myID);
+          
+          if (amIExist) {
+            const otherUser = data?.participants?.find(p => p._id !== myID);
+            return {
+              id: doc.id,
+              ...data,
+              otherUser,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean); 
 
-  const otherUser = data?.participants?.find(p => p._id !== myID);
-
-  return {
-    id: doc.id,
-    ...data,
-    otherUser,
-  };
-});
-
-setChatList(filteredChats);
-    
+      setChatList(filteredChats);
     });
 
   return () => unsubscribe();
 }, [myID]);
+
+
+console.log("chatlist", chatList)
   return (
     <View style={{flex:1,backgroundColor:AppColors.WHITE}}>
       <AppHeader/>
@@ -56,11 +63,13 @@ setChatList(filteredChats);
 
       contentContainerStyle={{gap:20,marginTop:20, paddingBottom:150}}
       renderItem={({item})=>{
+
+        console.log("utem", item)
         return(
           <ConversationBar
           name={item?.otherUser?.fullName}
           message={item?.lastMessage}
-          time={item.lastMessageAt}
+          time={item?.lastMessageAt}
           FriendId={item?.otherUser?._id}
           />
         )

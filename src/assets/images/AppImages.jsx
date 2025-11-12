@@ -37,4 +37,7 @@ export default AppImages = {
     link: require('./link.png'),
     photo: require('./photo.png'),
     poll: require('./poll.png'),
+
+    MainHeaderIcon: require('./MainHeaderIcon.png'),
+    mainHeaderRowlogo : require('./mainHeaderRowlogo.png')
 } 

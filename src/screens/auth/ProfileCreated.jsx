@@ -16,19 +16,19 @@ const ProfileCreated = ({navigation}) => {
   
   return (
     <ImageBackground
-      source={AppImages.STARTBG}
+      source={AppImages.AUTHBG}
       style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
     >
       <View
         style={{
-          gap: 10,
+          gap: 30,
           alignItems: 'center',
           justifyContent: 'center',
-          height: responsiveHeight(60),
+          height: responsiveHeight(61),
         }}
       >
-        <AppText title={'Profile Created'} textSize={3.5} textFontWeight />
-        <AppText title={'welcome to Count Me'} textSize={3} textFontWeight />
+        <AppText title={'Profile Created'} textSize={3.5} textFontWeight textColor={AppColors.WHITE} />
+        {/* <AppText title={'welcome to Count Me'} textSize={3} textFontWeight textColor={AppColors.WHITE}/>
         <AppText
           title={
             'Lorem Ipsum is simply dummy text of the printing and typesetting industry.'
@@ -36,6 +36,14 @@ const ProfileCreated = ({navigation}) => {
           textwidth={80}
           textAlignment={'center'}
           textSize={2}
+        /> */}
+      <Image
+          source={AppImages.MainHeaderIcon}
+          style={{
+            height: responsiveHeight(20),
+            resizeMode: 'contain',
+            width: responsiveWidth(100),
+          }}
         />
 
         <Image
@@ -47,6 +55,7 @@ const ProfileCreated = ({navigation}) => {
           }}
         />
       </View>
+
 
       <AppButton title="Get Started" handlePress={()=> navigation.navigate("MainNavigator")} />
         

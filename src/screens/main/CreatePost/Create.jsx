@@ -7,6 +7,7 @@ import {
   Alert,
   ToastAndroid,
   FlatList,
+  Image,
 } from 'react-native';
 import React, { useState } from 'react';
 import AppColors from '../../../utils/Other/AppColors';
@@ -28,7 +29,7 @@ import NormalBlackButton from '../../../components/AppCommonComponents/NormalBla
 import GooglePlacesTextInput from 'react-native-google-places-textinput';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const Create = ({ navigation }) => {
   const userId = getAuth()?.currentUser?.uid;
@@ -46,13 +47,13 @@ const Create = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
 
+  const [selectedType, setSelectedType] = useState('Activity Post');
+
   console.log('CountMeDetails', date);
 
   const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
   const UserData = useSelector(state => state?.auth);
   const AddressDetail = useSelector(state => state?.auth?.Address);
-
-
 
   const createPostApiCall = async () => {
     if (Caption == '') {
@@ -71,34 +72,41 @@ const Create = ({ navigation }) => {
       AddressDetail,
       '',
     );
-    navigation.goBack()
+    navigation.goBack();
     setLoader(false);
   };
 
-
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-  
-         <DateTimePickerModal
+      <DateTimePickerModal
         isVisible={show}
         minimumDate={new Date()}
         mode="datetime"
-        onConfirm={(selectedDate)=>{setDate(selectedDate), setShow(false)}}
-        onCancel={()=>{setShow(false)}}
-
+        onConfirm={selectedDate => {
+          setDate(selectedDate), setShow(false);
+        }}
+        onCancel={() => {
+          setShow(false);
+        }}
       />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1, backgroundColor: AppColors.WHITE }}
       >
-        <View style={{ flex: 1, padding: 20 }}>
+        <View style={{ padding: 20 }}>
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-between' }}
           >
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <AntDesign name={'close'} size={20} color={AppColors.BLACK} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center' , gap:10}}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <AntDesign name={'close'} size={20} color={AppColors.BLACK} />
+              </TouchableOpacity>
+              <Image
+                source={AppImages.mainHeaderRowlogo}
+                style={{  width: 120, resizeMode: 'contain' }}
+              />
+            </View>
 
             <SmallButtons
               title="POST"
@@ -107,36 +115,56 @@ const Create = ({ navigation }) => {
             />
           </View>
 
-          <View>
+          {/* <View>
             <AppTextInput
               placeholder="What’s on your mind"
               onChangeText={txt => setCaption(txt)}
               value={Caption}
             />
-          </View>
+          </View> */}
         </View>
 
-        
-        {postType == 'Countme' ? (
-          <CountMeComponent
-            MyFavSports={MyFavSports}
-            handlePressButton={item => {
-              setCountMeDetails({ ...CountMeDetails, sport: item?.name });
-            }}
-            value={CountMeDetails?.sport}
-            handleNormalButtonPress={() => setPostType('')}
-            onChangeText={txt =>
-              setCountMeDetails({ ...CountMeDetails, totalPlayers: txt })
-            }
-            textValue={CountMeDetails?.totalPlayers}
-            onChangeAmount={txt =>
-              setCountMeDetails({ ...CountMeDetails, amount: txt })
-            }
-            AmountValue={CountMeDetails?.amount}
-            onDatePickerPress={() => setShow(true)}
-            dateValue={date}
-            show={show}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignSelf: 'center',
+            gap: 20,
+            marginBottom: 20,
+          }}
+        >
+          <SelectableButtons
+            width={45}
+            title="Activity Post"
+            handlePress={() => setSelectedType('Activity Post')}
+            value={selectedType}
           />
+          <SelectableButtons
+            width={45}
+            title="Chill Post"
+            handlePress={() => setSelectedType('Chill Post')}
+            value={selectedType}
+          />
+        </View>
+        <CountMeComponent
+          MyFavSports={MyFavSports}
+          handlePressButton={item => {
+            setCountMeDetails({ ...CountMeDetails, sport: item?.name });
+          }}
+          value={CountMeDetails?.sport}
+          handleNormalButtonPress={() => setPostType('')}
+          onChangeText={txt =>
+            setCountMeDetails({ ...CountMeDetails, totalPlayers: txt })
+          }
+          textValue={CountMeDetails?.totalPlayers}
+          onChangeAmount={txt =>
+            setCountMeDetails({ ...CountMeDetails, amount: txt })
+          }
+          AmountValue={CountMeDetails?.amount}
+          onDatePickerPress={() => setShow(true)}
+          dateValue={date}
+          show={show}
+        />
+        {/* {postType == 'Countme' ? (
         ) : postType == 'link' ? (
           <View style={{ padding: 20, paddingBottom: 100, gap: 30 }}>
             <NormalBlackButton onPress={() => setPostType('')} />
@@ -177,9 +205,9 @@ const Create = ({ navigation }) => {
               title={ "Add location"}
               onHandlePress={() => navigation.navigate('AddLocation')}
             />
-            {/* <PostFeatureBar img={AppImages.live} title="Live Video" /> */}
+
           </View>
-        )}
+        )} */}
       </KeyboardAvoidingView>
     </ScrollView>
   );

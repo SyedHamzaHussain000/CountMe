@@ -9,6 +9,7 @@ import NormalBlackButton from './AppCommonComponents/NormalBlackButton';
 import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+import AppButton from './AppCommonComponents/AppButton';
 
 type props = {
   MyFavSports?: any;
@@ -42,10 +43,10 @@ const CountMeComponent = ({
 
   return (
     <View style={{ paddingHorizontal: 10, paddingBottom: 50, gap: 30 }}>
-      <View style={{ gap: 10 }}>
-        <NormalBlackButton onPress={handleNormalButtonPress} />
-        <AppText title={'Select Sports'} textSize={2} />
-        <FlatList
+      <View style={{ gap: 10, flexDirection:'row', justifyContent:'space-between' }}>
+        {/* <NormalBlackButton onPress={handleNormalButtonPress} /> */}
+        {/* <AppText title={'Select Sports'} textSize={2} /> */}
+        {/* <FlatList
           data={MyFavSports}
           horizontal
           contentContainerStyle={{ gap: 10, marginTop: 10 }}
@@ -59,7 +60,11 @@ const CountMeComponent = ({
               />
             );
           }}
-        />
+        /> */}
+
+        <AppButton width={40} title='Add Activity'/>
+
+        <AppButton width={40} title='Upload Image'/>
       </View>
 
       <AppTextInput

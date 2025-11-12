@@ -27,8 +27,8 @@ import { setFavouriteSports, setProfilePicture, setSignupFlowCompleted, setSport
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('1234567890');
   const LoginApi = () => {
     if (email == '' || password == '') {
       ShowToast('error', 'Please enter your email and password');

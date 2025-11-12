@@ -248,6 +248,7 @@ const Conversation = ({navigation, route}) => {
       <FlatList
         data={existedMessage}
         contentContainerStyle={{padding:10, gap:20}}
+        inverted
         renderItem={({ item }) => {
 
           console.log("item",item)

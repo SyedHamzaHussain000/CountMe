@@ -16,6 +16,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProfilePicture } from '../../redux/slices/AuthSlice';
 import { getAuth } from '@react-native-firebase/auth';
+import BackButtonWithHeader from '../../components/BackButtonWithHeader';
 
 const UploadPicture = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ const UploadPicture = ({ navigation }) => {
   return (
     <Container backgroundImage={AppImages.AUTHBG}>
       <View style={{ gap: 20 }}>
-        <BackButton />
+        <BackButtonWithHeader/>
         <AppText
           title={'upload your photo'}
           textSize={3}
@@ -59,7 +60,7 @@ const UploadPicture = ({ navigation }) => {
       </View>
 
       <View style={{ gap: 20, marginTop: 30 }}>
-        <View style={{ height: responsiveHeight(50) }}>
+        <View style={{ height: responsiveHeight(40) }}>
           <TouchableOpacity
             onPress={openLibrary}
             style={{ alignSelf: 'center' }}
@@ -81,7 +82,7 @@ const UploadPicture = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ marginTop: 20, gap: 10 }}>
+        <View style={{  gap: 10 }}>
           <AppButton
             title="Continue"
             handlePress={() => navigation.navigate('AddSports')}

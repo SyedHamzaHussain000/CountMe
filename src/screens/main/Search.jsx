@@ -81,7 +81,7 @@ const Search = ({ navigation }) => {
 
   const CreateRecentActivity = SortStartingSoonPosts => {
     const now = moment();
-    const oneWeekLater = moment().add(7, 'days');
+    const oneWeekLater = moment().add(20, 'days');
 
     const filtered = SortStartingSoonPosts.filter(post => {
       if (!post.matchDateAndTime) return false;

@@ -17,92 +17,92 @@ import SelectSports from '../../../components/SelectSports';
 import AppButton from '../../../components/AppCommonComponents/AppButton';
 import { setFavouriteSports } from '../../../redux/slices/AuthSlice';
 import { useDispatch } from 'react-redux';
+import BackButtonWithHeader from '../../../components/BackButtonWithHeader';
+import LineBreak from '../../../components/LineBreak';
+import AppTextInput from '../../../components/AppCommonComponents/AppTextInput';
 
-const AddSports = ({navigation}) => {
+const AddSports = ({ navigation }) => {
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
-  const Sports = [
-    { id: 1, name: 'Basketball', bgColour: AppColors.PRIMARY },
-    { id: 2, name: 'Football (Soccer)', bgColour: AppColors.SECONDARY },
-    { id: 3, name: 'American Football', bgColour: AppColors.PRIMARY },
-    { id: 4, name: 'Rugby', bgColour: AppColors.SECONDARY },
-    { id: 5, name: 'Baseball', bgColour: AppColors.PRIMARY },
-    { id: 6, name: 'Cricket', bgColour: AppColors.SECONDARY },
-    { id: 7, name: 'Volleyball', bgColour: AppColors.PRIMARY },
-    { id: 8, name: 'Handball', bgColour: AppColors.SECONDARY },
-    { id: 9, name: 'Hockey', bgColour: AppColors.PRIMARY },
-    { id: 10, name: 'Lacrosse', bgColour: AppColors.SECONDARY },
-    { id: 11, name: 'Water Polo', bgColour: AppColors.PRIMARY },
-    { id: 12, name: 'Softball', bgColour: AppColors.SECONDARY },
-    { id: 13, name: 'Futsal', bgColour: AppColors.PRIMARY },
-    { id: 14, name: 'Athletics', bgColour: AppColors.SECONDARY },
-    { id: 15, name: 'Boxing', bgColour: AppColors.PRIMARY },
-    { id: 16, name: 'Wrestling', bgColour: AppColors.SECONDARY },
-    { id: 17, name: 'Gymnastics', bgColour: AppColors.PRIMARY },
-    { id: 18, name: 'Swimming', bgColour: AppColors.SECONDARY },
-    { id: 19, name: 'Diving', bgColour: AppColors.PRIMARY },
-    { id: 20, name: 'Tennis', bgColour: AppColors.SECONDARY },
-    { id: 21, name: 'Table Tennis', bgColour: AppColors.PRIMARY },
-    { id: 22, name: 'Badminton', bgColour: AppColors.SECONDARY },
-    { id: 23, name: 'Squash', bgColour: AppColors.PRIMARY },
-    { id: 24, name: 'Cycling', bgColour: AppColors.SECONDARY },
-    { id: 25, name: 'Triathlon', bgColour: AppColors.PRIMARY },
-    { id: 26, name: 'Marathon Running', bgColour: AppColors.SECONDARY },
-    { id: 27, name: 'Weightlifting', bgColour: AppColors.PRIMARY },
-    { id: 28, name: 'Powerlifting', bgColour: AppColors.SECONDARY },
-    { id: 29, name: 'CrossFit', bgColour: AppColors.PRIMARY },
-    { id: 30, name: 'Skateboarding', bgColour: AppColors.SECONDARY },
-    { id: 31, name: 'Snowboarding', bgColour: AppColors.PRIMARY },
-    { id: 32, name: 'Skiing', bgColour: AppColors.SECONDARY },
-    { id: 33, name: 'Surfing', bgColour: AppColors.PRIMARY },
-    { id: 34, name: 'Windsurfing', bgColour: AppColors.SECONDARY },
-    { id: 35, name: 'Kitesurfing', bgColour: AppColors.PRIMARY },
-    { id: 36, name: 'Rock Climbing', bgColour: AppColors.SECONDARY },
-    { id: 37, name: 'Mountaineering', bgColour: AppColors.PRIMARY },
-    { id: 38, name: 'Skydiving', bgColour: AppColors.SECONDARY },
-    { id: 39, name: 'Paragliding', bgColour: AppColors.PRIMARY },
-    { id: 40, name: 'Parkour', bgColour: AppColors.SECONDARY },
-    { id: 41, name: 'BMX', bgColour: AppColors.PRIMARY },
-    { id: 42, name: 'Motocross', bgColour: AppColors.SECONDARY },
-    { id: 43, name: 'Karate', bgColour: AppColors.PRIMARY },
-    { id: 44, name: 'Taekwondo', bgColour: AppColors.SECONDARY },
-    { id: 45, name: 'Judo', bgColour: AppColors.PRIMARY },
-    { id: 46, name: 'Jiu-Jitsu', bgColour: AppColors.SECONDARY },
-    { id: 47, name: 'Kickboxing', bgColour: AppColors.PRIMARY },
-    { id: 48, name: 'Muay Thai', bgColour: AppColors.SECONDARY },
-    { id: 49, name: 'MMA', bgColour: AppColors.PRIMARY },
-    { id: 50, name: 'Capoeira', bgColour: AppColors.SECONDARY },
-    { id: 51, name: 'Sambo', bgColour: AppColors.PRIMARY },
-    { id: 52, name: 'Fencing', bgColour: AppColors.SECONDARY },
-    { id: 53, name: 'Golf', bgColour: AppColors.PRIMARY },
-    { id: 54, name: 'Archery', bgColour: AppColors.SECONDARY },
-    { id: 55, name: 'Shooting', bgColour: AppColors.PRIMARY },
-    { id: 56, name: 'Darts', bgColour: AppColors.SECONDARY },
-    { id: 57, name: 'Billiards', bgColour: AppColors.PRIMARY },
-    { id: 58, name: 'Bowling', bgColour: AppColors.SECONDARY },
-    { id: 59, name: 'Horse Racing', bgColour: AppColors.PRIMARY },
-    { id: 60, name: 'Polo', bgColour: AppColors.SECONDARY },
-    { id: 61, name: 'Equestrian', bgColour: AppColors.PRIMARY },
-    { id: 62, name: 'Dog Sledding', bgColour: AppColors.SECONDARY },
-    { id: 63, name: 'Greyhound Racing', bgColour: AppColors.PRIMARY },
-    { id: 64, name: 'Camel Racing', bgColour: AppColors.SECONDARY },
-    { id: 65, name: 'Rowing', bgColour: AppColors.PRIMARY },
-    { id: 66, name: 'Canoeing', bgColour: AppColors.SECONDARY },
-    { id: 67, name: 'Kayaking', bgColour: AppColors.PRIMARY },
-    { id: 68, name: 'Sailing', bgColour: AppColors.SECONDARY },
-    { id: 69, name: 'Jet Skiing', bgColour: AppColors.PRIMARY },
-    { id: 70, name: 'Water Skiing', bgColour: AppColors.SECONDARY },
-    { id: 71, name: 'Paddleboarding', bgColour: AppColors.PRIMARY },
-    { id: 72, name: 'Chess', bgColour: AppColors.SECONDARY },
-    { id: 73, name: 'Esports', bgColour: AppColors.PRIMARY },
-    { id: 74, name: 'Yoga', bgColour: AppColors.SECONDARY },
-    { id: 75, name: 'Bridge', bgColour: AppColors.PRIMARY },
+  const SelectSubActivity = [
+    // Sports & Physical
+    { id: 1, name: '🏅 Sports & Fitness', bgColour: AppColors.PRIMARY },
+    { id: 2, name: '⚽ Team Sports', bgColour: AppColors.SECONDARY },
+    { id: 3, name: '🏋️‍♂️ Gym & Bodybuilding', bgColour: AppColors.PRIMARY },
+    { id: 4, name: '🚴 Cycling & Running', bgColour: AppColors.SECONDARY },
+    { id: 5, name: '🧘 Yoga & Meditation', bgColour: AppColors.PRIMARY },
+
+    // Creativity & Arts
+    { id: 6, name: '🎨 Arts & Creativity', bgColour: AppColors.SECONDARY },
+    { id: 7, name: '🎭 Drama & Theatre', bgColour: AppColors.PRIMARY },
+    { id: 8, name: '🎵 Music & Singing', bgColour: AppColors.SECONDARY },
+    {
+      id: 9,
+      name: '📸 Photography & Videography',
+      bgColour: AppColors.PRIMARY,
+    },
+    { id: 10, name: '✍️ Writing & Blogging', bgColour: AppColors.SECONDARY },
+
+    // Tech & Learning
+    { id: 11, name: '💻 Technology & Learning', bgColour: AppColors.PRIMARY },
+    { id: 12, name: '🤖 AI & Robotics', bgColour: AppColors.SECONDARY },
+    { id: 13, name: '🧑‍💻 Coding & Development', bgColour: AppColors.PRIMARY },
+    { id: 14, name: '📚 Reading & Research', bgColour: AppColors.SECONDARY },
+    {
+      id: 15,
+      name: '🧩 Problem Solving & Puzzles',
+      bgColour: AppColors.PRIMARY,
+    },
+
+    // Nature & Outdoor
+    { id: 16, name: '🌿 Outdoor & Nature', bgColour: AppColors.SECONDARY },
+    { id: 17, name: '🏕 Camping & Hiking', bgColour: AppColors.PRIMARY },
+    { id: 18, name: '🌊 Water Sports', bgColour: AppColors.SECONDARY },
+    { id: 19, name: '🐾 Animal & Wildlife', bgColour: AppColors.PRIMARY },
+    {
+      id: 20,
+      name: '🌸 Gardening & Eco Living',
+      bgColour: AppColors.SECONDARY,
+    },
+
+    // Mind & Lifestyle
+    { id: 21, name: '🧠 Mind & Relaxation', bgColour: AppColors.PRIMARY },
+    { id: 22, name: '💬 Social & Lifestyle', bgColour: AppColors.SECONDARY },
+    { id: 23, name: '🛍️ Fashion & Shopping', bgColour: AppColors.PRIMARY },
+    { id: 24, name: '🍳 Cooking & Baking', bgColour: AppColors.SECONDARY },
+    { id: 25, name: '🎮 Entertainment & Games', bgColour: AppColors.PRIMARY },
+
+    // Growth & Career
+    { id: 26, name: '🚀 Career & Skill Growth', bgColour: AppColors.SECONDARY },
+    { id: 27, name: '📈 Business & Startups', bgColour: AppColors.PRIMARY },
+    { id: 28, name: '💰 Finance & Investment', bgColour: AppColors.SECONDARY },
+    {
+      id: 29,
+      name: '🗣️ Leadership & Communication',
+      bgColour: AppColors.PRIMARY,
+    },
+    {
+      id: 30,
+      name: '📊 Productivity & Planning',
+      bgColour: AppColors.SECONDARY,
+    },
+
+    // Culture & Community
+    { id: 31, name: '🎭 Culture & Entertainment', bgColour: AppColors.PRIMARY },
+    { id: 32, name: '🌍 Travel & Exploration', bgColour: AppColors.SECONDARY },
+    { id: 33, name: '🎉 Events & Festivals', bgColour: AppColors.PRIMARY },
+    {
+      id: 34,
+      name: '💞 Volunteering & Community',
+      bgColour: AppColors.SECONDARY,
+    },
+    { id: 35, name: '🏠 Home & Lifestyle', bgColour: AppColors.PRIMARY },
   ];
 
   const [searchText, setSearchText] = useState('');
   const [selectedSports, setSelectedSports] = useState([]);
 
-  const filteredSports = Sports.filter(item =>
+  const filteredSports = SelectSubActivity.filter(item =>
     item.name.toLowerCase().includes(searchText.toLowerCase()),
   );
 
@@ -117,42 +117,41 @@ const AddSports = ({navigation}) => {
     });
   };
 
-  useEffect(()=>{
-    dispatch(setFavouriteSports(selectedSports))
-  },[selectedSports])
+
+  useEffect(() => {
+    dispatch(setFavouriteSports(selectedSports));
+  }, [selectedSports]);
 
   return (
     <Container backgroundImage={AppImages.AUTHBG}>
-      <ScrollView style={{ gap: 20 }}>
-        <BackButton />
+      <ScrollView style={{ gap: 20 }} showsVerticalScrollIndicator={false}>
+        <BackButtonWithHeader />
+        <LineBreak height={30} />
         <AppText
-          title="Add Sports"
+          title="Select Activity"
           textSize={3}
           textFontWeight
           textColor={AppColors.WHITE}
         />
         <AppText
-          title="Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+          title="What would you like to do the most in your free time?"
           textColor={AppColors.WHITE}
           textSize={1.8}
         />
 
         {/* 🔎 Search bar */}
-        <AppSearchBar
+        {/* <AppSearchBar
           placeHolder="search your sports here"
           value={searchText}
           onChangeText={setSearchText}
-        />
+        /> */}
 
         {/* 🏀 Sports List */}
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 20 , marginBottom:20}}>
           <FlatList
-            data={filteredSports}
-            numColumns={2}
-            columnWrapperStyle={{
-              justifyContent: 'space-between',
-              marginBottom: 12,
-            }}
+            data={SelectSubActivity}
+            contentContainerStyle={{ flexWrap: 'wrap', flexDirection:'row', gap:10 }}
+            
             renderItem={({ item }) => {
               const isSelected = selectedSports.some(res => res.id == item.id);
 
@@ -168,8 +167,18 @@ const AddSports = ({navigation}) => {
             keyExtractor={item => item.id.toString()}
           />
         </View>
+
+        
+        <View style={{marginBottom:20, gap:10}}>
+          <AppText title={"Other Activity"} textSize={3} textFontWeight textColor={AppColors.WHITE}/>    
+          <AppTextInput />
+        </View>
+
       </ScrollView>
-      <AppButton title="Continue" handlePress={() => navigation.navigate("AddSportsSkills")} />
+      <AppButton
+        title="Continue"
+        handlePress={() => navigation.navigate('ProfileCreated')}
+      />
     </Container>
   );
 };
