@@ -4,6 +4,7 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Container from '../../../components/AppCommonComponents/Container';
@@ -15,12 +16,17 @@ import Line from '../../../components/AppCommonComponents/Line';
 import AppSearchBar from '../../../components/AppCommonComponents/AppSearchBar';
 import SelectSports from '../../../components/SelectSports';
 import AppButton from '../../../components/AppCommonComponents/AppButton';
-import { setFavouriteSports, setUserDetails, setUserUpdateDetailOnly } from '../../../redux/slices/AuthSlice';
+import {
+  setFavouriteSports,
+  setUserDetails,
+  setUserUpdateDetailOnly,
+} from '../../../redux/slices/AuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import BackButtonWithHeader from '../../../components/BackButtonWithHeader';
 import LineBreak from '../../../components/LineBreak';
 import AppTextInput from '../../../components/AppCommonComponents/AppTextInput';
 import { ApiCallFormData } from '../../../utils/apicalls/ApiCalls';
+import ShowToast from '../../../utils/Other/ShowToast';
 
 const AddSports = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -28,6 +34,8 @@ const AddSports = ({ navigation }) => {
   const profileImage = useSelector(state => state.auth.ProfileImage);
   const token = useSelector(state => state.auth.token);
   const userData = useSelector(state => state.auth.userData);
+
+  const [loader, setLoader] = useState(false);
 
   console.log('first', userData);
 
@@ -124,42 +132,47 @@ const AddSports = ({ navigation }) => {
     });
   };
 
-  useEffect(() => {
-    dispatch(setFavouriteSports(selectedSports));
-  }, [selectedSports]);
+  // useEffect(() => {
+  //   dispatch(setFavouriteSports(selectedSports));
+  // }, [selectedSports]);
 
   const UpdateProfile = async () => {
     // console.log("selectedSports",profileImage)
 
-    const userUpdateDetial = {
-      activity: selectedSports.map(res => res.name),
-      image: profileImage?.assets?.map(res => ({
-        type: res?.type,
-        name: res?.fileName,
-        uri: res?.uri,
-      })),
-    };
-    const formData = new FormData();
+    try {
 
-    formData.append(`userId`, userData._id);
-    formData.append('activity', JSON.stringify(userUpdateDetial.activity));
-    userUpdateDetial.image.forEach((img, index) => {
-      formData.append('image', {
-        uri: img.uri,
-        name: img.fileName || `photo_${index}.jpg`,
-        type: img.type || 'image/jpeg',
-      });
-    });
+      const profilePicture = profileImage?.assets[0];
+      setLoader(true);
+      const userUpdateDetial = {
+        activity: selectedSports.map(res => res.name),
+        image: {
+          type: profilePicture?.type,
+          name: profilePicture?.fileName,
+          uri: profilePicture?.uri,
+        },
+      };
 
-    const {data} = await ApiCallFormData(
-      'POST',
-      'updateUser',
-      formData,
-    );
+      const formData = new FormData();
 
-    dispatch(setUserUpdateDetailOnly(data.data))
-    navigation.navigate('ProfileCreated');
+      formData.append(`userId`, userData._id);
+      formData.append('activity', JSON.stringify(userUpdateDetial.activity));
 
+      // userUpdateDetial?.image?.forEach((img, index) => {
+      formData.append('image', userUpdateDetial.image);
+      // });
+
+      const { data } = await ApiCallFormData('POST', 'updateUser', formData);
+
+      console.log('data...........', data);
+
+      setLoader(false);
+      ShowToast('success', data.message);
+
+      dispatch(setUserUpdateDetailOnly(data.data));
+      navigation.navigate('ProfileCreated');
+    } catch (error) {
+      console.log('Error', error);
+    }
   };
 
   return (
@@ -221,7 +234,11 @@ const AddSports = ({ navigation }) => {
           <AppTextInput />
         </View>
       </ScrollView>
-      <AppButton title="Continue" handlePress={() => UpdateProfile()} />
+      <AppButton
+        title="Continue"
+        handlePress={() => UpdateProfile()}
+        loading={loader}
+      />
     </Container>
   );
 };

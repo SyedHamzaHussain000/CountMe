@@ -54,6 +54,9 @@ export const ApiCallWithUserId = async(method, endpoint, userId,data, token= nul
 
 export const ApiCallFormData = async(method, endpoint, data, token = null) => {
    try {
+
+
+
        let config = {
         method: method,
         url: `${BASE_URL}${endpoint}`,
@@ -61,12 +64,12 @@ export const ApiCallFormData = async(method, endpoint, data, token = null) => {
                 'Content-Type': 'multipart/form-data',
                 ...(token && { Authorization: `Bearer ${token}` }) 
             },
-            data : data ? data : '' 
+            data : data
         };  
             const res = await axios(config); 
         return res
     
     } catch (error) {
-     return error
+     return error.response.message
     } 
 }

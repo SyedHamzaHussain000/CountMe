@@ -20,10 +20,11 @@ import Toast from 'react-native-toast-message';
 import ShowToast from '../../utils/Other/ShowToast';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from '../../redux/slices/AuthSlice';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
+import BackButtonWithHeader from '../../components/BackButtonWithHeader';
 
 const SignUp = ({ navigation }) => {
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [credientials, setCredientials] = useState({
     full_name: '',
     email: '',
@@ -32,7 +33,7 @@ const SignUp = ({ navigation }) => {
   });
   const [loader, setLoader] = useState(false);
 
-  const CreateAccount = () => {
+  const CreateAccount = async () => {
     if (
       !credientials.email ||
       !credientials.full_name ||
@@ -44,35 +45,31 @@ const SignUp = ({ navigation }) => {
       ShowToast('error', 'Password does not match');
     } else {
       setLoader(true);
-      createUserWithEmailAndPassword(
-        getAuth(),
-        credientials.email,
-        credientials.passord,
-      )
-        .then(async() => {
-          console.log('User account created & signed in!');
-          dispatch(setUserDetails({
-            email: credientials.email,
-            full_name: credientials.full_name,
-            device_token: null
-          }))
-          ShowToast('success', 'User account created & signed in!');
-        setLoader(false)
-        })
-        .catch(error => {
+
+      try {
+        const signUpDetials = {
+          email: credientials.email,
+          password: credientials.passord,
+          fullName: credientials.full_name,
+        };
+        const { data } = await ApiCall('POST', 'signUpUser', signUpDetials);
+
+        console.log('data', data);
+        if (data.message == 'OTP Sent Successfully!') {
+          ShowToast('success', data.message);
+          navigation.navigate('OtpVerification', { data: data });
           setLoader(false);
-          if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
-            ShowToast('error', 'That email address is already in use!');
-          }
+        } else {
+          ShowToast('error', data.message);
+          setLoader(false);
+        }
+      } catch (error) {
+        console.log('Error', error);
+        ShowToast('error', error);
+        setLoader(false);
+      }
 
-          if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
-            ShowToast('error', 'That email address is invalid!');
-          }
-
-          console.error(error);
-        });
+     
     }
   };
 
@@ -80,7 +77,7 @@ const SignUp = ({ navigation }) => {
     <Container backgroundImage={AppImages.AUTHBG}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ gap: 20 }}>
-          <BackButton />
+          <BackButtonWithHeader/>
           <AppText
             title={'Create Your Account'}
             textSize={3}

@@ -3,10 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   userData: null,
   token: "",
+  ProfileImage: null,
   // email: null,
   // full_name: null,
   // device_token: null,
-  // ProfileImage: null,
   // FavouriteSports: [],
   // SportsSkills: [],
   // SignupFlowCompleted: false,
@@ -48,16 +48,16 @@ export const AuthSlice = createSlice({
     },
     setUserDetails: (state, actions) => {
         state.userData = actions.payload.data
-        state.token = actions.payload.token
+        state.token = actions.payload.token || actions.payload.accessToken
     },
     setUserUpdateDetailOnly: (state, actions) => {
 
 
         state.userData = actions.payload
     },
-    // setProfilePicture: (state, actions) => {
-    //   state.ProfileImage = actions.payload;
-    // },
+    setProfilePicture: (state, actions) => {
+      state.ProfileImage = actions.payload;
+    },
     // setFavouriteSports: (state, actions) => {
     //   state.FavouriteSports = actions.payload;
     // },

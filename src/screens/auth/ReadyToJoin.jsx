@@ -1,4 +1,10 @@
-import { View, Text, ImageBackground, Image } from 'react-native';
+import {
+  View,
+  Text,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import AppImages from '../../assets/images/AppImages';
 import AppText from '../../components/AppCommonComponents/AppText';
@@ -6,16 +12,17 @@ import { responsiveHeight } from '../../utils/Other/Responsive_Dimensions';
 import AppButton from '../../components/AppCommonComponents/AppButton';
 import AppColors from '../../utils/Other/AppColors';
 
-const ReadyToJoin = ({navigation}) => {
+const ReadyToJoin = ({ navigation }) => {
   return (
     <ImageBackground
-      source={AppImages.STARTBG}
+      source={AppImages.AUTHBG}
       style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
     >
-      <AppText title={'Welcome To'} textSize={3.5} />
+
+      <AppText title={'Welcome To'} textSize={3.5} textColor={AppColors.WHITE} textFontWeight />
       <Image
-        source={AppImages.LOGO}
-        style={{ height: responsiveHeight(15), width: responsiveHeight(15) }}
+        source={AppImages.MainHeaderIcon}
+        style={{ height: responsiveHeight(18), width: responsiveHeight(18), marginTop:20 }}
         resizeMode="contain"
       />
 
@@ -26,9 +33,12 @@ const ReadyToJoin = ({navigation}) => {
           marginBottom: 10,
         }}
       >
-        <AppText title={'Time To Get Started'} textSize={2.5} textFontWeight />
+        <AppText title={'Time To Get Started'} textSize={2.5} textFontWeight textColor={AppColors.BLACK} />
       </View>
-      <AppButton title="Ready to Join the Game?"  handlePress={()=> navigation.navigate("Login")}/>
+      <AppButton
+        title="Ready to Join the Game?"
+        handlePress={() => navigation.navigate('Login')}
+      />
 
       <View style={{ flexDirection: 'row', marginTop: 20 }}>
         <AppText
@@ -36,12 +46,14 @@ const ReadyToJoin = ({navigation}) => {
           textSize={2}
           textFontWeight
         />
-        <AppText
-          title={'login here'}
-          textSize={2}
-          textFontWeight
-          textColor={AppColors.PRIMARY}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <AppText
+            title={' login here'}
+            textSize={2}
+            textFontWeight
+            textColor={AppColors.PRIMARY}
+          />
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );

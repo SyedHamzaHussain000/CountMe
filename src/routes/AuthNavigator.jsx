@@ -9,6 +9,7 @@ import UploadPicture from '../screens/auth/UploadPicture';
 import AddSports from '../screens/auth/sports/AddSports';
 import AddSportsSkills from '../screens/auth/sports/AddSportsSkills';
 import ProfileCreated from '../screens/auth/ProfileCreated';
+import OtpVerification from '../screens/auth/forgetpassword/OtpVerification';
 
 const Stack = createStackNavigator();
 const AuthNavigator = () => {
@@ -18,6 +19,7 @@ const AuthNavigator = () => {
       <Stack.Screen name="ReadyToJoin" component={ReadyToJoin} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="OtpVerification" component={OtpVerification} />
   
       
     </Stack.Navigator>

@@ -100,7 +100,7 @@ const Profile = ({ navigation }) => {
             <AppButton
               title="Logout"
               handlePress={() => {
-                dispatch(SignOut()), getAuth().signOut();
+                dispatch(SignOut());
               }}
             />
 

@@ -1,9 +1,19 @@
 import { getDatabase, ref, get, } from "@react-native-firebase/database";
 import { Alert } from "react-native";
+import { ApiCall } from "../../../utils/apicalls/ApiCalls";
 
 const GetAllPosts = async() => {
 
+  try {
+      const {data} = await ApiCall('GET', 'getAllPost')
 
+      // console.log("data........................", data)
+      return data.data
+  } catch (error) {
+    console.log("error", error)
+  }
+
+return  
     const db = getDatabase();
   const postsRef = ref(db, "posts");
 

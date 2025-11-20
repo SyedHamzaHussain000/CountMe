@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 import AppTextInput from './AppCommonComponents/AppTextInput';
 import SelectableButtons from './AppCommonComponents/SelectableButtons';
@@ -10,7 +10,9 @@ import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import AppButton from './AppCommonComponents/AppButton';
-
+import Feather from 'react-native-vector-icons/Feather';
+import { responsiveFontSize } from '../utils/Other/Responsive_Dimensions';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 type props = {
   MyFavSports?: any;
   handlePressButton?: (value?: any) => any;
@@ -23,6 +25,13 @@ type props = {
   show?: boolean;
   onChangeAmount?: (text: string) => void;
   AmountValue?: string;
+  selectedType?: any;
+  onUploadImageButtonPress?: () => void;
+  onActivityButtonPress?: () => void;
+  imageData: any;
+  onImageClear: () => void;
+  onChangeCaption: (text : string) => void
+  captionValue: string
 };
 
 const CountMeComponent = ({
@@ -37,35 +46,81 @@ const CountMeComponent = ({
   show,
   AmountValue,
   onChangeAmount,
+  selectedType,
+  onUploadImageButtonPress,
+  onActivityButtonPress,
+  imageData,
+  onImageClear,
+  onChangeCaption,
+  captionValue
 }: props) => {
   const nav = useNavigation();
-  const AddressDetail = useSelector((state: any) => state?.auth?.Address)
+  const AddressDetail = useSelector((state: any) => state?.auth?.Address);
 
   return (
     <View style={{ paddingHorizontal: 10, paddingBottom: 50, gap: 30 }}>
-      <View style={{ gap: 10, flexDirection:'row', justifyContent:'space-between' }}>
-        {/* <NormalBlackButton onPress={handleNormalButtonPress} /> */}
-        {/* <AppText title={'Select Sports'} textSize={2} /> */}
-        {/* <FlatList
-          data={MyFavSports}
-          horizontal
-          contentContainerStyle={{ gap: 10, marginTop: 10 }}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => {
-            return (
-              <SelectableButtons
-                title={item.name}
-                handlePress={() => handlePressButton && handlePressButton(item)}
-                value={value}
-              />
-            );
-          }}
-        /> */}
+      <View
+        style={{
+          gap: 10,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        {selectedType == 'Activity Post' && (
+          <AppButton
+            width={40}
+            title="Add Activity"
+            handlePress={onActivityButtonPress}
+            colourOne={'#8A2BE2'}
+            colourTwo={'#FF5722'}
+          />
+        )}
 
-        <AppButton width={40} title='Add Activity'/>
-
-        <AppButton width={40} title='Upload Image'/>
+        <AppButton
+          width={50}
+          title="Upload Image"
+          handlePress={onUploadImageButtonPress}
+          colourOne={'#8A2BE2'}
+          colourTwo={'#FF5722'}
+          rightLogo={
+            <Feather
+              name={'plus-circle'}
+              size={responsiveFontSize(2)}
+              color={AppColors.WHITE}
+            />
+          }
+        />
       </View>
+
+      {imageData && (
+        <View style={{alignSelf:'flex-start'}}>
+          <TouchableOpacity
+            onPress={onImageClear}
+            style={{ position: 'absolute', zIndex: 10, right: -10, top: -10 }}
+          >
+            <Ionicons
+              name={'close-circle'}
+              size={responsiveFontSize(4)}
+              color={AppColors.PRIMARY}
+            />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: imageData?.uri }}
+            style={{ height: 100, width: 100, borderRadius: 10 }}
+          />
+        </View>
+      )}
+
+      <AppTextInput
+        title="What's in your mind"
+        titleColour={AppColors.BLACK}
+        TextInputColour={AppColors.LIGHTGRAY}
+        onChangeText={onChangeCaption}
+        value={captionValue}
+        
+      />
+
+
 
       <AppTextInput
         title="Total Player You need"
@@ -113,9 +168,7 @@ const CountMeComponent = ({
           titleColour={AppColors.BLACK}
           TextInputColour={AppColors.LIGHTGRAY}
           keyboardType={'number-pad'}
-          value={
-          AddressDetail?.address
-          }
+          value={AddressDetail?.address}
           placeholder={
             AddressDetail?.address ? AddressDetail?.address : 'Add Location'
           }

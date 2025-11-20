@@ -7,3 +7,4 @@ export const UserId = getAuth()?.currentUser?.uid
 
 
 export const BASE_URL = "https://appsdemo.pro/CountMe/api/user/"
+export const IMAGE_BASE_URL = "https://appsdemo.pro/CountMe/"

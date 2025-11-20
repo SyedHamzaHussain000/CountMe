@@ -19,16 +19,20 @@ type props = {
   marginTop?: number;
   handlePress?: () => void;
   loading?: boolean;
-  width?:number 
+  width?:number ;
+  colourOne?: any;
+  colourTwo?: any
+  rightLogo?: any
+
 };
 
-const AppButton = ({ title, marginTop, handlePress, loading ,width}: props) => {
+const AppButton = ({ title, marginTop, handlePress, loading ,width, colourOne, colourTwo, rightLogo}: props) => {
   return (
     <>
       {loading == true ? (
         <View style={{ marginTop: marginTop || 0 }}>
           <LinearGradient
-            colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
+            colors={[colourOne ? colourOne: AppColors.PRIMARY, colourTwo ? colourTwo :  AppColors.SECONDARY]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={[styles.linearGradient, { width: responsiveWidth(90) }]}
@@ -42,10 +46,10 @@ const AppButton = ({ title, marginTop, handlePress, loading ,width}: props) => {
           style={{ marginTop: marginTop || 0 }}
         >
           <LinearGradient
-            colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
+            colors={[colourOne ? colourOne: AppColors.PRIMARY, colourTwo ? colourTwo :  AppColors.SECONDARY]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={[styles.linearGradient, { width: responsiveWidth(width?width:90) }]}
+            style={[styles.linearGradient, { width: responsiveWidth(width?width:90), flexDirection:'row', alignItems:'center', gap:10 }]}
           >
             <AppText
               title={title}
@@ -53,6 +57,12 @@ const AppButton = ({ title, marginTop, handlePress, loading ,width}: props) => {
               textFontWeight
               textColor={AppColors.WHITE}
             />
+
+            {
+              rightLogo && (
+                rightLogo
+              )
+            }
           </LinearGradient>
         </TouchableOpacity>
       )}

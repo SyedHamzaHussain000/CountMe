@@ -47,40 +47,9 @@ const Home = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const userId = getAuth()?.currentUser?.uid;
-  const userDetail = useSelector(state => state?.auth);
+  const userDetail = useSelector(state => state?.auth.userData);
 
-  // useEffect(() => {
-  //   const db = getDatabase();
-  //   const postsRef = ref(db, 'posts');
-
-  //   const unsubscribe = onValue(postsRef, snapshot => {
-  //     if (snapshot.exists()) {
-  //       const data = Object.values(snapshot.val());
-  //       setAllLocalPosts(data.reverse()); // latest first
-  //     }
-  //     setLoader(false);
-  //   });
-
-  //   return () => off(postsRef, 'value', unsubscribe);
-  // }, []);
-
-
-//   useEffect(() => {
-//   const db = getDatabase();
-//   const postsRef = ref(db, 'posts');
-
-//   const unsubscribe = onValue(postsRef, snapshot => {
-//     if (snapshot.exists()) {
-//       const data = Object.values(snapshot.val());
-//       setAllLocalPosts(data.reverse()); // latest first
-//     }
-//     setLoader(false);
-//   });
-
-//   // cleanup
-//   return () => unsubscribe();
-// }, []);
-
+  console.log("userDetail",userDetail)
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
       getAllNewPost();
@@ -92,7 +61,7 @@ const Home = ({ navigation }) => {
   const getAllNewPost = async () => {
     setLoader(true);
     const GetPostAndSetToLocalState = await GetAllPosts();
-    const getPostLikes = await GetAllPostLikes();
+    const getPostLikes = await GetAllPostLikes(); 
     const getPostJoins = await GetAllPostJoins();
 
     const normalizedLikes = NormalizeData(getPostLikes);
@@ -303,19 +272,19 @@ const Home = ({ navigation }) => {
 
             return (
               <SocialMediaPost
-                AuthorId={item?.authorId}
-                name={item?.authorName}
+                AuthorId={item?.userId?._id}
+                name={item?.userId.fullName}
                 ago={moment(item?.createdAt).fromNow()}
                 PostDescription={item?.caption}
-                PostPicture={item?.PostPicture}
-                JoiningPost={item?.totalPlayers > 0 ? true : false}
+                PostPicture={item?.posts}
+                JoiningPost={item?.type ==  "ActivityPost" ? true : false}
                 IsJoined={isJoined}
-                Likes={item?.likesCount}
-                Comment={item?.commentsCount}
-                Share={item?.sharesCount}
-                TotalJoiners={item?.totalPlayers}
-                TotalJoinerRemain={item?.joinedCount}
-                onLikePress={() => toggleLike(item?.postId, isLiked)}
+                Likes={item?.totalLikes}
+                Comment={item?.totalComments}
+                Share={item?.totalShares}
+                TotalJoiners={item?.totalPlayer}
+                TotalJoinerRemain={item?.joinedUsers?.length}
+                onLikePress={() => toggleLike(item?._id, isLiked)}
                 onJoinTeamPress={() =>
                   toggleJoin(item?.postId, isJoined, item?.authorId)
                 }
@@ -332,9 +301,9 @@ const Home = ({ navigation }) => {
                   })
                 }
                 onSharePress={() =>
-                  sharePostAlert(item?.postId, item?.authorId)
+                  sharePostAlert(item?._id, item?.userId?._id)
                 }
-                isAutherPost={item?.authorId == userId}
+                isAutherPost={item?.userId?._id == userDetail?._id}
                 navigation={navigation}
               />
             );

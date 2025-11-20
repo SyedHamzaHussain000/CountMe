@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import React, { useState } from 'react';
 import AppImages from '../../assets/images/AppImages';
@@ -36,11 +37,15 @@ const Login = ({ navigation }) => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('james01@gmail.com');
   const [password, setPassword] = useState('12345678');
+
+  const [loader, setLoader] = useState(false);
   const LoginApi = async () => {
     if (email == '' || password == '') {
       ShowToast('error', 'Please enter your email and password');
       return;
     }
+
+    setLoader(true)
 
 
     try {
@@ -51,11 +56,13 @@ const Login = ({ navigation }) => {
       };
       
       const { data } = await ApiCall('POST', 'loginUser', userDetails);
-      
-      dispatch(setUserDetails(data));
+
+      setLoader(false)
+      dispatch(setUserDetails(data)); 
       
       ShowToast('success', data.message);
     } catch (error) {
+      setLoader(false)
         ShowToast('error', error?.response?.message);
     }
     // return;
@@ -95,18 +102,23 @@ const Login = ({ navigation }) => {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }}>
       <Container backgroundImage={AppImages.AUTHBG}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
           <View style={{ gap: 10, marginTop: 30 }}>
-            <AppText
+            {/* <AppText
               title={'Countme'}
               textSize={4}
               textColor={AppColors.SECONDARY}
               textFontWeight
               textAlignment={'center'}
-            />
+            /> */}
+            <Image
+                    source={AppImages.MainHeaderIcon}
+                    style={{ height: responsiveHeight(15), width: responsiveHeight(15), marginTop:20 , alignSelf:'center'}}
+                    resizeMode="contain"
+                  />
             <AppText
               title={'Sign In'}
-              textSize={3}
+              textSize={4}
               textColor={AppColors.WHITE}
               textFontWeight
               textAlignment={'center'}
@@ -153,6 +165,7 @@ const Login = ({ navigation }) => {
             title="Sign In"
             marginTop={30}
             handlePress={() => LoginApi()}
+            loading={loader}
           />
 
           <View style={{ marginTop: 20 }}>

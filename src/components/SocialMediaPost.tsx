@@ -11,6 +11,7 @@ import AppColors from '../utils/Other/AppColors';
 import AppButton from './AppCommonComponents/AppButton';
 import SmallButtons from './AppCommonComponents/SmallButtons';
 import { useNavigation } from '@react-navigation/native';
+import { BASE_URL, IMAGE_BASE_URL } from '../utils/BaseUrls/BaseUrl';
 
 type props = {
   AuthorId?: any,
@@ -77,10 +78,11 @@ const SocialMediaPost = ({
 
       <AppText title={PostDescription} textSize={2}/>
 
+      
       {
-        PostPicture && (
-          
-            <Image source={AppImages.POSTPICTURE} style={styles.img}/>
+        PostPicture.length > 0 && (
+
+            <Image source={{uri: `${IMAGE_BASE_URL}${PostPicture[0]}`}} style={styles.img}/>
         )
       }
 

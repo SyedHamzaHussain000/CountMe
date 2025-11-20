@@ -41,7 +41,7 @@ const MainNavigator = () => {
 
   return (
     <Stack.Navigator    screenOptions={{ headerShown: false }}>
-      {userData?.isVerified == true  ? (
+      {userData?.isupdated == true  ? (
         <>
           <Stack.Screen name="TabBars" component={TabBars} />
           <Stack.Screen name="Conversation" component={Conversation} />

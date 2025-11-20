@@ -15,8 +15,8 @@ const AppHeader = () => {
   return (
     <View style={{padding:20, flexDirection:'row', alignItems:'center', justifyContent:'space-between', borderBottomWidth:0.5, backgroundColor:AppColors.WHITE}}>
         <View style={{flexDirection:'row', alignItems:'center', gap:5}}>
-            <Image source={AppImages.SLOGO}  style={{height:30, width:30, resizeMode:'contain'}}/>
-            <AppText title={"Countme"} textSize={3} textFontWeight/>
+            <Image source={AppImages.mainHeaderRowlogo}  style={{height:30, width:120, resizeMode:'contain'}}/>
+            {/* <AppText title={"Countme"} textSize={3} textFontWeight/> */}
         </View>
 
         <View style={{flexDirection:'row', alignItems:'center', gap:10}}>   
