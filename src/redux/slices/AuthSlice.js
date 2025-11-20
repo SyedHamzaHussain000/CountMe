@@ -1,14 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  email: null,
-  full_name: null,
-  device_token: null,
-  ProfileImage: null,
-  FavouriteSports: [],
-  SportsSkills: [],
-  SignupFlowCompleted: false,
-  Address: null,
+  userData: null,
+  token: "",
+  // email: null,
+  // full_name: null,
+  // device_token: null,
+  // ProfileImage: null,
+  // FavouriteSports: [],
+  // SportsSkills: [],
+  // SignupFlowCompleted: false,
+  // Address: null,
   
   Gender: '',
   Birthday: '',
@@ -45,22 +47,26 @@ export const AuthSlice = createSlice({
         (state.Bio = action.payload.Bio);
     },
     setUserDetails: (state, actions) => {
-      state.email = actions.payload.email;
-      state.full_name = actions.payload.full_name;
-      state.device_token = actions.payload.device_token;
+        state.userData = actions.payload.data
+        state.token = actions.payload.token
     },
-    setProfilePicture: (state, actions) => {
-      state.ProfileImage = actions.payload;
+    setUserUpdateDetailOnly: (state, actions) => {
+
+
+        state.userData = actions.payload
     },
-    setFavouriteSports: (state, actions) => {
-      state.FavouriteSports = actions.payload;
-    },
-    setSportsSkills: (state, actions) => {
-      state.SportsSkills = actions.payload;
-    },
-    setSignupFlowCompleted: (state, actions) => {
-      state.SignupFlowCompleted = actions.payload;
-    },
+    // setProfilePicture: (state, actions) => {
+    //   state.ProfileImage = actions.payload;
+    // },
+    // setFavouriteSports: (state, actions) => {
+    //   state.FavouriteSports = actions.payload;
+    // },
+    // setSportsSkills: (state, actions) => {
+    //   state.SportsSkills = actions.payload;
+    // },
+    // setSignupFlowCompleted: (state, actions) => {
+    //   state.SignupFlowCompleted = actions.payload;
+    // },
     setAddress: (state, actions) => {
       state.Address = actions.payload;
     },
@@ -71,26 +77,8 @@ export const AuthSlice = createSlice({
  state.AllJoiningPosts = action.payload;
     },
     SignOut: state => {
-      (state.email = null),
-        (state.full_name = null),
-        (state.device_token = null),
-        (state.ProfileImage = null),
-        (state.FavouriteSports = []),
-        (state.SportsSkills = []),
-        (state.SignupFlowCompleted = false),
-        (state.Address = null),
-        (state.Gender = ''),
-        (state.Birthday = ''),
-        (state.Language = ''),
-        (state.City = ''),
-        (state.Primary_sports = ''),
-        (state.Skill_Level = ''),
-        (state.Availability = ''),
-        (state.Joined_CountMe = ''),
-        (state.Contact_Number = ''),
-        (state.Bio = '');
-        state.AllNearbyPosts = [];
-        state.AllJoiningPosts = [];
+      state.userData = null
+      state.token = ""
     },
   },
 });
@@ -99,6 +87,7 @@ export const AuthSlice = createSlice({
 export const {
   setUserDetails,
   setUpdateUserDetails,
+  setUserUpdateDetailOnly,
   setProfilePicture,
   setFavouriteSports,
   setSportsSkills,
@@ -107,6 +96,7 @@ export const {
   setNearbyPosts,
   setAllJoiningPosts,
   SignOut,
+  
 } = AuthSlice.actions;
 
 export default AuthSlice.reducer;

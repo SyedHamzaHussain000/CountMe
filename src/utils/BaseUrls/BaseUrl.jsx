@@ -5,3 +5,5 @@ export const UsersDbRef = database().ref('/Users');
 
 export const UserId = getAuth()?.currentUser?.uid
 
+
+export const BASE_URL = "https://appsdemo.pro/CountMe/api/user/"

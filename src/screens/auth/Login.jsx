@@ -23,48 +23,73 @@ import {
 import ShowToast from '../../utils/Other/ShowToast';
 import { get, getDatabase, ref } from '@react-native-firebase/database';
 import { useDispatch } from 'react-redux';
-import { setFavouriteSports, setProfilePicture, setSignupFlowCompleted, setSportsSkills, setUserDetails } from '../../redux/slices/AuthSlice';
+import {
+  setFavouriteSports,
+  setProfilePicture,
+  setSignupFlowCompleted,
+  setSportsSkills,
+  setUserDetails,
+} from '../../redux/slices/AuthSlice';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('test@gmail.com');
-  const [password, setPassword] = useState('1234567890');
-  const LoginApi = () => {
+  const [email, setEmail] = useState('james01@gmail.com');
+  const [password, setPassword] = useState('12345678');
+  const LoginApi = async () => {
     if (email == '' || password == '') {
       ShowToast('error', 'Please enter your email and password');
       return;
     }
 
-    signInWithEmailAndPassword(getAuth(), email, password).then(async () => {
-      const auth = getAuth();
-      const user = auth.currentUser;
 
-      if (user) {
-        const db = getDatabase();
-        const userRef = ref(db, `Users/${user.uid}`);
-        const snapshot = await get(userRef);
+    try {
+      
+      const userDetails = {
+        email: email,
+        password: password,
+      };
+      
+      const { data } = await ApiCall('POST', 'loginUser', userDetails);
+      
+      dispatch(setUserDetails(data));
+      
+      ShowToast('success', data.message);
+    } catch (error) {
+        ShowToast('error', error?.response?.message);
+    }
+    // return;
 
-        if (snapshot.exists()) {
-          const userDetails = snapshot.val();
-          dispatch(
-            setUserDetails({
-              email: userDetails.email,
-              full_name: userDetails.full_name,
-              device_token: '',
-            }),
-          );
-          dispatch(setFavouriteSports(userDetails.Sports));
-          dispatch(setSportsSkills(userDetails.SportsSkills));
-          dispatch(setProfilePicture(userDetails.ProfilePicture));
-          dispatch(setSignupFlowCompleted(userDetails.ProfileCreated));
-          
-          ShowToast('success', `Welcome ${userDetails.full_name}`);
-        } else {
-          console.log('No user data found!');
-        }
-      }
-      ShowToast('success', 'Successfully logged in');
-    });
+    // signInWithEmailAndPassword(getAuth(), email, password).then(async () => {
+    //   const auth = getAuth();
+    //   const user = auth.currentUser;
+
+    //   if (user) {
+    //     const db = getDatabase();
+    //     const userRef = ref(db, `Users/${user.uid}`);
+    //     const snapshot = await get(userRef);
+
+    //     if (snapshot.exists()) {
+    //       const userDetails = snapshot.val();
+    //       dispatch(
+    //         setUserDetails({
+    //           email: userDetails.email,
+    //           full_name: userDetails.full_name,
+    //           device_token: '',
+    //         }),
+    //       );
+    //       dispatch(setFavouriteSports(userDetails.Sports));
+    //       dispatch(setSportsSkills(userDetails.SportsSkills));
+    //       dispatch(setProfilePicture(userDetails.ProfilePicture));
+    //       dispatch(setSignupFlowCompleted(userDetails.ProfileCreated));
+
+    //       ShowToast('success', `Welcome ${userDetails.full_name}`);
+    //     } else {
+    //       console.log('No user data found!');
+    //     }
+    //   }
+    //   ShowToast('success', 'Successfully logged in');
+    // });
   };
 
   return (
@@ -102,13 +127,18 @@ const Login = ({ navigation }) => {
               marginBottom: 5,
             }}
           >
-            <AppTextInput title="Email" placeholder="abc@yahoo.com" onChangeText={(txt)=> setEmail(txt)} value={email}/>
+            <AppTextInput
+              title="Email"
+              placeholder="abc@yahoo.com"
+              onChangeText={txt => setEmail(txt)}
+              value={email}
+            />
             <AppTextInput
               title="Password"
               placeholder="*************"
               password={true}
               secureTextEntry={true}
-              onChangeText={(txt)=> setPassword(txt)} 
+              onChangeText={txt => setPassword(txt)}
               value={password}
             />
           </View>

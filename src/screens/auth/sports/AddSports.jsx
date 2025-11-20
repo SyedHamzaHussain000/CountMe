@@ -15,14 +15,21 @@ import Line from '../../../components/AppCommonComponents/Line';
 import AppSearchBar from '../../../components/AppCommonComponents/AppSearchBar';
 import SelectSports from '../../../components/SelectSports';
 import AppButton from '../../../components/AppCommonComponents/AppButton';
-import { setFavouriteSports } from '../../../redux/slices/AuthSlice';
-import { useDispatch } from 'react-redux';
+import { setFavouriteSports, setUserDetails, setUserUpdateDetailOnly } from '../../../redux/slices/AuthSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import BackButtonWithHeader from '../../../components/BackButtonWithHeader';
 import LineBreak from '../../../components/LineBreak';
 import AppTextInput from '../../../components/AppCommonComponents/AppTextInput';
+import { ApiCallFormData } from '../../../utils/apicalls/ApiCalls';
 
 const AddSports = ({ navigation }) => {
   const dispatch = useDispatch();
+
+  const profileImage = useSelector(state => state.auth.ProfileImage);
+  const token = useSelector(state => state.auth.token);
+  const userData = useSelector(state => state.auth.userData);
+
+  console.log('first', userData);
 
   const SelectSubActivity = [
     // Sports & Physical
@@ -117,10 +124,43 @@ const AddSports = ({ navigation }) => {
     });
   };
 
-
   useEffect(() => {
     dispatch(setFavouriteSports(selectedSports));
   }, [selectedSports]);
+
+  const UpdateProfile = async () => {
+    // console.log("selectedSports",profileImage)
+
+    const userUpdateDetial = {
+      activity: selectedSports.map(res => res.name),
+      image: profileImage?.assets?.map(res => ({
+        type: res?.type,
+        name: res?.fileName,
+        uri: res?.uri,
+      })),
+    };
+    const formData = new FormData();
+
+    formData.append(`userId`, userData._id);
+    formData.append('activity', JSON.stringify(userUpdateDetial.activity));
+    userUpdateDetial.image.forEach((img, index) => {
+      formData.append('image', {
+        uri: img.uri,
+        name: img.fileName || `photo_${index}.jpg`,
+        type: img.type || 'image/jpeg',
+      });
+    });
+
+    const {data} = await ApiCallFormData(
+      'POST',
+      'updateUser',
+      formData,
+    );
+
+    dispatch(setUserUpdateDetailOnly(data.data))
+    navigation.navigate('ProfileCreated');
+
+  };
 
   return (
     <Container backgroundImage={AppImages.AUTHBG}>
@@ -147,11 +187,14 @@ const AddSports = ({ navigation }) => {
         /> */}
 
         {/* 🏀 Sports List */}
-        <View style={{ marginTop: 20 , marginBottom:20}}>
+        <View style={{ marginTop: 20, marginBottom: 20 }}>
           <FlatList
             data={SelectSubActivity}
-            contentContainerStyle={{ flexWrap: 'wrap', flexDirection:'row', gap:10 }}
-            
+            contentContainerStyle={{
+              flexWrap: 'wrap',
+              flexDirection: 'row',
+              gap: 10,
+            }}
             renderItem={({ item }) => {
               const isSelected = selectedSports.some(res => res.id == item.id);
 
@@ -168,17 +211,17 @@ const AddSports = ({ navigation }) => {
           />
         </View>
 
-        
-        <View style={{marginBottom:20, gap:10}}>
-          <AppText title={"Other Activity"} textSize={3} textFontWeight textColor={AppColors.WHITE}/>    
+        <View style={{ marginBottom: 20, gap: 10 }}>
+          <AppText
+            title={'Other Activity'}
+            textSize={3}
+            textFontWeight
+            textColor={AppColors.WHITE}
+          />
           <AppTextInput />
         </View>
-
       </ScrollView>
-      <AppButton
-        title="Continue"
-        handlePress={() => navigation.navigate('ProfileCreated')}
-      />
+      <AppButton title="Continue" handlePress={() => UpdateProfile()} />
     </Container>
   );
 };

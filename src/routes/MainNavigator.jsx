@@ -33,12 +33,15 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
-  const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
+  const userData = useSelector(state => state?.auth?.userData);
   const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
+
+  console.log("userData",userData)
+  
 
   return (
     <Stack.Navigator    screenOptions={{ headerShown: false }}>
-      {MyFavSports?.length > 0 && MySportsSkills?.length > 0 ? (
+      {userData?.isVerified == true  ? (
         <>
           <Stack.Screen name="TabBars" component={TabBars} />
           <Stack.Screen name="Conversation" component={Conversation} />

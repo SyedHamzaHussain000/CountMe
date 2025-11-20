@@ -34,10 +34,10 @@ const UploadPicture = ({ navigation }) => {
 
     if (!result.didCancel && result.assets && result.assets.length > 0) {
       setImageUri(result.assets[0].uri);
-      dispatch(setProfilePicture(result.assets[0].uri));
+      dispatch(setProfilePicture(result));
     }
   };
-
+  
   return (
     <Container backgroundImage={AppImages.AUTHBG}>
       <View style={{ gap: 20 }}>

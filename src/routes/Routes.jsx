@@ -4,34 +4,20 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import { useSelector } from 'react-redux';
 
 
 const Stack = createStackNavigator();
 const Routes = () => {
 
-
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
-
-  // Handle user state changes
-  function handleAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  useEffect(() => {
-    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, []);
-
-  if (initializing) return null;
+  const token = useSelector(state => state.auth.token)
 
 
 
   return (
      <Stack.Navigator  screenOptions={{headerShown:false}}>
       {
-        user ?
+        token ?
         <Stack.Screen name="MainNavigator" component={MainNavigator} />
         :
 
