@@ -6,6 +6,7 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
@@ -19,28 +20,22 @@ import AppColors from '../../utils/Other/AppColors';
 import IconText from '../../components/AppCommonComponents/IconText';
 import LinearGradient from 'react-native-linear-gradient';
 import AppText from '../../components/AppCommonComponents/AppText';
-import ScoreCard from '../../components/ScoreCard';
-import AddInputAndUpload from '../../components/AppCommonComponents/AddInputAndUpload';
 import SocialMediaPost from '../../components/SocialMediaPost';
-import { getAuth } from '@react-native-firebase/auth';
 import { SignOut } from '../../redux/slices/AuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AppButton from '../../components/AppCommonComponents/AppButton';
 import GetOnlyMyPostApi from '../../global/main/PostsRelatedFunctions/GetOnlyMyPostApi';
 import moment from 'moment';
-import GetAllPostLikes from '../../global/main/PostsRelatedFunctions/GetAllPostLikes';
-import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
 import NormalizeData from '../../global/utils/NormalizeData';
+import { IMAGE_BASE_URL } from '../../utils/BaseUrls/BaseUrl';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
 
 const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const userId = getAuth()?.currentUser?.uid;
-  const userDetail = useSelector(state => state?.auth);
+  const userDetail = useSelector(state => state?.auth?.userData);
+  const userId = userDetail?._id;
   const [allLocalPost, setAllLocalPosts] = useState([]);
-
-  const [likes, setLikes] = useState([]);
-  const [joines, setJoines] = useState([]);
 
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
@@ -51,25 +46,64 @@ const Profile = ({ navigation }) => {
   }, [navigation]);
 
   const getAllMyPost = async () => {
+    // TODO: Ideally this should also be an API call, but keeping existing function for now
+    // assuming GetOnlyMyPostApi might be updated later or returns compatible data
     const allMyPosts = await GetOnlyMyPostApi(userId);
-    const getPostLikes = await GetAllPostLikes();
-    const getPostJoins = await GetAllPostJoins();
-
-    const normalizedLikes = NormalizeData(getPostLikes);
-    const normalizedJoins = NormalizeData(getPostJoins);
-
     setAllLocalPosts(allMyPosts);
-    setLikes(normalizedLikes);
-    setJoines(normalizedJoins);
+  };
+
+  const toggleLike = async (postId, isLiked) => {
+    // Optimistic Update
+    const updatedPosts = allLocalPost.map(post => {
+      if (post.postId === postId) {
+        const currentLikes = post.like || [];
+        let newLikes;
+        if (isLiked) {
+          newLikes = currentLikes.filter(l => l._id !== userId);
+        } else {
+          newLikes = [...currentLikes, { _id: userId }];
+        }
+        return {
+          ...post,
+          like: newLikes,
+          likesCount: newLikes.length,
+          totalLikes: newLikes.length // Ensure compatibility
+        };
+      }
+      return post;
+    });
+
+    setAllLocalPosts(updatedPosts);
+
+    try {
+      await ApiCall('POST', 'user/likeAndUnLikePost', {
+        postId: postId,
+        userId: userId,
+      });
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      // Revert on error if needed, but for now keeping it simple
+    }
+  };
+
+  const toggleJoin = (postId, isJoined, authorId) => {
+    // Placeholder for Join functionality if needed on Profile
+    // Since these are "my posts", joining might not be relevant or handled differently
+    Alert.alert("Info", "Join functionality on profile is currently disabled.");
+  };
+
+  const sharePostAlert = (postId, authorId) => {
+    // Placeholder for Share functionality
+    Alert.alert("Share", "Share functionality coming soon.");
   };
 
   return (
-    <View style={{ backgroundColor: AppColors.WHITE,  }}>
+    <View style={{ backgroundColor: AppColors.WHITE, }}>
 
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingBottom:100,
+          paddingBottom: 100,
         }}
         nestedScrollEnabled
       >
@@ -77,7 +111,10 @@ const Profile = ({ navigation }) => {
         <View>
           <Image source={AppImages.cover} style={styles.cover} />
           <View style={styles.pfpImgContainer}>
-            <Image source={AppImages.profileimg} style={styles.pfpImg} />
+            <Image
+              source={userDetail?.image ? { uri: `${IMAGE_BASE_URL}${userDetail.image}` } : AppImages.profileimg}
+              style={styles.pfpImg}
+            />
           </View>
 
           <View style={styles.cameraContainer}>
@@ -92,10 +129,6 @@ const Profile = ({ navigation }) => {
             paddingTop: 100,
           }}
         >
-          {/* <View style={{alignSelf:'flex-end', backgroundColor:AppColors.WHITE, padding:10}}>
-          <IconText title='Rating 4/5' Icon={<SvgIcons.starthumb/>}/>
-        </View> */}
-
           <View>
             <AppButton
               title="Logout"
@@ -113,7 +146,7 @@ const Profile = ({ navigation }) => {
               }}
             >
               <AppText
-                title={userDetail?.full_name}
+                title={userDetail?.fullName}
                 textSize={3}
                 textFontWeight
               />
@@ -121,9 +154,11 @@ const Profile = ({ navigation }) => {
               <View
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
               >
-                <SvgIcons.badmiton height={30} />
-                <SvgIcons.helmet height={30} />
-                <SvgIcons.basket height={30} />
+                {userDetail?.activity?.map((item, index) => (
+                  <Text key={index} style={{ fontSize: 25, color: 'black' }}>
+                    {item.split(' ')[0]}
+                  </Text>
+                ))}
               </View>
             </View>
 
@@ -153,7 +188,7 @@ const Profile = ({ navigation }) => {
             </View>
 
             <AppText
-              title={userDetail?.Bio}
+              title={userDetail?.bio}
               textSize={2}
               textFontWeight
               textwidth={80}
@@ -162,31 +197,26 @@ const Profile = ({ navigation }) => {
             <View style={{ marginTop: 20 }}>
               <IconText
                 Icon={<SvgIcons.us />}
-                title={`Lives In ${userDetail?.City}`}
+                title={`Lives In ${userDetail?.city || ''}`}
                 textFontWeight
               />
               <IconText
                 Icon={<SvgIcons.run />}
-                title={`Primary Sports: ${userDetail?.Primary_sports}`}
+                title={`Primary Sports: ${userDetail?.primarySport || ''}`}
                 textFontWeight
               />
               <IconText
                 Icon={<SvgIcons.wifi />}
-                title={`Skill Level: ${userDetail?.Skill_Level}`}
+                title={`Skill Level: ${userDetail?.skillLevel || ''}`}
                 textFontWeight
               />
               <IconText
                 Icon={<SvgIcons.clock />}
-                title={`Availability: ${userDetail?.Availability}`}
+                title={`Availability: ${userDetail?.availablity || ''}`}
                 textFontWeight
               />
             </View>
 
-            {/* <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:20}}>
-              <ScoreCard ScoreTitle='Matches Played' TotalScore={50}/>
-              <ScoreCard ScoreTitle='Wins' TotalScore={30}/>
-              <ScoreCard ScoreTitle='Teams Formed' TotalScore={30}/>
-          </View> */}
           </View>
 
           <View style={{ marginTop: 15, marginBottom: 10 }}>
@@ -194,60 +224,66 @@ const Profile = ({ navigation }) => {
           </View>
 
 
-            <FlatList
-              data={allLocalPost}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                gap: 20,
-                paddingBottom: 0,
-              }}
-              renderItem={({ item }) => {
-                const isLiked = !!likes?.[item?.postId]?.[userId];
-                const isJoined = !!joines?.[item?.postId]?.[userId];
+          <FlatList
+            data={allLocalPost}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              gap: 20,
+              paddingBottom: 0,
+            }}
+            renderItem={({ item }) => {
+              // Check if liked by current user using the 'like' array from API/Post object
+              const isLiked = item?.like?.some(l => l._id === userId);
+              // Join status logic would go here if supported
+              const isJoined = false;
 
-                return (
-                  <SocialMediaPost
-                    AuthorId={item?.authorId}
-                    name={item?.authorName}
-                    ago={moment(item?.createdAt).fromNow()}
-                    PostDescription={item?.caption}
-                    PostPicture={item?.PostPicture}
-                    JoiningPost={item?.totalPlayers > 0 ? true : false}
-                    IsJoined={isJoined}
-                    Likes={item?.likesCount}
-                    Comment={item?.commentsCount}
-                    Share={item?.sharesCount}
-                    TotalJoiners={item?.totalPlayers}
-                    TotalJoinerRemain={item?.joinedCount}
-                    onLikePress={() => toggleLike(item?.postId, isLiked)}
-                    onJoinTeamPress={() =>
-                      toggleJoin(item?.postId, isJoined, item?.authorId)
-                    }
-                    onCommentPress={() =>
-                      navigation.navigate('PostComment', {
-                        postId: item?.postId,
-                        runner: true,
-                      })
-                    }
-                    onRunnerPress={() =>
-                      navigation.navigate('PostComment', {
-                        postId: item?.postId,
-                        runner: true,
-                      })
-                    }
-                    onSharePress={() =>
-                      sharePostAlert(item?.postId, item?.authorId)
-                    }
-                    isAutherPost={item?.authorId == userId}
-                    navigation={navigation}
-                  />
-                );
-              }}
-            />
+              return (
+                <SocialMediaPost
+                  AuthorId={item?.authorId}
+                  name={item?.authorName}
+                  ago={moment(item?.createdAt).fromNow()}
+                  PostDescription={item?.caption}
+                  PostPicture={item?.PostPicture}
+                  JoiningPost={item?.totalPlayers > 0 ? true : false}
+                  IsJoined={isJoined}
+                  Likes={item?.totalLikes || item?.likesCount} // Use totalLikes if available
+                  Comment={item?.commentsCount}
+                  Share={item?.sharesCount}
+                  TotalJoiners={item?.totalPlayers}
+                  TotalJoinerRemain={item?.joinedCount}
+                  onLikePress={() => toggleLike(item?.postId, isLiked)}
+                  onJoinTeamPress={() =>
+                    toggleJoin(item?.postId, isJoined, item?.authorId)
+                  }
+                  onCommentPress={() =>
+                    navigation.navigate('PostComment', {
+                      postId: item?.postId,
+                      runner: true,
+                      comments: item?.comment // Pass comments if available
+                    })
+                  }
+                  onRunnerPress={() =>
+                    navigation.navigate('PostComment', {
+                      postId: item?.postId,
+                      runner: true,
+                      comments: item?.comment
+                    })
+                  }
+                  onSharePress={() =>
+                    sharePostAlert(item?.postId, item?.authorId)
+                  }
+                  isAutherPost={item?.authorId == userId}
+                  navigation={navigation}
+                  IsLiked={isLiked}
+                  activity={item?.activity}
+                />
+              );
+            }}
+          />
 
         </LinearGradient>
       </ScrollView>
-     </View>
+    </View>
   );
 };
 
@@ -268,13 +304,14 @@ const styles = StyleSheet.create({
     bottom: -50,
     zIndex: 1,
     paddingHorizontal: 20,
+    borderRadius: 400
   },
   pfpImg: {
     width: responsiveHeight(13),
     height: responsiveHeight(13),
     resizeMode: 'cover',
-    borderTopRightRadius: 30,
-    borderTopLeftRadius: 30,
+    borderTopRightRadius: 300,
+    borderTopLeftRadius: 300,
     overflow: 'hidden',
     alignSelf: 'center',
   },

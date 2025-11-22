@@ -16,7 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 type props = {
   MyFavSports?: any;
   handlePressButton?: (value?: any) => any;
-  value?: string;
+  value?: string | string[];
   handleNormalButtonPress?: () => void;
   onChangeText?: (text: string) => void;
   textValue?: string;
@@ -30,8 +30,12 @@ type props = {
   onActivityButtonPress?: () => void;
   imageData: any;
   onImageClear: () => void;
-  onChangeCaption: (text : string) => void
+  onChangeCaption: (text: string) => void
   captionValue: string
+  title?: string;
+  onChangeTitle?: (text: string) => void;
+  paymentMethod?: string;
+  setPaymentMethod?: (method: string) => void;
 };
 
 const CountMeComponent = ({
@@ -52,13 +56,17 @@ const CountMeComponent = ({
   imageData,
   onImageClear,
   onChangeCaption,
-  captionValue
+  captionValue,
+  title,
+  onChangeTitle,
+  paymentMethod,
+  setPaymentMethod
 }: props) => {
   const nav = useNavigation();
   const AddressDetail = useSelector((state: any) => state?.auth?.Address);
 
   return (
-    <View style={{ paddingHorizontal: 10, paddingBottom: 50, gap: 30 }}>
+    <View style={{ paddingHorizontal: 10, paddingBottom: 50, gap: 20 }}>
       <View
         style={{
           gap: 10,
@@ -66,18 +74,26 @@ const CountMeComponent = ({
           justifyContent: 'space-between',
         }}
       >
-        {selectedType == 'Activity Post' && (
-          <AppButton
-            width={40}
-            title="Add Activity"
-            handlePress={onActivityButtonPress}
-            colourOne={'#8A2BE2'}
-            colourTwo={'#FF5722'}
-          />
-        )}
+        {selectedType == 'Activity Post' ? (
+          <View style={{ width: '48%' }}>
+            <AppButton
+              width={45} // Relative to parent View
+              title={value && value.length > 0 ? "Change Activity" : "Add Activity"}
+              handlePress={onActivityButtonPress}
+              colourOne={'#8A2BE2'}
+              colourTwo={'#FF5722'}
+            />
+            {value && value.length > 0 && (
+              <Text style={{ color: AppColors.BLACK, marginTop: 5, fontWeight: 'bold' }}>
+                Selected: {Array.isArray(value) ? value.join(', ') : value}
+              </Text>
+            )}
+          </View>
+        ) : <View />}
+
 
         <AppButton
-          width={50}
+          width={45} // Relative to parent View
           title="Upload Image"
           handlePress={onUploadImageButtonPress}
           colourOne={'#8A2BE2'}
@@ -90,10 +106,11 @@ const CountMeComponent = ({
             />
           }
         />
+
       </View>
 
       {imageData && (
-        <View style={{alignSelf:'flex-start'}}>
+        <View style={{ alignSelf: 'flex-start' }}>
           <TouchableOpacity
             onPress={onImageClear}
             style={{ position: 'absolute', zIndex: 10, right: -10, top: -10 }}
@@ -112,69 +129,113 @@ const CountMeComponent = ({
       )}
 
       <AppTextInput
+        title="Title Here (Optional)"
+        titleColour={AppColors.BLACK}
+        TextInputColour={AppColors.LIGHTGRAY}
+        onChangeText={onChangeTitle}
+        value={title}
+      />
+
+      <AppTextInput
         title="What's in your mind"
         titleColour={AppColors.BLACK}
         TextInputColour={AppColors.LIGHTGRAY}
         onChangeText={onChangeCaption}
         value={captionValue}
-        
+        multiline={true}
+        numberOfLines={4}
+        style={{ height: 100, textAlignVertical: 'top' }}
       />
 
 
+      {selectedType == 'Activity Post' && (
+        <>
+          <AppTextInput
+            title="Enter Player You Need"
+            titleColour={AppColors.BLACK}
+            TextInputColour={AppColors.LIGHTGRAY}
+            keyboardType={'number-pad'}
+            maxLength={2}
+            onChangeText={onChangeText}
+            value={textValue}
+          />
+          <AppTextInput
+            title="Enter $ (Per Person)"
+            placeholder="$"
+            titleColour={AppColors.BLACK}
+            TextInputColour={AppColors.LIGHTGRAY}
+            keyboardType={'number-pad'}
+            onChangeText={onChangeAmount}
+            value={AmountValue}
+          />
 
-      <AppTextInput
-        title="Total Player You need"
-        titleColour={AppColors.BLACK}
-        TextInputColour={AppColors.LIGHTGRAY}
-        keyboardType={'number-pad'}
-        maxLength={2}
-        onChangeText={onChangeText}
-        value={textValue}
-      />
-      <AppTextInput
-        title="Amount"
-        placeholder="$"
-        titleColour={AppColors.BLACK}
-        TextInputColour={AppColors.LIGHTGRAY}
-        keyboardType={'number-pad'}
-        onChangeText={onChangeAmount}
-        value={AmountValue}
-      />
+          {/* <TouchableOpacity onPress={onDatePickerPress}>
+            <AppTextInput
+              title="Date/Time"
+              titleColour={AppColors.BLACK}
+              TextInputColour={AppColors.LIGHTGRAY}
+              keyboardType={'number-pad'}
+              onChangeText={onChangeText}
+              value={
+                dateValue
+                  ? moment(dateValue).format('DD-MMM-YYYY hh:mm A')
+                  : 'Select Date and Time'
+              }
+              placeholder={
+                dateValue
+                  ? moment(dateValue).format('DD-MMM-YYYY hh:mm A')
+                  : 'Select Date and Time'
+              }
+              editable={false}
+            />
+          </TouchableOpacity> */}
 
-      <TouchableOpacity onPress={onDatePickerPress}>
-        <AppTextInput
-          title="Date/Time"
-          titleColour={AppColors.BLACK}
-          TextInputColour={AppColors.LIGHTGRAY}
-          keyboardType={'number-pad'}
-          onChangeText={onChangeText}
-          value={
-            dateValue
-              ? moment(dateValue).format('DD-MMM-YYYY hh:mm A')
-              : 'Select Date and Time'
-          }
-          placeholder={
-            dateValue
-              ? moment(dateValue).format('DD-MMM-YYYY hh:mm A')
-              : 'Select Date and Time'
-          }
-          editable={false}
-        />
-      </TouchableOpacity>
+          <TouchableOpacity onPress={() => nav.navigate('AddLocation')}>
+            <AppTextInput
+              title="Add Location"
+              titleColour={AppColors.BLACK}
+              TextInputColour={AppColors.LIGHTGRAY}
+              keyboardType={'number-pad'}
+              value={AddressDetail?.address}
+              placeholder={
+                AddressDetail?.address ? AddressDetail?.address : 'Add Location'
+              }
+              editable={false}
+            />
+          </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => nav.navigate('AddLocation')}>
-        <AppTextInput
-          title="Enter locaiton"
-          titleColour={AppColors.BLACK}
-          TextInputColour={AppColors.LIGHTGRAY}
-          keyboardType={'number-pad'}
-          value={AddressDetail?.address}
-          placeholder={
-            AddressDetail?.address ? AddressDetail?.address : 'Add Location'
-          }
-          editable={false}
-        />
-      </TouchableOpacity>
+          <View>
+            <AppText title="Select Payment" textFontWeight textSize={2} style={{ marginBottom: 10 }} />
+            <View style={{ flexDirection: 'row', gap: 20 }}>
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: paymentMethod === 'Cash' ? '#D8B4FE' : '#E0E0E0', // Light purple if selected
+                  padding: 15,
+                  borderRadius: 10,
+                  alignItems: 'center'
+                }}
+                onPress={() => setPaymentMethod && setPaymentMethod('Cash')}
+              >
+                <Text style={{ color: paymentMethod === 'Cash' ? 'white' : 'black', fontWeight: 'bold' }}>Cash</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: paymentMethod === 'Online' ? '#D8B4FE' : '#E0E0E0',
+                  padding: 15,
+                  borderRadius: 10,
+                  alignItems: 'center'
+                }}
+                onPress={() => setPaymentMethod && setPaymentMethod('Online')}
+              >
+                <Text style={{ color: paymentMethod === 'Online' ? 'white' : 'black', fontWeight: 'bold' }}>Online</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </>
+      )}
     </View>
   );
 };

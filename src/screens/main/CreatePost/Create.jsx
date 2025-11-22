@@ -33,7 +33,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { ApiCallFormData } from '../../../utils/apicalls/ApiCalls';
 import { launchImageLibrary } from 'react-native-image-picker';
 
-const Create = ({ navigation }) => {
+const Create = ({ navigation, route }) => {
   const userId = getAuth()?.currentUser?.uid;
   const [Caption, setCaption] = useState('');
   const [postType, setPostType] = useState(''); //Count me //Poll //general //link //location
@@ -51,26 +51,37 @@ const Create = ({ navigation }) => {
   const [imageData, setImageData] = useState()
 
   const [selectedType, setSelectedType] = useState('Activity Post');
-  
-  
+  const [title, setTitle] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
+
+
   const userDetail = useSelector(state => state?.auth.userData);
   const MyFavSports = useSelector(state => state?.auth?.FavouriteSports);
   const UserData = useSelector(state => state?.auth);
   const AddressDetail = useSelector(state => state?.auth?.Address);
 
+  React.useEffect(() => {
+    if (route.params?.selectedActivity) {
+      // Assuming single selection for now or taking the first one if multiple
+      // But API expects array string, so we can map names
+      const activityNames = route.params.selectedActivity.map(a => a.name);
+      // For display, maybe just show the first one or a summary
+      // Storing full array in state might be better if we want to send all
+      setCountMeDetails(prev => ({ ...prev, sport: activityNames }));
+    }
+  }, [route.params?.selectedActivity]);
 
+  const openLibrary = async () => {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 1,
+    });
 
-    const openLibrary = async () => {
-      const result = await launchImageLibrary({
-        mediaType: 'photo',
-        quality: 1,
-      });
-  
-      if (!result.didCancel && result.assets && result.assets.length > 0) {
-        setImageData(result.assets[0]);
-        // dispatch(setProfilePicture(result));
-      }
-    };
+    if (!result.didCancel && result.assets && result.assets.length > 0) {
+      setImageData(result.assets[0]);
+      // dispatch(setProfilePicture(result));
+    }
+  };
 
   const createPostApiCall = async () => {
     if (Caption == '') {
@@ -78,48 +89,42 @@ const Create = ({ navigation }) => {
       return;
     }
     try {
-      
-    
-    const formdata = new FormData();
-
-    console.log("first",imageData)
-    formdata.append('userId', userDetail?._id );
-    formdata.append('type', selectedType == "Activity Post" ?  'ActivityPost' : 'CasualPost');
-    formdata.append('posts',imageData ? {
-      type: imageData.type,
-      name: imageData.fileName,
-      uri: imageData.uri,
-    } : '' ); 
-    formdata.append('caption', Caption);
-    formdata.append('perPrsonPrice', CountMeDetails.amount);
-    formdata.append('totalPlayer', CountMeDetails.totalPlayers);
-    formdata.append('startTime', JSON.stringify(date));
-    formdata.append('latitude', JSON.stringify( AddressDetail?.latitude));
-    formdata.append('longitude', JSON.stringify(AddressDetail?.longitude));
-    formdata.append('locationName', AddressDetail?.address);
-    formdata.append('activity', '["Entertainment"]');
 
 
+      const formdata = new FormData();
 
-    setLoader(true);
-    const {data} = await ApiCallFormData('POST', 'createPost', formdata);
+      console.log("first", imageData)
+      formdata.append('userId', userDetail?._id);
+      formdata.append('type', selectedType == "Activity Post" ? 'ActivityPost' : 'CasualPost');
+      formdata.append('posts', imageData ? {
+        type: imageData.type,
+        name: imageData.fileName,
+        uri: imageData.uri,
+      } : '');
+      formdata.append('caption', Caption);
+      formdata.append('perPrsonPrice', CountMeDetails.amount);
+      formdata.append('totalPlayer', CountMeDetails.totalPlayers);
+      formdata.append('startTime', JSON.stringify(date));
+      formdata.append('latitude', JSON.stringify(AddressDetail?.latitude));
+      formdata.append('longitude', JSON.stringify(AddressDetail?.longitude));
+      formdata.append('locationName', AddressDetail?.address);
 
-    navigation.goBack();
-    setLoader(false);
+      // Use selected sports or default
+      const activityToSend = CountMeDetails.sport && CountMeDetails.sport.length > 0
+        ? JSON.stringify(CountMeDetails.sport)
+        : '["Entertainment"]';
+      formdata.append('activity', activityToSend);
+
+
+
+      setLoader(true);
+      const { data } = await ApiCallFormData('POST', 'createPost', formdata);
+
+      navigation.navigate('TabBars');
+      setLoader(false);
     } catch (error) {
-      console.log("error" ,error) 
+      console.log("error", error)
     }
-    return;
-    await CreatePostApi(
-      UserData,
-      userId,
-      Caption,
-      CountMeDetails,
-      postLink,
-      date,
-      AddressDetail,
-      '',
-    );
   };
 
   return (
@@ -147,7 +152,7 @@ const Create = ({ navigation }) => {
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
             >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.navigate('TabBars')}>
                 <AntDesign name={'close'} size={20} color={AppColors.BLACK} />
               </TouchableOpacity>
               <Image
@@ -188,8 +193,8 @@ const Create = ({ navigation }) => {
           />
           <SelectableButtons
             width={45}
-            title="Chill Post"
-            handlePress={() => setSelectedType('Chill Post')}
+            title="Casual Post"
+            handlePress={() => setSelectedType('Casual Post')}
             value={selectedType}
           />
         </View>
@@ -214,16 +219,20 @@ const Create = ({ navigation }) => {
           onChangeAmount={txt =>
             setCountMeDetails({ ...CountMeDetails, amount: txt })
           }
-          
-          
+
+
           AmountValue={CountMeDetails?.amount}
           onDatePickerPress={() => setShow(true)}
           dateValue={date}
           show={show}
-          onUploadImageButtonPress={()=> openLibrary()}
-          onActivityButtonPress={()=> console.log("first")}
+          onUploadImageButtonPress={() => openLibrary()}
+          onActivityButtonPress={() => navigation.navigate('AddSports', { isSelectionMode: true })}
           imageData={imageData}
-          onImageClear={()=> setImageData()}
+          onImageClear={() => setImageData()}
+          title={title}
+          onChangeTitle={setTitle}
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
         />
 
         {/* {postType == 'Countme' ? (

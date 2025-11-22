@@ -29,7 +29,6 @@ import {
   runTransaction,
   set,
 } from '@react-native-firebase/database';
-import GetAllPostLikes from '../../global/main/PostsRelatedFunctions/GetAllPostLikes';
 import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
 import NormalizeData from '../../global/utils/NormalizeData';
 import {
@@ -37,11 +36,11 @@ import {
   AutoSkeletonIgnoreView,
 } from 'react-native-auto-skeleton';
 import AppColors from '../../utils/Other/AppColors';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
 
 const Home = ({ navigation }) => {
   const [VisibleModal, SetVisibleModal] = useState(false);
   const [allLocalPost, setAllLocalPosts] = useState([]);
-  const [likes, setLikes] = useState([]);
   const [joines, setJoines] = useState([]);
   const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
@@ -49,7 +48,7 @@ const Home = ({ navigation }) => {
   const userId = getAuth()?.currentUser?.uid;
   const userDetail = useSelector(state => state?.auth.userData);
 
-  console.log("userDetail",userDetail)
+  console.log("userDetail", userDetail)
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
       getAllNewPost();
@@ -61,68 +60,42 @@ const Home = ({ navigation }) => {
   const getAllNewPost = async () => {
     setLoader(true);
     const GetPostAndSetToLocalState = await GetAllPosts();
-    const getPostLikes = await GetAllPostLikes(); 
     const getPostJoins = await GetAllPostJoins();
 
-    const normalizedLikes = NormalizeData(getPostLikes);
     const normalizedJoins = NormalizeData(getPostJoins);
 
     setAllLocalPosts(GetPostAndSetToLocalState);
-    setLikes(normalizedLikes);
     setJoines(normalizedJoins);
     setLoader(false);
   };
 
   const toggleLike = async (postId, isLiked) => {
     setAllLocalPosts(prev =>
-      prev.map(p =>
-        p.postId === postId
-          ? {
-              ...p,
-              likesCount: p.likesCount + (isLiked ? -1 : 1),
-              isLiked: !isLiked,
-            }
-          : p,
-      ),
+      prev.map(p => {
+        if (p._id === postId) {
+          let updatedLikes = p.like || [];
+          if (isLiked) {
+            updatedLikes = updatedLikes.filter(l => l._id !== userDetail?._id);
+          } else {
+            updatedLikes = [...updatedLikes, { _id: userDetail?._id, fullName: userDetail?.full_name, image: userDetail?.image }];
+          }
+          return {
+            ...p,
+            totalLikes: p.totalLikes + (isLiked ? -1 : 1),
+            like: updatedLikes,
+          };
+        }
+        return p;
+      })
     );
 
-    setLikes(prev => {
-      const updated = { ...prev };
-
-      if (isLiked) {
-        // remove like
-        delete updated[postId][userId];
-        if (Object.keys(updated[postId]).length === 0) {
-          delete updated[postId];
-        }
-      } else {
-        if (!updated[postId]) updated[postId] = {};
-        updated[postId][userId] = {
-          userId,
-          postId,
-          name: userDetail.full_name,
-          createdAt: Date.now(),
-        };
-      }
-
-      return updated;
-    });
-
-    const db = getDatabase();
-    const likeRef = ref(db, `likes/${postId}/${userId}`);
-    const postRef = ref(db, `posts/${postId}/likesCount`);
-
-    if (isLiked) {
-      await remove(likeRef);
-      await runTransaction(postRef, count => (count || 1) - 1);
-    } else {
-      await set(likeRef, {
-        userId,
-        name: userDetail.full_name,
+    try {
+      await ApiCall('POST', 'user/likeAndUnLikePost', {
         postId: postId,
-        createdAt: Date.now(),
+        userId: userId
       });
-      await runTransaction(postRef, count => (count || 0) + 1);
+    } catch (error) {
+      console.log("Error liking post:", error);
     }
   };
 
@@ -136,10 +109,10 @@ const Home = ({ navigation }) => {
       prev.map(p =>
         p.postId === postId
           ? {
-              ...p,
-              joinedCount: p.joinedCount + (isJoined ? -1 : 1),
-              isJoined: !isJoined,
-            }
+            ...p,
+            joinedCount: p.joinedCount + (isJoined ? -1 : 1),
+            isJoined: !isJoined,
+          }
           : p,
       ),
     );
@@ -267,18 +240,22 @@ const Home = ({ navigation }) => {
             paddingBottom: responsiveHeight(40),
           }}
           renderItem={({ item }) => {
-            const isLiked = !!likes?.[item?.postId]?.[userId];
+            const isLiked = item?.like?.some(l => l._id === userDetail?._id);
             const isJoined = !!joines?.[item?.postId]?.[userId];
+
+            console.log("item", item);
 
             return (
               <SocialMediaPost
                 AuthorId={item?.userId?._id}
+                authorImage={item?.userId?.image}
                 name={item?.userId.fullName}
                 ago={moment(item?.createdAt).fromNow()}
                 PostDescription={item?.caption}
                 PostPicture={item?.posts}
-                JoiningPost={item?.type ==  "ActivityPost" ? true : false}
+                JoiningPost={item?.type == "ActivityPost" ? true : false}
                 IsJoined={isJoined}
+                IsLiked={isLiked}
                 Likes={item?.totalLikes}
                 Comment={item?.totalComments}
                 Share={item?.totalShares}
@@ -286,18 +263,22 @@ const Home = ({ navigation }) => {
                 TotalJoinerRemain={item?.joinedUsers?.length}
                 onLikePress={() => toggleLike(item?._id, isLiked)}
                 onJoinTeamPress={() =>
-                  toggleJoin(item?.postId, isJoined, item?.authorId)
+                  navigation.navigate('JoinPaymentScreen', {
+                    postData: item
+                  })
                 }
                 onCommentPress={() =>
                   navigation.navigate('PostComment', {
-                    postId: item?.postId,
+                    postId: item?._id,
                     runner: true,
+                    comments: item?.comment
                   })
                 }
                 onRunnerPress={() =>
                   navigation.navigate('PostComment', {
                     postId: item?.postId,
                     runner: true,
+                    comments: item?.comment
                   })
                 }
                 onSharePress={() =>
@@ -305,6 +286,7 @@ const Home = ({ navigation }) => {
                 }
                 isAutherPost={item?.userId?._id == userDetail?._id}
                 navigation={navigation}
+                activity={item?.activity}
               />
             );
           }}

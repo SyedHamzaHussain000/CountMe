@@ -64,110 +64,113 @@ const Search = ({ navigation }) => {
     { id: 8, img: AppImages.sport8, sportsName: AllSports[0].name },
   ];
 
-  useEffect(() => {
-    const nav = navigation.addListener('focus', async () => {
-      const getAllSportsJoinedPost = await GetAllJoiningPost(dispatch);
+  // useEffect(() => {
+  //   const nav = navigation.addListener('focus', async () => {
+  //     const getAllSportsJoinedPost = await GetAllJoiningPost(dispatch);
 
-      const getPostJoins = await GetAllPostJoins();
-      const normalizedJoins = NormalizeData(getPostJoins);
+  //     const getPostJoins = await GetAllPostJoins();
+  //     const normalizedJoins = NormalizeData(getPostJoins);
 
-      setAllSportsPost(getAllSportsJoinedPost);
-      CreateRecentActivity(getAllSportsJoinedPost);
-      setJoines(normalizedJoins);
-    });
+  //     setAllSportsPost(getAllSportsJoinedPost);
+  //     CreateRecentActivity(getAllSportsJoinedPost);
+  //     setJoines(normalizedJoins);
+  //   });
 
-    return nav;
-  }, [navigation]);
+  //   return nav;
+  // }, [navigation]);
 
-  const CreateRecentActivity = SortStartingSoonPosts => {
-    const now = moment();
-    const oneWeekLater = moment().add(20, 'days');
+  // const CreateRecentActivity = SortStartingSoonPosts => {
+  //   const now = moment();
+  //   const oneWeekLater = moment().add(20, 'days');
 
-    const filtered = SortStartingSoonPosts.filter(post => {
-      if (!post.matchDateAndTime) return false;
+  //   const filtered = SortStartingSoonPosts.filter(post => {
+  //     if (!post.matchDateAndTime) return false;
 
-      const matchTime = moment(JSON.parse(post.matchDateAndTime));
-      return matchTime.isBetween(now, oneWeekLater);
-    });
+  //     const matchTime = moment(JSON.parse(post.matchDateAndTime));
+  //     return matchTime.isBetween(now, oneWeekLater);
+  //   });
 
-    const sorted = filtered.sort((a, b) => {
-      const timeA = moment(JSON.parse(a.matchDateAndTime));
-      const timeB = moment(JSON.parse(b.matchDateAndTime));
-      return timeA - timeB;
-    });
+  //   const sorted = filtered.sort((a, b) => {
+  //     const timeA = moment(JSON.parse(a.matchDateAndTime));
+  //     const timeB = moment(JSON.parse(b.matchDateAndTime));
+  //     return timeA - timeB;
+  //   });
 
-    setRecentActivity(sorted);
+  //   setRecentActivity(sorted);
 
-    return sorted;
-  };
+  //   return sorted;
+  // };
 
-  const toggleJoin = async (postId, isJoined, authorId) => {
-    if (authorId == userId) {
-      console.log("you are the author you can't join this post");
-      return;
-    }
+  // const toggleJoin = async (postId, isJoined, authorId) => {
+  //   if (authorId == userId) {
+  //     console.log("you are the author you can't join this post");
+  //     return;
+  //   }
 
-    setAllSportsPost(prev =>
-      prev.map(p =>
-        p.postId === postId
-          ? {
-              ...p,
-              joinedCount: p.joinedCount + (isJoined ? -1 : 1),
-              isJoined: !isJoined,
-            }
-          : p,
-      ),
-    );
+  //   setAllSportsPost(prev =>
+  //     prev.map(p =>
+  //       p.postId === postId
+  //         ? {
+  //             ...p,
+  //             joinedCount: p.joinedCount + (isJoined ? -1 : 1),
+  //             isJoined: !isJoined,
+  //           }
+  //         : p,
+  //     ),
+  //   );
 
-    setJoines(prev => {
-      const updated = { ...prev };
+  //   setJoines(prev => {
+  //     const updated = { ...prev };
 
-      if (isJoined) {
-        // remove like
-        delete updated[postId][userId];
-        if (Object.keys(updated[postId]).length === 0) {
-          delete updated[postId];
-        }
-      } else {
-        if (!updated[postId]) updated[postId] = {};
-        updated[postId][userId] = {
-          userId,
-          postId,
-          name: userDetail.full_name,
-          createdAt: Date.now(),
-        };
-      }
+  //     if (isJoined) {
+  //       // remove like
+  //       delete updated[postId][userId];
+  //       if (Object.keys(updated[postId]).length === 0) {
+  //         delete updated[postId];
+  //       }
+  //     } else {
+  //       if (!updated[postId]) updated[postId] = {};
+  //       updated[postId][userId] = {
+  //         userId,
+  //         postId,
+  //         name: userDetail.full_name,
+  //         createdAt: Date.now(),
+  //       };
+  //     }
 
-      return updated;
-    });
+  //     return updated;
+  //   });
 
-    const db = getDatabase();
-    const joinsRef = ref(db, `joins/${postId}/${userId}`);
-    const postRef = ref(db, `posts/${postId}/joinedCount`);
+  //   const db = getDatabase();
+  //   const joinsRef = ref(db, `joins/${postId}/${userId}`);
+  //   const postRef = ref(db, `posts/${postId}/joinedCount`);
 
-    if (isJoined) {
-      await remove(joinsRef);
-      await runTransaction(postRef, count => (count || 1) - 1);
-    } else {
-      await set(joinsRef, {
-        userId,
-        name: userDetail.full_name,
-        postId: postId,
-        createdAt: Date.now(),
-      });
-      await runTransaction(postRef, count => (count || 0) + 1);
-    }
-  };
+  //   if (isJoined) {
+  //     await remove(joinsRef);
+  //     await runTransaction(postRef, count => (count || 1) - 1);
+  //   } else {
+  //     await set(joinsRef, {
+  //       userId,
+  //       name: userDetail.full_name,
+  //       postId: postId,
+  //       createdAt: Date.now(),
+  //     });
+  //     await runTransaction(postRef, count => (count || 0) + 1);
+  //   }
+  // };
 
-  const filteredPostBySport = AllSportPosts?.filter((res)=> res?.sport == selectedSports)
+  const filteredPostBySport = AllSportPosts?.filter((res) => res?.sport == selectedSports)
   return (
     <ImageBackground source={AppImages.searchbg} style={{ flex: 1 }}>
       <AppHeader />
 
-      <ScrollView
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <AppText title={'Search in developent'} textSize={2.5} textFontWeight textAlignment={'center'} textColor={AppColors.BLACK} />
+      </View>
+      {/* <ScrollView
         contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 0 }}
-      >
-        {/* <View style={styles.buttonContainer}>
+      > */}
+      {/* <View style={styles.buttonContainer}>
           {/* <TouchableOpacity style={styles.yellowButtons}>
             <AppText
               title={'Add Activity'}
@@ -177,7 +180,7 @@ const Search = ({ navigation }) => {
             <SvgIcons.activity />
           </TouchableOpacity> */}
 
-        {/* <TouchableOpacity>
+      {/* <TouchableOpacity>
             <LinearGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -192,9 +195,9 @@ const Search = ({ navigation }) => {
               />
             </LinearGradient>
           </TouchableOpacity> */}
-        {/* </View> */}
+      {/* </View> */}
 
-        <View style={{ marginTop: 20 }}>
+      {/* <View style={{ marginTop: 20 }}>
           <AppText
             title={'Recent activity'}
             textSize={3}
@@ -320,7 +323,7 @@ const Search = ({ navigation }) => {
             )
           }
         </View>
-      </ScrollView>
+      </ScrollView> */}
     </ImageBackground>
   );
 };

@@ -28,8 +28,9 @@ import AppTextInput from '../../../components/AppCommonComponents/AppTextInput';
 import { ApiCallFormData } from '../../../utils/apicalls/ApiCalls';
 import ShowToast from '../../../utils/Other/ShowToast';
 
-const AddSports = ({ navigation }) => {
+const AddSports = ({ navigation, route }) => {
   const dispatch = useDispatch();
+  const isSelectionMode = route?.params?.isSelectionMode;
 
   const profileImage = useSelector(state => state.auth.ProfileImage);
   const token = useSelector(state => state.auth.token);
@@ -137,6 +138,15 @@ const AddSports = ({ navigation }) => {
   // }, [selectedSports]);
 
   const UpdateProfile = async () => {
+    if (isSelectionMode) {
+      navigation.navigate({
+        name: 'Create',
+        params: { selectedActivity: selectedSports },
+        merge: true,
+      });
+      return;
+    }
+
     // console.log("selectedSports",profileImage)
 
     try {
@@ -181,13 +191,13 @@ const AddSports = ({ navigation }) => {
         <BackButtonWithHeader />
         <LineBreak height={30} />
         <AppText
-          title="Select Activity"
+          title={isSelectionMode ? "Select Activity" : "Select Activity"}
           textSize={3}
           textFontWeight
           textColor={AppColors.WHITE}
         />
         <AppText
-          title="What would you like to do the most in your free time?"
+          title={isSelectionMode ? "Select the activity for your post" : "What would you like to do the most in your free time?"}
           textColor={AppColors.WHITE}
           textSize={1.8}
         />
@@ -235,7 +245,7 @@ const AddSports = ({ navigation }) => {
         </View>
       </ScrollView>
       <AppButton
-        title="Continue"
+        title={isSelectionMode ? "Select" : "Continue"}
         handlePress={() => UpdateProfile()}
         loading={loader}
       />

@@ -9,97 +9,85 @@ import {
 import React, { useEffect, useState } from 'react';
 import { SvgIcons } from '../../../assets/icons/HomeIcons/SvgIcons';
 import AppText from '../../../components/AppCommonComponents/AppText';
-import {
-  get,
-  getDatabase,
-  push,
-  ref,
-  runTransaction,
-  set,
-} from '@react-native-firebase/database';
 import AppImages from '../../../assets/images/AppImages';
 import { responsiveWidth } from '../../../utils/Other/Responsive_Dimensions';
 import AppColors from '../../../utils/Other/AppColors';
 import AppTextInput from '../../../components/AppCommonComponents/AppTextInput';
 import RoundButton from '../../../components/RoundButton';
-import { getAuth } from '@react-native-firebase/auth';
+
 import { useSelector } from 'react-redux';
 import NormalizeData from '../../../global/utils/NormalizeData';
 import moment from 'moment';
+import { ApiCall } from '../../../utils/apicalls/ApiCalls';
+import { IMAGE_BASE_URL } from '../../../utils/BaseUrls/BaseUrl';
 
 const PostComment = ({ navigation, route }) => {
-  const { postId, runner } = route?.params;
+  const { postId, runner, comments: initialComments } = route?.params;
+
+  console.log("postId", initialComments);
 
   const [TextComment, setTextComments] = useState('');
   const [comments, setComments] = useState([]);
 
-  const userId = getAuth()?.currentUser?.uid;
-  const userDetail = useSelector(state => state?.auth);
+  const userDetail = useSelector(state => state?.auth.userData);
+
+  const userId = userDetail?._id;
 
   useEffect(() => {
-    const nav = navigation.addListener('focus', () => {
-      getAllComments();      
-    });
-    return nav;
-  }, [navigation]);
+    if (initialComments) {
+      // Sort by createdAt descending
+      const sorted = [...initialComments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setComments(sorted);
+    }
 
-  const AddComment = async text => {
+    // // Handle runner auto-comment
+    // if (runner) {
+    //   const alreadyCommented = initialComments?.some(
+    //     c => c.userId?._id === userId && c.message === "Game on, I’m coming 🏃"
+    //   );
+
+    //   if (!alreadyCommented) {
+    //     AddComment("Game on, I’m coming 🏃");
+    //   }
+    // }
+  }, [initialComments, runner]);
+
+  const AddComment = async (text) => {
+    const commentText = text ? text : TextComment;
+    if (!commentText.trim()) return;
+
     try {
-      const db = getDatabase();
-      const user = getAuth().currentUser;
+      const newComment = {
+        userId: {
+          _id: userId,
+          fullName: userDetail?.full_name,
+          image: userDetail?.image
+        },
+        message: commentText,
+        _id: Date.now().toString(), // Temporary ID
+        createdAt: new Date().toISOString(),
+        postId: postId
+      };
 
-      if (!user) return;
+      // Optimistic update
+      setComments(prev => [newComment, ...prev]);
+      setTextComments('');
 
-      const commentRef = ref(db, `comments/${postId}`);
-      const postRef = ref(db, `posts/${postId}/commentsCount`);
-      const newCommentRef = push(commentRef);
-
-      await set(newCommentRef, {
-        userId: userId,
-        name: userDetail.full_name,
-        comment: text ? text :  TextComment,
+      const commentData = {
         postId: postId,
-        createdAt: Date.now(), // or serverTimestamp() if Firestore
-        runner: runner
-      });
-      await runTransaction(postRef, count => (count || 0) + 1);
-      await getAllComments();
+        userId: userId,
+        message: commentText
+      }
+
+
+      const res = await ApiCall('POST', 'commentByUser', commentData);
+      console.log("cooment res", res)
+
+
       console.log('Comment added successfully');
     } catch (error) {
       console.error('Error adding comment:', error);
-    }
-  };
-
-  const getAllComments = async () => {
-    const db = getDatabase();
-    const commentsRef = ref(db, `comments/${postId}`);
-
-    try {
-      const snapshot = await get(commentsRef);
-
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const alreadyCommented = Object.values(data).some(
-          c => c.userId === userId && c.runner === true
-        );
-
-
-        if(alreadyCommented == false){
-          AddComment("Game on, I’m coming 🏃")
-        }
-
-        const formatted = Object.keys(data).map(key => ({
-          id: key,
-          ...data[key],
-        }));
-
-        formatted.sort((a, b) => b.createdAt - a.createdAt);
-
-        setComments(formatted);
-      }
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      return [];
+      Alert.alert("Error", "Failed to add comment");
     }
   };
 
@@ -127,7 +115,7 @@ const PostComment = ({ navigation, route }) => {
                 }}
               >
                 <Image
-                  source={AppImages.photo}
+                  source={item?.userId?.image ? { uri: `${IMAGE_BASE_URL}${item.userId.image}` } : AppImages.photo}
                   style={{
                     borderRadius: 200,
                     resizeMode: 'contain',
@@ -143,13 +131,13 @@ const PostComment = ({ navigation, route }) => {
                       gap: 5,
                     }}
                   >
-                    <AppText title={item.name} textSize={2} textFontWeight />
+                    <AppText title={item?.userId?.fullName} textSize={2} textFontWeight />
                     <AppText
                       title={moment(item?.createdAt).fromNow()}
                       textSize={1.5}
                     />
                   </View>
-                  <AppText title={item.comment} textSize={1.8} />
+                  <AppText title={item?.message} textSize={1.8} />
                 </View>
               </View>
               <View

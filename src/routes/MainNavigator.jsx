@@ -28,6 +28,9 @@ import PostComment from '../screens/main/CreatePost/PostComment';
 import AddLocation from '../screens/main/CreatePost/AddLocation';
 import OtherUserProfile from '../screens/main/Stack/Profile/OtherUserProfile';
 import EditProfile from '../screens/main/Stack/Profile/EditProfile';
+import JoinPaymentScreen from '../screens/main/JoinPaymentScreen';
+import AddCardScreen from '../screens/main/AddCardScreen';
+import HistoryScreen from '../screens/main/HistoryScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -36,33 +39,37 @@ const MainNavigator = () => {
   const userData = useSelector(state => state?.auth?.userData);
   const MySportsSkills = useSelector(state => state?.auth?.SportsSkills);
 
-  console.log("userData",userData)
-  
+  console.log("userData", userData)
+
 
   return (
-    <Stack.Navigator    screenOptions={{ headerShown: false }}>
-      {userData?.isupdated == true  ? (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {userData?.isupdated == true ? (
         <>
           <Stack.Screen name="TabBars" component={TabBars} />
           <Stack.Screen name="Conversation" component={Conversation} />
-          <Stack.Screen name="Create" component={Create} 
-          options={{presentation: 'modal'}}
+          <Stack.Screen name="Create" component={Create}
+            options={{ presentation: 'modal' }}
           />
-          <Stack.Screen name="PostComment" component={PostComment} 
-          options={{presentation: 'modal'}}
+          <Stack.Screen name="PostComment" component={PostComment}
+            options={{ presentation: 'modal' }}
           />
-          <Stack.Screen name="AddLocation" component={AddLocation} 
-          options={{presentation: 'modal'}}
+          <Stack.Screen name="AddLocation" component={AddLocation}
+            options={{ presentation: 'modal' }}
           />
-<Stack.Screen name="OtherUserProfile" component={OtherUserProfile} />
-          <Stack.Screen name="EditProfile" component={EditProfile} 
-          options={{presentation: 'card'}}
+          <Stack.Screen name="OtherUserProfile" component={OtherUserProfile} />
+          <Stack.Screen name="EditProfile" component={EditProfile}
+            options={{ presentation: 'card' }}
           />
+          <Stack.Screen name="JoinPaymentScreen" component={JoinPaymentScreen} />
+          <Stack.Screen name="AddCardScreen" component={AddCardScreen} />
+          <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
+          <Stack.Screen name="AddSports" component={AddSports} />
 
-        
-          
 
-          
+
+
+
         </>
       ) : (
         <>

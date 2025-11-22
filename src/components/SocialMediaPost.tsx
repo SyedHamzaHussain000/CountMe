@@ -15,6 +15,7 @@ import { BASE_URL, IMAGE_BASE_URL } from '../utils/BaseUrls/BaseUrl';
 
 type props = {
   AuthorId?: any,
+  authorImage?: any,
   pfp?: any;
   name?: string;
   ago?: string;
@@ -25,6 +26,7 @@ type props = {
   Share?: any;
   JoiningPost?: boolean;
   IsJoined?: boolean;
+  IsLiked?: boolean;
   TotalJoiners?: number;
   TotalJoinerRemain?: number;
   isAutherPost?: boolean,
@@ -33,13 +35,15 @@ type props = {
   onSharePress?: () => void;
   onJoinTeamPress?: () => void;
   onViewProfilePress?: () => void;
-  onRunnerPress?:()=> void;
+  onRunnerPress?: () => void;
   navigation?: any
-  RemoveFunctionality?:boolean
+  RemoveFunctionality?: boolean;
+  activity?: string[];
 };
 const SocialMediaPost = ({
   AuthorId,
-  pfp,
+
+  authorImage,
   name,
   ago,
   PostDescription,
@@ -49,6 +53,7 @@ const SocialMediaPost = ({
   Share,
   JoiningPost,
   IsJoined,
+  IsLiked,
   TotalJoiners,
   TotalJoinerRemain,
   isAutherPost,
@@ -59,76 +64,87 @@ const SocialMediaPost = ({
   onViewProfilePress,
   onRunnerPress,
   navigation,
-  RemoveFunctionality
+  RemoveFunctionality,
+  activity
 }: props) => {
 
 
   return (
-    <View style={{gap:10}}>
+    <View style={{ gap: 10 }}>
       <View style={styles.PostHeaderContainer}>
-        <TouchableOpacity onPress={()=> isAutherPost ? navigation.navigate("Profile"):  navigation.navigate("OtherUserProfile", {FriendId: AuthorId })}  style={styles.PostHeaderChild}>
-            <Image source={AppImages.IMAGES} style={styles.pfp} />
-            <View>
-                <AppText title={name} textSize={2} textFontWeight/>
-                <AppText title={ago}/>
-            </View>
+        <TouchableOpacity onPress={() => isAutherPost ? navigation.navigate("Profile") : navigation.navigate("OtherUserProfile", { FriendId: AuthorId })} style={styles.PostHeaderChild}>
+          <Image source={authorImage ? { uri: `${IMAGE_BASE_URL}${authorImage}` } : AppImages.IMAGES} style={styles.pfp} />
+          <View>
+            <AppText title={name} textSize={2} textFontWeight />
+            <AppText title={ago} />
+          </View>
         </TouchableOpacity>
-        <SvgXml xml={Appsvgicon.Dots}/>
+        <SvgXml xml={Appsvgicon.Dots} />
       </View>
 
-      <AppText title={PostDescription} textSize={2}/>
+      <AppText title={PostDescription} textSize={2} />
 
-      
+      {activity && activity.length > 0 && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+          {activity.map((act, index) => (
+            <View key={index} style={{ backgroundColor: AppColors.PRIMARY + '20', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 15 }}>
+              <Text style={{ color: AppColors.PRIMARY, fontSize: 12, fontWeight: '600' }}>{act}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+
       {
         PostPicture.length > 0 && (
 
-            <Image source={{uri: `${IMAGE_BASE_URL}${PostPicture[0]}`}} style={styles.img}/>
+          <Image source={{ uri: `${IMAGE_BASE_URL}${PostPicture[0]}` }} style={styles.img} />
         )
       }
 
       {
         JoiningPost && (
-            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginTop:10, marginBottom:10}}>
-                <View style={{flexDirection:'row', alignItems:'center', gap:5}}>
-                    <Image source={AppImages.JOINERS} style={{height:20, width:20, resizeMode:'contain'}}/>
-                        <AppText title={`${TotalJoinerRemain}/${TotalJoiners} Joined`} textFontWeight textSize={2}/>
-                </View>
-                {
-                  !isAutherPost && (
-
-                    <SmallButtons title={IsJoined ? 'Leave Now': 'Join Now'} icon={IsJoined ? null: <SvgXml xml={Appsvgicon.Send} height={18} width={18}/>} handlePress={onJoinTeamPress}/>
-                  ) 
-                }
-                
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+              <Image source={AppImages.JOINERS} style={{ height: 20, width: 20, resizeMode: 'contain' }} />
+              <AppText title={`${TotalJoinerRemain}/${TotalJoiners} Joined`} textFontWeight textSize={2} />
             </View>
+            {
+              !isAutherPost && (
+
+                <SmallButtons title={IsJoined ? 'Leave Now' : 'Join Now'} icon={IsJoined ? null : <SvgXml xml={Appsvgicon.Send} height={18} width={18} />} handlePress={onJoinTeamPress} />
+              )
+            }
+
+          </View>
         )
       }
 
-        {
-          !RemoveFunctionality && (
+      {
+        !RemoveFunctionality && (
 
-      <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-        <View style={{flexDirection:'row', alignItems:'center', gap:10}}>
-            <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.LIKE} />} onPress={onLikePress}/>
-            <PostFooter Counts={Comment} icon={<SvgXml xml={Appsvgicon.ChatBubble} />} onPress={onCommentPress}/>
-            <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.ChatB} height={17} width={17} />} iconTwo={<SvgXml xml={Appsvgicon.Runner} height={17} width={17} />} onPress={onRunnerPress}/>
-        </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <PostFooter Counts={Likes} icon={<SvgXml xml={IsLiked ? Appsvgicon.HeartOutline : Appsvgicon.HeartOutline} />} onPress={onLikePress} />
+              <PostFooter Counts={Comment} icon={<SvgXml xml={Appsvgicon.ChatBubble} />} onPress={onCommentPress} />
+              <PostFooter Counts={Likes} icon={<SvgXml xml={Appsvgicon.ChatB} height={17} width={17} />} iconTwo={<SvgXml xml={Appsvgicon.Runner} height={17} width={17} />} onPress={onRunnerPress} />
+            </View>
 
-      
-        <View>
-          {
-            !isAutherPost && (
 
-              <PostFooter Counts={Share} icon={<SvgXml xml={Appsvgicon.Share} />} onPress={onSharePress}/>
-            )
-          }
-        </View>
-      </View>
-          )
-        }
+            <View>
+              {
+                !isAutherPost && (
 
-      <View style={{marginTop:10}}>
-        <Line colour={"lightgray"}/>
+                  <PostFooter Counts={Share} icon={<SvgXml xml={Appsvgicon.Share} />} onPress={onSharePress} />
+                )
+              }
+            </View>
+          </View>
+        )
+      }
+
+      <View style={{ marginTop: 10 }}>
+        <Line colour={"lightgray"} />
       </View>
 
 
@@ -146,7 +162,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     borderRadius: 200,
   },
-  PostHeaderContainer:{ flexDirection: 'row', alignItems:'center', justifyContent:'space-between' },
-  PostHeaderChild:{ flexDirection: 'row', alignItems:'center', gap:10 },
-  img:{height:responsiveHeight(22), width:responsiveWidth(90), borderRadius:20}
+  PostHeaderContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  PostHeaderChild: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  img: { height: responsiveHeight(22), width: responsiveWidth(90), borderRadius: 20 }
 });
