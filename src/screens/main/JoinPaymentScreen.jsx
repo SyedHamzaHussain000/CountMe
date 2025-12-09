@@ -14,13 +14,7 @@ import AppImages from '../../assets/images/AppImages';
 
 const JoinPaymentScreen = ({ navigation, route }) => {
     const { postData } = route.params || {};
-    const [selectedMethod, setSelectedMethod] = useState('card'); // 'cash' or 'card'
-    const [selectedCard, setSelectedCard] = useState('4242');
-
-    const cards = [
-        { id: '1', last4: '4242', brand: 'Mastercard' },
-        { id: '2', last4: '6212', brand: 'Visa' },
-    ];
+    const [selectedMethod, setSelectedMethod] = useState('cash'); // 'cash' or 'online'
 
     return (
         <View style={{ flex: 1, backgroundColor: AppColors.WHITE }}>
@@ -68,39 +62,13 @@ const JoinPaymentScreen = ({ navigation, route }) => {
 
                     <TouchableOpacity
                         style={styles.row}
-                        onPress={() => setSelectedMethod('card')}
+                        onPress={() => setSelectedMethod('online')}
                     >
-                        <AppText title="Pay With Card" textFontWeight textSize={2} />
+                        <AppText title="Online Transfer" textFontWeight textSize={2} />
                         <View style={styles.radioOuter}>
-                            {selectedMethod === 'card' && <View style={styles.radioInner} />}
+                            {selectedMethod === 'online' && <View style={styles.radioInner} />}
                         </View>
                     </TouchableOpacity>
-
-                    {selectedMethod === 'card' && (
-                        <View style={{ marginTop: 20 }}>
-                            <AppText title="Select Card" textFontWeight textSize={2.2} style={{ marginBottom: 15 }} />
-
-                            {cards.map((card) => (
-                                <TouchableOpacity
-                                    key={card.id}
-                                    style={styles.row}
-                                    onPress={() => setSelectedCard(card.last4)}
-                                >
-                                    <AppText title={`**** ***** **** ${card.last4}`} textFontWeight textSize={2} />
-                                    <View style={styles.radioOuter}>
-                                        {selectedCard === card.last4 && <View style={styles.radioInner} />}
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-
-                            <AppButton
-                                title="+ Add Card"
-                                marginTop={20}
-                                handlePress={() => navigation.navigate('AddCardScreen')}
-                                width={80}
-                            />
-                        </View>
-                    )}
                 </View>
 
             </ScrollView>

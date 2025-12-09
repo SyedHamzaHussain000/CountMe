@@ -7,6 +7,9 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
+  Linking,
+  TouchableOpacity,
+  Platform,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
@@ -24,16 +27,12 @@ import { SvgIcons } from '../../assets/icons/HomeIcons/SvgIcons';
 import Line from '../../components/AppCommonComponents/Line';
 import Participants from '../../components/AppCommonComponents/Participants';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
-import { getNearbyPosts } from '../../global/main/mapsScreenFunctions/GetNearbyPosts';
-import { useDispatch, useSelector } from 'react-redux';
-import GetAllJoinerByPost from '../../global/main/mapsScreenFunctions/GetAllJoinerByPost';
 import moment from 'moment';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
 
 const Maps = ({ navigation }) => {
-  const dispatch = useDispatch();
   const mapRef = useRef();
-  const AllNearbyPosts = useSelector(state => state?.auth?.AllNearbyPosts);
-
+  const [AllNearbyPosts, setAllNearbyPosts] = useState([]);
 
   const [postIndex, setPostIndex] = useState(0);
   const [AllPostJoinersState, setAllPostJoinersState] = useState([]);
@@ -57,35 +56,42 @@ const Maps = ({ navigation }) => {
     return nav;
   }, [navigation]);
 
-  useEffect(() => {
-    getAllJoiners(AllNearbyPosts);
-  }, [AllNearbyPosts]);
+  // useEffect(() => {
+  //   getAllJoiners(AllNearbyPosts);
+  // }, [AllNearbyPosts]);
 
   useEffect(() => {
     if (AllNearbyPosts.length > 0) {
       // Focus on the first post
       animateToTheLocation(
-        AllNearbyPosts[0].latitude,
-        AllNearbyPosts[0].longitude,
+        parseFloat(AllNearbyPosts[0].latitude),
+        parseFloat(AllNearbyPosts[0].longitude),
       );
     }
   }, [AllNearbyPosts]);
 
   const getNearbyLocations = async () => {
-    await getNearbyPosts(40.7579747, -73.9855426, 300, dispatch);
+    try {
+      const res = await ApiCall('get', 'getNearbyActivityPosts?latitude=38.7888&longitude=106.5349');
+      if (res?.data?.success) {
+        setAllNearbyPosts(res.data.data);
+      } else {
+        console.log('Error fetching nearby posts:', res);
+      }
+    } catch (error) {
+      console.log('Error in getNearbyLocations:', error);
+    }
   };
 
   // 40.9651419
   // -73.6751251
   const getAllJoiners = async (AllNearbyPosts, i) => {
-    setJoinerLoader(true);
-    const getPostJoiners = await GetAllJoinerByPost(
-      AllNearbyPosts[i == 0 || i > 0 ? i : postIndex]?.postId,
-    );
-
-
-    setAllPostJoinersState(getPostJoiners);
-    setJoinerLoader(false);
+    // setJoinerLoader(true);
+    // const getPostJoiners = await GetAllJoinerByPost(
+    //   AllNearbyPosts[i == 0 || i > 0 ? i : postIndex]?.postId,
+    // );
+    // setAllPostJoinersState(getPostJoiners);
+    // setJoinerLoader(false);
   };
 
   const animateToTheLocation = (lat, lng) => {
@@ -100,6 +106,21 @@ const Maps = ({ navigation }) => {
         2000, // duration in ms
       );
     }
+  };
+
+  const openMapDirection = (lat, lng) => {
+    const scheme = Platform.select({ ios: 'maps:0,0?daddr=', android: 'geo:0,0?q=' });
+    const latLng = `${lat},${lng}`;
+    const label = 'Custom Label';
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`
+    });
+
+    // Using a universal link for better cross-platform compatibility if the above fails or as a preference
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+    Linking.openURL(googleMapsUrl).catch(err => console.error('An error occurred', err));
   };
 
   return (
@@ -133,15 +154,16 @@ const Maps = ({ navigation }) => {
               AllNearbyPosts.map((res, index) => {
                 return (
                   <Marker
-                    key={res.postId}
+                    key={res._id || index}
                     coordinate={{
-                      latitude: res.latitude,
-                      longitude: res.longitude,
+                      latitude: parseFloat(res.latitude),
+                      longitude: parseFloat(res.longitude),
                     }}
                     title={res.caption}
-                    description={res.address}
+                    description={res.locationName}
                     onPress={() => {
-                      setPostIndex(index), getAllJoiners(AllNearbyPosts, index);
+                      setPostIndex(index);
+                      // getAllJoiners(AllNearbyPosts, index);
                     }}
                   />
                 );
@@ -204,8 +226,8 @@ const Maps = ({ navigation }) => {
           >
             <IconText
               title={
-                AllNearbyPosts[postIndex]?.sport
-                  ? AllNearbyPosts[postIndex]?.sport
+                AllNearbyPosts[postIndex]?.activity && AllNearbyPosts[postIndex]?.activity.length > 0
+                  ? AllNearbyPosts[postIndex]?.activity[0]
                   : 'Not Activity'
               }
               Icon={<SvgIcons.world />}
@@ -213,8 +235,8 @@ const Maps = ({ navigation }) => {
             />
             <IconText
               title={
-                AllNearbyPosts[postIndex]?.amount
-                  ? `$ ${AllNearbyPosts[postIndex]?.amount}`
+                AllNearbyPosts[postIndex]?.perPrsonPrice
+                  ? `$ ${AllNearbyPosts[postIndex]?.perPrsonPrice}`
                   : '0'
               }
               Icon={<SvgIcons.Penny />}
@@ -223,8 +245,8 @@ const Maps = ({ navigation }) => {
           </View>
           <IconText
             title={
-              AllNearbyPosts[postIndex]?.matchDateAndTime
-                ? moment(JSON.parse( AllNearbyPosts[postIndex]?.matchDateAndTime)).format("DD MMM YYYY hh:mm A")
+              AllNearbyPosts[postIndex]?.date
+                ? `${AllNearbyPosts[postIndex]?.date} ${AllNearbyPosts[postIndex]?.startTime || ''}`
                 : '-'
             }
             Icon={<SvgIcons.calender />}
@@ -234,24 +256,34 @@ const Maps = ({ navigation }) => {
           <View>
             <IconText
               title={
-                AllNearbyPosts[postIndex]?.address
-                  ? AllNearbyPosts[postIndex]?.address
+                AllNearbyPosts[postIndex]?.locationName
+                  ? AllNearbyPosts[postIndex]?.locationName
                   : 'No Address'
               }
               Icon={<SvgIcons.location />}
               titleColour={AppColors.WHITE}
             />
 
-            <View style={{ width: responsiveWidth(75), alignSelf: 'center' }}>
+            <TouchableOpacity
+              style={{ width: responsiveWidth(75), alignSelf: 'center' }}
+              onPress={() => {
+                if (AllNearbyPosts[postIndex]) {
+                  openMapDirection(
+                    parseFloat(AllNearbyPosts[postIndex].latitude),
+                    parseFloat(AllNearbyPosts[postIndex].longitude)
+                  );
+                }
+              }}
+            >
               <AppText
                 title="Get Direction"
                 textColor={'#FD26D9'}
                 textSize={2}
               />
-            </View>
+            </TouchableOpacity>
           </View>
           <IconText
-            title={`participants (${AllNearbyPosts[postIndex]?.joinedCount}/${AllNearbyPosts[postIndex]?.totalPlayers})`}
+            title={`participants (${AllNearbyPosts[postIndex]?.joinedUsers?.length || 0}/${AllNearbyPosts[postIndex]?.totalPlayer || 0})`}
             Icon={<SvgIcons.pfp />}
             titleColour={AppColors.WHITE}
           />
@@ -261,7 +293,7 @@ const Maps = ({ navigation }) => {
 
         <View style={{ padding: 20, paddingBottom: 0 }}>
           <Participants
-            name={AllNearbyPosts[postIndex]?.authorName}
+            name={AllNearbyPosts[postIndex]?.userId?.fullName || 'Organizer'}
             pfp={AppImages.User}
             type={'Organizer'}
           />
