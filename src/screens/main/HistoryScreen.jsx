@@ -1,41 +1,73 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AppText from '../../components/AppCommonComponents/AppText';
 import { responsiveHeight, responsiveWidth } from '../../utils/Other/Responsive_Dimensions';
 import AppColors from '../../utils/Other/AppColors';
 import LinearGradient from 'react-native-linear-gradient';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
+import { useSelector } from 'react-redux';
+import { IMAGE_BASE_URL } from '../../utils/BaseUrls/BaseUrl';
+import AppImages from '../../assets/images/AppImages';
+import moment from 'moment';
 
 const HistoryScreen = ({ navigation }) => {
-    const [activeTab, setActiveTab] = useState('History');
+    const [activeTab, setActiveTab] = useState('Upcoming');
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const token = useSelector(state => state.auth.token);
 
-    const dummyData = [
-        { id: '1', name: 'Mary Elizabeth', status: '3/6 Joined', time: 'Starting 9:00 PM', date: '10/09/2025' },
-        { id: '2', name: 'Mary Elizabeth', status: '3/6 Joined', time: 'Starting 9:00 PM', date: '10/09/2025' },
-        { id: '3', name: 'Mary Elizabeth', status: '3/6 Joined', time: 'Starting 9:00 PM', date: '10/09/2025' },
-        { id: '4', name: 'Mary Elizabeth', status: '3/6 Joined', time: 'Starting 9:00 PM', date: '10/09/2025' },
-        { id: '5', name: 'Mary Elizabeth', status: '3/6 Joined', time: 'Starting 9:00 PM', date: '10/09/2025' },
-    ];
+    const fetchJoinedPosts = async () => {
+        setLoading(true);
+        try {
+            const type = activeTab === 'History' ? 'History' : 'Upcomming';
+            const res = await ApiCall('GET', `getJoinedActivityPost?type=${type}`, null, token);
+            if (res.data) {
+                setPosts(res.data.data);
+            } else {
+                setPosts([]);
+            }
+        } catch (error) {
+            console.log("Error fetching joined posts:", error);
+            setPosts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchJoinedPosts();
+        });
+        return unsubscribe;
+    }, [navigation, activeTab]);
+
+    useEffect(() => {
+        fetchJoinedPosts();
+    }, [activeTab]);
 
     const renderItem = ({ item }) => (
         <View style={styles.card}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
-                    <View style={{ height: 40, width: 40, borderRadius: 20, backgroundColor: '#ccc' }}></View>
+                    <Image
+                        source={item?.userId?.image ? { uri: `${IMAGE_BASE_URL}${item?.userId?.image}` } : AppImages.IMAGES}
+                        style={{ height: 40, width: 40, borderRadius: 20, backgroundColor: '#ccc' }}
+                    />
                     <View style={{ width: '60%' }}>
-                        <AppText title={item.name} textFontWeight textSize={1.8} />
-                        <AppText title="Lorem Ipsum is simply dummy text of the printing and typesetting industry." textSize={1.2} textColor="gray" numberOfLines={2} />
+                        <AppText title={item?.userId?.fullName || "User"} textFontWeight textSize={1.8} />
+                        <AppText title={item?.caption || "No caption provided"} textSize={1.2} textColor="gray" numberOfLines={2} />
                     </View>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                     <AppText title="Starting" textSize={1.5} textFontWeight />
-                    <AppText title={item.time} textSize={1.5} />
+                    <AppText title={item?.startTime || "N/A"} textSize={1.5} />
                 </View>
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <AppText title={item.status} textFontWeight textSize={1.8} />
-                <AppText title={item.date} textSize={1.5} textColor="gray" />
+                <AppText title={`${item?.joinedUsers?.length || 0}/${item?.totalPlayer || 0} Joined`} textFontWeight textSize={1.8} />
+                <AppText title={item?.date || "N/A"} textSize={1.5} textColor="gray" />
             </View>
         </View>
     );
@@ -44,27 +76,9 @@ const HistoryScreen = ({ navigation }) => {
         <View style={{ flex: 1, backgroundColor: AppColors.WHITE }}>
             <AppHeader />
 
-            <View style={{ padding: 20 }}>
+            <View style={{ padding: 20, flex: 1 }}>
                 {/* Tabs */}
                 <View style={styles.tabContainer}>
-                    <TouchableOpacity
-                        style={[styles.tab, activeTab === 'History' ? {} : { backgroundColor: 'transparent' }]}
-                        onPress={() => setActiveTab('History')}
-                    >
-                        {activeTab === 'History' ? (
-                            <LinearGradient
-                                colors={[AppColors.PRIMARY, AppColors.SECONDARY]} // Assuming these are the pink/purple gradient
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.gradientTab}
-                            >
-                                <AppText title="History" textColor={AppColors.WHITE} textFontWeight />
-                            </LinearGradient>
-                        ) : (
-                            <AppText title="History" textColor={AppColors.BLACK} />
-                        )}
-                    </TouchableOpacity>
-
                     <TouchableOpacity
                         style={[styles.tab, activeTab === 'Upcoming' ? {} : { backgroundColor: 'transparent' }]}
                         onPress={() => setActiveTab('Upcoming')}
@@ -82,15 +96,51 @@ const HistoryScreen = ({ navigation }) => {
                             <AppText title="Upcoming" textColor={AppColors.BLACK} />
                         )}
                     </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.tab, activeTab === 'History' ? {} : { backgroundColor: 'transparent' }]}
+                        onPress={() => setActiveTab('History')}
+                    >
+                        {activeTab === 'History' ? (
+                            <LinearGradient
+                                colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.gradientTab}
+                            >
+                                <AppText title="History" textColor={AppColors.WHITE} textFontWeight />
+                            </LinearGradient>
+                        ) : (
+                            <AppText title="History" textColor={AppColors.BLACK} />
+                        )}
+                    </TouchableOpacity>
                 </View>
 
-                <FlatList
-                    data={dummyData}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={{ gap: 15, paddingBottom: 100 }}
-                    showsVerticalScrollIndicator={false}
-                />
+                {loading && posts?.length === 0 ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator size="large" color={AppColors.PRIMARY} />
+                    </View>
+                ) : (
+                    <FlatList
+                        data={posts}
+                        renderItem={renderItem}
+                        keyExtractor={item => item._id}
+                        contentContainerStyle={{ gap: 15, paddingBottom: 100 }}
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={loading}
+                                onRefresh={fetchJoinedPosts}
+                                colors={[AppColors.PRIMARY]}
+                            />
+                        }
+                        ListEmptyComponent={
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+                                <AppText title={`No ${activeTab.toLowerCase()} posts found`} textColor="gray" />
+                            </View>
+                        }
+                    />
+                )}
 
             </View>
         </View>

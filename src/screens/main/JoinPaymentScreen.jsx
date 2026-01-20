@@ -11,11 +11,48 @@ import Appsvgicon from '../../assets/icons/Appsvgicon';
 import moment from 'moment';
 import { IMAGE_BASE_URL } from '../../utils/BaseUrls/BaseUrl';
 import AppImages from '../../assets/images/AppImages';
+import { useSelector } from 'react-redux';
+import { getAuth } from '@react-native-firebase/auth';
+import { ApiCallFormData } from '../../utils/apicalls/ApiCalls';
+import ShowToast from '../../utils/Other/ShowToast';
 
 const JoinPaymentScreen = ({ navigation, route }) => {
     const { postData } = route.params || {};
     const [selectedMethod, setSelectedMethod] = useState('cash'); // 'cash' or 'online'
+    const [loading, setLoading] = useState(false);
 
+    const token = useSelector(state => state.auth.token);
+    const userId = getAuth()?.currentUser?.uid;
+    const userDetail = useSelector(state => state?.auth.userData);
+
+    console.log("userDetail", userDetail)
+
+    const handleJoin = async () => {
+        setLoading(true);
+        const data = new FormData();
+        data.append('postId', postData?._id);
+        data.append('userId', userDetail?._id);
+        data.append('status', selectedMethod === 'cash' ? 'Cash' : 'Online');
+
+
+
+        try {
+            const res = await ApiCallFormData('POST', 'editPost', data, token);
+            if (res.data.status === true) {
+                ShowToast('success', 'Joined successfully');
+                navigation.goBack();
+            } else {
+                ShowToast('error', res.data.message || 'Failed to join');
+            }
+        } catch (error) {
+            console.log("Error joining post:", error);
+            ShowToast('error', 'Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    console.log("popstData", postData)
     return (
         <View style={{ flex: 1, backgroundColor: AppColors.WHITE }}>
             <AppHeader />
@@ -74,11 +111,11 @@ const JoinPaymentScreen = ({ navigation, route }) => {
             </ScrollView>
 
             <View style={{ padding: 20, paddingBottom: responsiveHeight(5) }}>
-                <AppButton title="Join Now" handlePress={() => {
-                    // Handle join logic here
-                    console.log("Joining with", selectedMethod);
-                    navigation.goBack();
-                }} />
+                <AppButton
+                    title="Join Now"
+                    loading={loading}
+                    handlePress={handleJoin}
+                />
             </View>
         </View>
     );
