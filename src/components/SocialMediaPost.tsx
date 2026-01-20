@@ -1,4 +1,5 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import React from 'react';
 import AppImages from '../assets/images/AppImages';
 import { responsiveHeight, responsiveWidth } from '../utils/Other/Responsive_Dimensions';
@@ -39,6 +40,9 @@ type props = {
   navigation?: any
   RemoveFunctionality?: boolean;
   activity?: string[];
+  matchDate?: string;
+  startTime?: string;
+  endTime?: string;
 };
 const SocialMediaPost = ({
   AuthorId,
@@ -65,7 +69,10 @@ const SocialMediaPost = ({
   onRunnerPress,
   navigation,
   RemoveFunctionality,
-  activity
+  activity,
+  matchDate,
+  startTime,
+  endTime
 }: props) => {
 
 
@@ -91,6 +98,19 @@ const SocialMediaPost = ({
               <Text style={{ color: AppColors.PRIMARY, fontSize: 12, fontWeight: '600' }}>{act}</Text>
             </View>
           ))}
+        </View>
+      )}
+
+      {JoiningPost && matchDate && (
+        <View style={{ backgroundColor: AppColors.LIGHTGRAY + '40', padding: 10, borderRadius: 10, gap: 5 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <Ionicons name="calendar-outline" size={16} color={AppColors.PRIMARY} />
+            <AppText title={`Match Date: ${matchDate}`} textSize={1.8} textFontWeight />
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <Ionicons name="time-outline" size={16} color={AppColors.PRIMARY} />
+            <AppText title={`Time: ${startTime} - ${endTime}`} textSize={1.8} textFontWeight />
+          </View>
         </View>
       )}
 

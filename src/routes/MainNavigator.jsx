@@ -76,9 +76,9 @@ const MainNavigator = () => {
           <Stack.Screen name="UploadPicture" component={UploadPicture} />
           <Stack.Screen name="AddSports" component={AddSports} />
           <Stack.Screen name="AddSportsSkills" component={AddSportsSkills} />
-          <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
         </>
       )}
+      <Stack.Screen name="ProfileCreated" component={ProfileCreated} />
     </Stack.Navigator>
   );
 };

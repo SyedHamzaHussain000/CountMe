@@ -26,6 +26,10 @@ type props = {
   onChangeAmount?: (text: string) => void;
   AmountValue?: string;
   selectedType?: any;
+  onStartTimePress?: () => void;
+  onEndTimePress?: () => void;
+  startTimeValue?: Date;
+  endTimeValue?: Date;
   onUploadImageButtonPress?: () => void;
   onActivityButtonPress?: () => void;
   imageData: any;
@@ -47,6 +51,10 @@ const CountMeComponent = ({
   textValue,
   onDatePickerPress,
   dateValue,
+  onStartTimePress,
+  onEndTimePress,
+  startTimeValue,
+  endTimeValue,
   show,
   AmountValue,
   onChangeAmount,
@@ -169,26 +177,54 @@ const CountMeComponent = ({
             value={AmountValue}
           />
 
-          {/* <TouchableOpacity onPress={onDatePickerPress}>
-            <AppTextInput
-              title="Date/Time"
-              titleColour={AppColors.BLACK}
-              TextInputColour={AppColors.LIGHTGRAY}
-              keyboardType={'number-pad'}
-              onChangeText={onChangeText}
-              value={
-                dateValue
-                  ? moment(dateValue).format('DD-MMM-YYYY hh:mm A')
-                  : 'Select Date and Time'
-              }
-              placeholder={
-                dateValue
-                  ? moment(dateValue).format('DD-MMM-YYYY hh:mm A')
-                  : 'Select Date and Time'
-              }
-              editable={false}
-            />
-          </TouchableOpacity> */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <TouchableOpacity onPress={onDatePickerPress} style={{ width: '100%' }}>
+              <AppTextInput
+                title="Select Date"
+                titleColour={AppColors.BLACK}
+                TextInputColour={AppColors.LIGHTGRAY}
+                value={
+                  dateValue
+                    ? moment(dateValue).format('DD-MM-YYYY')
+                    : 'Select Date'
+                }
+                placeholder="Select Date"
+                editable={false}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+            <TouchableOpacity onPress={onStartTimePress} style={{ flex: 1 }}>
+              <AppTextInput
+                title="Start Time"
+                titleColour={AppColors.BLACK}
+                TextInputColour={AppColors.LIGHTGRAY}
+                value={
+                  startTimeValue
+                    ? moment(startTimeValue).format('hh:mm A')
+                    : 'Start Time'
+                }
+                placeholder="Start Time"
+                editable={false}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={onEndTimePress} style={{ flex: 1 }}>
+              <AppTextInput
+                title="End Time"
+                titleColour={AppColors.BLACK}
+                TextInputColour={AppColors.LIGHTGRAY}
+                value={
+                  endTimeValue
+                    ? moment(endTimeValue).format('hh:mm A')
+                    : 'End Time'
+                }
+                placeholder="End Time"
+                editable={false}
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity onPress={() => nav.navigate('AddLocation')}>
             <AppTextInput

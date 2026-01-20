@@ -49,21 +49,21 @@ const Login = ({ navigation }) => {
 
 
     try {
-      
+
       const userDetails = {
         email: email,
         password: password,
       };
-      
+
       const { data } = await ApiCall('POST', 'loginUser', userDetails);
 
       setLoader(false)
-      dispatch(setUserDetails(data)); 
-      
+      dispatch(setUserDetails(data));
+
       ShowToast('success', data.message);
     } catch (error) {
       setLoader(false)
-        ShowToast('error', error?.response?.message);
+      ShowToast('error', error?.response?.message);
     }
     // return;
 
@@ -112,10 +112,10 @@ const Login = ({ navigation }) => {
               textAlignment={'center'}
             /> */}
             <Image
-                    source={AppImages.MainHeaderIcon}
-                    style={{ height: responsiveHeight(15), width: responsiveHeight(15), marginTop:20 , alignSelf:'center'}}
-                    resizeMode="contain"
-                  />
+              source={AppImages.MainHeaderIcon}
+              style={{ height: responsiveHeight(15), width: responsiveHeight(15), marginTop: 20, alignSelf: 'center' }}
+              resizeMode="contain"
+            />
             <AppText
               title={'Sign In'}
               textSize={4}

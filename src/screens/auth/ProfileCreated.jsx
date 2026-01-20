@@ -9,11 +9,11 @@ import {
 import AppButton from '../../components/AppCommonComponents/AppButton';
 import AppColors from '../../utils/Other/AppColors';
 
-const ProfileCreated = ({navigation}) => {
+const ProfileCreated = ({ navigation }) => {
 
 
 
-  
+
   return (
     <ImageBackground
       source={AppImages.AUTHBG}
@@ -37,7 +37,7 @@ const ProfileCreated = ({navigation}) => {
           textAlignment={'center'}
           textSize={2}
         /> */}
-      <Image
+        <Image
           source={AppImages.MainHeaderIcon}
           style={{
             height: responsiveHeight(20),
@@ -57,8 +57,8 @@ const ProfileCreated = ({navigation}) => {
       </View>
 
 
-      <AppButton title="Get Started" handlePress={()=> navigation.navigate("MainNavigator")} />
-        
+      <AppButton title="Get Started" handlePress={() => navigation.navigate("TabBars")} />
+
     </ImageBackground>
   );
 };

@@ -287,6 +287,9 @@ const Home = ({ navigation }) => {
                 isAutherPost={item?.userId?._id == userDetail?._id}
                 navigation={navigation}
                 activity={item?.activity}
+                matchDate={item?.date}
+                startTime={item?.startTime}
+                endTime={item?.endTime}
               />
             );
           }}

@@ -8,6 +8,8 @@ import {
   ScrollView,
   Image,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
@@ -30,7 +32,7 @@ import IconText from '../../components/AppCommonComponents/IconText';
 import Banners from '../../components/Banners';
 import SocialMediaPost from '../../components/SocialMediaPost';
 import { GetAllJoiningPost } from '../../global/main/PostsRelatedFunctions/GetAllJoiningPost';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import GetAllPostJoins from '../../global/main/PostsRelatedFunctions/GetAllPostJoins';
 import NormalizeData from '../../global/utils/NormalizeData';
@@ -43,287 +45,176 @@ import {
 } from '@react-native-firebase/database';
 import { getAuth } from '@react-native-firebase/auth';
 import { AllSports } from '../../utils/Other/AllSports';
+import { ApiCall } from '../../utils/apicalls/ApiCalls';
+import AppSearchBar from '../../components/AppCommonComponents/AppSearchBar';
+import { IMAGE_BASE_URL } from '../../utils/BaseUrls/BaseUrl';
 
 const Search = ({ navigation }) => {
   const dispatch = useDispatch();
   const userId = getAuth()?.currentUser?.uid;
-  const [RecentActivity, setRecentActivity] = useState([]);
-  const [AllSportPosts, setAllSportsPost] = useState([]);
+  const token = useSelector(state => state.auth.token);
+
+  const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const [joines, setJoines] = useState([]);
 
-  const [selectedSports, setSelectedSports] = useState("Football (Soccer)")
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const { data } = await ApiCall('GET', 'getUserActivityPosts', null, token);
+      const getPostJoins = await GetAllPostJoins();
+      const normalizedJoins = NormalizeData(getPostJoins);
 
-  const sportsArr = [
-    { id: 1, img: AppImages.sport1, sportsName: AllSports[3].name },
-    { id: 2, img: AppImages.sport2, sportsName: AllSports[1].name },
-    { id: 3, img: AppImages.sport3, sportsName: AllSports[52].name },
-    { id: 4, img: AppImages.sport4, sportsName: AllSports[20].name },
-    { id: 5, img: AppImages.sport5, sportsName: AllSports[4].name },
-    { id: 6, img: AppImages.sport6, sportsName: AllSports[29].name },
-    { id: 7, img: AppImages.sport7, sportsName: AllSports[19].name },
-    { id: 8, img: AppImages.sport8, sportsName: AllSports[0].name },
-  ];
+      console.log("data.length", data.data.length)
 
-  // useEffect(() => {
-  //   const nav = navigation.addListener('focus', async () => {
-  //     const getAllSportsJoinedPost = await GetAllJoiningPost(dispatch);
+      if (data && data.data) {
+        // Parse activity if it's a string
+        const parsedPosts = data.data.map(post => {
+          let parsedActivity = post.activity;
+          if (typeof post.activity === 'string') {
+            try {
+              parsedActivity = JSON.parse(post.activity);
+            } catch (e) {
+              console.log('Error parsing activity:', e);
+              parsedActivity = [post.activity]; // Fallback to array with single string
+            }
+          }
+          return {
+            ...post,
+            activity: parsedActivity
+          };
+        });
+        setPosts(parsedPosts);
+        setFilteredPosts(parsedPosts);
+      }
+      setJoines(normalizedJoins);
+    } catch (error) {
+      console.log('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  //     const getPostJoins = await GetAllPostJoins();
-  //     const normalizedJoins = NormalizeData(getPostJoins);
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchPosts();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
-  //     setAllSportsPost(getAllSportsJoinedPost);
-  //     CreateRecentActivity(getAllSportsJoinedPost);
-  //     setJoines(normalizedJoins);
-  //   });
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    if (text.trim() === '') {
+      setFilteredPosts(posts);
+    } else {
+      const filtered = posts.filter((post) =>
+        post.activity?.some((act) =>
+          act.toLowerCase().includes(text.toLowerCase())
+        )
+      );
+      setFilteredPosts(filtered);
+    }
+  };
 
-  //   return nav;
-  // }, [navigation]);
-
-  // const CreateRecentActivity = SortStartingSoonPosts => {
-  //   const now = moment();
-  //   const oneWeekLater = moment().add(20, 'days');
-
-  //   const filtered = SortStartingSoonPosts.filter(post => {
-  //     if (!post.matchDateAndTime) return false;
-
-  //     const matchTime = moment(JSON.parse(post.matchDateAndTime));
-  //     return matchTime.isBetween(now, oneWeekLater);
-  //   });
-
-  //   const sorted = filtered.sort((a, b) => {
-  //     const timeA = moment(JSON.parse(a.matchDateAndTime));
-  //     const timeB = moment(JSON.parse(b.matchDateAndTime));
-  //     return timeA - timeB;
-  //   });
-
-  //   setRecentActivity(sorted);
-
-  //   return sorted;
-  // };
-
-  // const toggleJoin = async (postId, isJoined, authorId) => {
-  //   if (authorId == userId) {
-  //     console.log("you are the author you can't join this post");
-  //     return;
-  //   }
-
-  //   setAllSportsPost(prev =>
-  //     prev.map(p =>
-  //       p.postId === postId
-  //         ? {
-  //             ...p,
-  //             joinedCount: p.joinedCount + (isJoined ? -1 : 1),
-  //             isJoined: !isJoined,
-  //           }
-  //         : p,
-  //     ),
-  //   );
-
-  //   setJoines(prev => {
-  //     const updated = { ...prev };
-
-  //     if (isJoined) {
-  //       // remove like
-  //       delete updated[postId][userId];
-  //       if (Object.keys(updated[postId]).length === 0) {
-  //         delete updated[postId];
-  //       }
-  //     } else {
-  //       if (!updated[postId]) updated[postId] = {};
-  //       updated[postId][userId] = {
-  //         userId,
-  //         postId,
-  //         name: userDetail.full_name,
-  //         createdAt: Date.now(),
-  //       };
-  //     }
-
-  //     return updated;
-  //   });
-
-  //   const db = getDatabase();
-  //   const joinsRef = ref(db, `joins/${postId}/${userId}`);
-  //   const postRef = ref(db, `posts/${postId}/joinedCount`);
-
-  //   if (isJoined) {
-  //     await remove(joinsRef);
-  //     await runTransaction(postRef, count => (count || 1) - 1);
-  //   } else {
-  //     await set(joinsRef, {
-  //       userId,
-  //       name: userDetail.full_name,
-  //       postId: postId,
-  //       createdAt: Date.now(),
-  //     });
-  //     await runTransaction(postRef, count => (count || 0) + 1);
-  //   }
-  // };
-
-  const filteredPostBySport = AllSportPosts?.filter((res) => res?.sport == selectedSports)
   return (
     <ImageBackground source={AppImages.searchbg} style={{ flex: 1 }}>
       <AppHeader />
 
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <AppText title={'Search in developent'} textSize={2.5} textFontWeight textAlignment={'center'} textColor={AppColors.BLACK} />
+      <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+        <AppSearchBar
+          placeHolder="Search by sports name"
+          value={searchQuery}
+          onChangeText={handleSearch}
+          color={AppColors.BLACK}
+        />
       </View>
-      {/* <ScrollView
-        contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 0 }}
-      > */}
-      {/* <View style={styles.buttonContainer}>
-          {/* <TouchableOpacity style={styles.yellowButtons}>
-            <AppText
-              title={'Add Activity'}
-              textSize={2}
-              textColor={AppColors.WHITE}
-            />
-            <SvgIcons.activity />
-          </TouchableOpacity> */}
 
-      {/* <TouchableOpacity>
-            <LinearGradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
-              style={styles.searchButton}
-            >
-              <SvgIcons.searchW />
-              <AppText
-                title={'Search'}
-                textSize={2}
-                textColor={AppColors.WHITE}
-              />
-            </LinearGradient>
-          </TouchableOpacity> */}
-      {/* </View> */}
-
-      {/* <View style={{ marginTop: 20 }}>
-          <AppText
-            title={'Recent activity'}
-            textSize={3}
-            textFontWeight
-            textColor={AppColors.BLACK}
-          />
-
-          <FlatList
-            data={RecentActivity}
-            horizontal
-            contentContainerStyle={{ gap: 20 }}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => {
-              return (
-                <ActivityCard
-                  ActivityName={item?.sport}
-                  TotalJoined={item?.joinedCount}
-                  TotalJoiner={item?.totalPlayers}
-                  JoiningFee={item?.amount}
-                  Icon={item.Icon}
-                />
-              );
-            }}
-          />
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={AppColors.PRIMARY} />
         </View>
-
-        <View>
-          <View
-            style={{
-              backgroundColor: AppColors.YELLOWIS,
-              opacity: 0.3,
-              height: responsiveHeight(40),
-              borderRadius: 10,
-              marginTop: 10,
-            }}
-          />
-          <View style={{ position: 'absolute', zIndex: 1, padding: 20 }}>
-            <AppText title={'Top 5 Sports'} textSize={2.5} textFontWeight />
-
-            <FlatList
-              data={RecentActivity}
-              contentContainerStyle={{ gap: 10, marginTop: 10 }}
-              renderItem={({ item }) => {
-                return (
-                  <TopActivityCard
-                    Title={item?.sport}
-                    TotalJoined={item?.joinedCount}
-                    TotalJoiner={item?.totalPlayers}
-                    Icon={<SvgIcons.club />}
-                  />
-                );
-              }}
+      ) : (
+        <FlatList
+          data={filteredPosts}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={() => fetchPosts()}
+              colors={[AppColors.PRIMARY]}
             />
-          </View>
-
-          <Banners data={RecentActivity} />
-
-          <View style={{ marginTop: 10 }}>
-            <AppText title={'Choose By Sports'} textSize={2.5} textFontWeight />
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  width: responsiveWidth(90),
-                  marginBottom:20
-                }}
-              >
-                {sportsArr.map((item, index) => (
-                  <TouchableOpacity
-                    onPress={() => setSelectedSports(item.sportsName)}>
-                    <Image
-                      key={index}
-                      source={item.img}
-                      style={{ width: 80, height: 80, borderRadius: 10,backgroundColor: item.sportsName == selectedSports ?  AppColors.PINK : null }}
-                    />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-
-        <View style={{ padding: 0 }}>
-          {
-            !filteredPostBySport.length > 0 ? (
-              <View style={{alignItems:'center', justifyContent:'center', paddingBottom:100}}>
-              <AppText title={"No match found related to this sports"} textColor={AppColors.BLACK} textSize={2} textFontWeight/>
-              </View>
-            ):(
-
-              <FlatList
-                data={filteredPostBySport}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                  gap: 20,
-                  paddingBottom: responsiveHeight(20),
-                }}
-                renderItem={({ item }) => {
-                  const isJoined = !!joines?.[item?.postId]?.[userId];
-                  return (
-                    <SocialMediaPost
-                      AuthorId={item?.authorId}
-                      name={item?.authorName}
-                      ago={moment(item?.createdAt).fromNow()}
-                      PostDescription={item?.caption}
-                      PostPicture={item?.PostPicture}
-                      JoiningPost={item?.totalPlayers > 0 ? true : false}
-                      IsJoined={isJoined}
-                      Likes={item?.likesCount}
-                      Comment={item?.commentsCount}
-                      Share={item?.sharesCount}
-                      TotalJoiners={item?.totalPlayers}
-                      TotalJoinerRemain={item?.joinedCount}
-                      isAutherPost={item?.authorId == userId}
-                      navigation={navigation}
-                      RemoveFunctionality={true}
-                    />
-                  );
-                }}
-              />
-            )
           }
-        </View>
-      </ScrollView> */}
+          contentContainerStyle={{
+            padding: 20,
+            paddingBottom: responsiveHeight(15),
+            gap: 20,
+          }}
+          ListEmptyComponent={
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+              <AppText
+                title={searchQuery ? "No match found related to this sports" : "No activity posts found"}
+                textColor={AppColors.BLACK}
+                textSize={2}
+                textFontWeight
+              />
+            </View>
+          }
+          renderItem={({ item }) => {
+            const postId = item?.postId || item?._id;
+            const isJoined = !!joines?.[postId]?.[userId];
+            const joinedCount = joines?.[postId] ? Object.keys(joines[postId]).length : (item?.joinedUsers?.length || 0);
+
+            return (
+              <SocialMediaPost
+                AuthorId={item?.userId?._id}
+                authorImage={item?.userId?.ProfilePicture}
+                name={item?.userId?.fullName}
+                ago={moment(item?.createdAt).fromNow()}
+                PostDescription={Array.isArray(item?.activity) ? item.activity.join(', ') : item?.activity}
+                PostPicture={item?.image ? [item.image] : []}
+                activity={item?.activity}
+                JoiningPost={true}
+                IsJoined={isJoined}
+                Likes={item?.totalLikes || 0}
+                Comment={item?.totalComments || 0}
+                Share={item?.totalShares || 0}
+                TotalJoiners={item?.totalPlayers || 0}
+                TotalJoinerRemain={joinedCount}
+                isAutherPost={item?.userId?._id === userId}
+                navigation={navigation}
+                RemoveFunctionality={false}
+                matchDate={item?.date}
+                startTime={item?.startTime}
+                endTime={item?.endTime}
+                onJoinTeamPress={() =>
+                  navigation.navigate('JoinPaymentScreen', {
+                    postData: item
+                  })
+                }
+                onCommentPress={() =>
+                  navigation.navigate('PostComment', {
+                    postId: postId,
+                    runner: true,
+                    comments: item?.comment
+                  })
+                }
+                onRunnerPress={() =>
+                  navigation.navigate('PostComment', {
+                    postId: postId,
+                    runner: true,
+                    comments: item?.comment
+                  })
+                }
+                onSharePress={() => {
+                  Alert.alert('Share Post', 'Do you want to share this post?');
+                }}
+              />
+            );
+          }}
+        />
+      )}
     </ImageBackground>
   );
 };

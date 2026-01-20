@@ -35,7 +35,7 @@ const AddSportsSkills = ({ navigation }) => {
   const dispatch = useDispatch();
   const [selectedSports, setSelectedSports] = useState([]);
 
-  console.log("selectedSports",selectedSports)
+  console.log("selectedSports", selectedSports)
 
   const Sports = [
     {
@@ -565,19 +565,19 @@ const AddSportsSkills = ({ navigation }) => {
 
   const CreateProfile = () => {
     UsersDbRef.child(UserId)
-    .set({
-      email: email,
-      full_name: full_name,
-      ProfilePicture: '',
-      device_token: device_token,
-      Sports: MyFavSports,
-      SportsSkills: selectedSports,
-      ProfileCreated: true,
-    })
-    .then(() => {
-      console.log("created")
-      // navigation.navigate('ProfileCreated');
-      dispatch(setSportsSkills(selectedSports));
+      .set({
+        email: email,
+        full_name: full_name,
+        ProfilePicture: '',
+        device_token: device_token,
+        Sports: MyFavSports,
+        SportsSkills: selectedSports,
+        ProfileCreated: true,
+      })
+      .then(() => {
+        console.log("created")
+        navigation.navigate('ProfileCreated');
+        dispatch(setSportsSkills(selectedSports));
       })
       .catch(error => {
         ShowToast('error', 'Internet connect lost');

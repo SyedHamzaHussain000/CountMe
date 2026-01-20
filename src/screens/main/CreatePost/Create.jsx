@@ -47,7 +47,13 @@ const Create = ({ navigation, route }) => {
 
   //date
   const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
   const [imageData, setImageData] = useState()
 
   const [selectedType, setSelectedType] = useState('Activity Post');
@@ -101,10 +107,13 @@ const Create = ({ navigation, route }) => {
         name: imageData.fileName,
         uri: imageData.uri,
       } : '');
+      formdata.append('title', title);
       formdata.append('caption', Caption);
       formdata.append('perPrsonPrice', CountMeDetails.amount);
       formdata.append('totalPlayer', CountMeDetails.totalPlayers);
-      formdata.append('startTime', JSON.stringify(date));
+      formdata.append('startTime', moment(startTime).format('hh:mm A'));
+      formdata.append('endTime', moment(endTime).format('hh:mm A'));
+      formdata.append('date', moment(date).format('DD-MM-YYYY'));
       formdata.append('latitude', JSON.stringify(AddressDetail?.latitude));
       formdata.append('longitude', JSON.stringify(AddressDetail?.longitude));
       formdata.append('locationName', AddressDetail?.address);
@@ -130,14 +139,36 @@ const Create = ({ navigation, route }) => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <DateTimePickerModal
-        isVisible={show}
+        isVisible={showDatePicker}
         minimumDate={new Date()}
-        mode="datetime"
+        mode="date"
         onConfirm={selectedDate => {
-          setDate(selectedDate), setShow(false);
+          setDate(selectedDate), setShowDatePicker(false);
         }}
         onCancel={() => {
-          setShow(false);
+          setShowDatePicker(false);
+        }}
+      />
+
+      <DateTimePickerModal
+        isVisible={showStartTimePicker}
+        mode="time"
+        onConfirm={selectedTime => {
+          setStartTime(selectedTime), setShowStartTimePicker(false);
+        }}
+        onCancel={() => {
+          setShowStartTimePicker(false);
+        }}
+      />
+
+      <DateTimePickerModal
+        isVisible={showEndTimePicker}
+        mode="time"
+        onConfirm={selectedTime => {
+          setEndTime(selectedTime), setShowEndTimePicker(false);
+        }}
+        onCancel={() => {
+          setShowEndTimePicker(false);
         }}
       />
 
@@ -222,9 +253,12 @@ const Create = ({ navigation, route }) => {
 
 
           AmountValue={CountMeDetails?.amount}
-          onDatePickerPress={() => setShow(true)}
+          onDatePickerPress={() => setShowDatePicker(true)}
+          onStartTimePress={() => setShowStartTimePicker(true)}
+          onEndTimePress={() => setShowEndTimePicker(true)}
           dateValue={date}
-          show={show}
+          startTimeValue={startTime}
+          endTimeValue={endTime}
           onUploadImageButtonPress={() => openLibrary()}
           onActivityButtonPress={() => navigation.navigate('AddSports', { isSelectionMode: true })}
           imageData={imageData}
