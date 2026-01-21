@@ -132,7 +132,12 @@ const SocialMediaPost = ({
             {
               !isAutherPost && (
 
-                <SmallButtons title={IsJoined ? 'Leave Now' : 'Join Now'} icon={IsJoined ? null : <SvgXml xml={Appsvgicon.Send} height={18} width={18} />} handlePress={onJoinTeamPress} />
+                <SmallButtons
+                  title={IsJoined ? 'Joined' : 'Join Now'}
+                  disabled={IsJoined}
+                  icon={<SvgXml xml={Appsvgicon.Send} height={18} width={18} />}
+                  handlePress={onJoinTeamPress}
+                />
               )
             }
 

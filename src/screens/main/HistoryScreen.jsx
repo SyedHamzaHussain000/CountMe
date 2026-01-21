@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Image, Linking, Platform } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AppText from '../../components/AppCommonComponents/AppText';
@@ -10,12 +10,19 @@ import { useSelector } from 'react-redux';
 import { IMAGE_BASE_URL } from '../../utils/BaseUrls/BaseUrl';
 import AppImages from '../../assets/images/AppImages';
 import moment from 'moment';
+import { SvgIcons } from '../../assets/icons/HomeIcons/SvgIcons';
 
 const HistoryScreen = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState('Upcoming');
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const token = useSelector(state => state.auth.token);
+    const AddressDetail = useSelector(state => state?.auth?.Address);
+
+    const openMapDirection = (lat, lng) => {
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        Linking.openURL(googleMapsUrl).catch(err => console.error('An error occurred', err));
+    };
 
     const fetchJoinedPosts = async () => {
         setLoading(true);
@@ -62,6 +69,24 @@ const HistoryScreen = ({ navigation }) => {
                 <View style={{ alignItems: 'flex-end' }}>
                     <AppText title="Starting" textSize={1.5} textFontWeight />
                     <AppText title={item?.startTime || "N/A"} textSize={1.5} />
+                </View>
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 5, flex: 1 }}
+                    onPress={() => {
+                        if (item?.latitude && item?.longitude) {
+                            openMapDirection(item.latitude, item.longitude);
+                        }
+                    }}
+                >
+                    <SvgIcons.location height={15} width={15} fill="gray" />
+                    <AppText title={item?.locationName || "No address provided"} textSize={1.2} textColor="gray" numberOfLines={1} style={{ flex: 1 }} />
+                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                    <SvgIcons.Penny height={15} width={15} fill={AppColors.PRIMARY} />
+                    <AppText title={`$${item?.perPrsonPrice || 0}`} textSize={1.4} textFontWeight textColor={AppColors.PRIMARY} />
                 </View>
             </View>
 

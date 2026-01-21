@@ -21,6 +21,7 @@ type props = {
   btnWidth?: any;
   marginTop?: number;
   loader?: boolean;
+  disabled?: boolean;
 };
 const SmallButtons = ({
   icon,
@@ -29,6 +30,7 @@ const SmallButtons = ({
   handlePress,
   marginTop,
   loader,
+  disabled
 }: props) => {
   return (
     <>
@@ -55,11 +57,12 @@ const SmallButtons = ({
         </View>
       ) : (
         <TouchableOpacity
-          onPress={handlePress}
+          onPress={disabled ? () => { } : handlePress}
+          disabled={disabled}
           style={{ marginTop: marginTop || 0 }}
         >
           <LinearGradient
-            colors={[AppColors.PRIMARY, AppColors.SECONDARY]}
+            colors={disabled ? ['#ccc', '#bbb'] : [AppColors.PRIMARY, AppColors.SECONDARY]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={[
@@ -79,7 +82,7 @@ const SmallButtons = ({
               textColor={AppColors.WHITE}
               textFontWeight
             />
-            {icon}
+            {!disabled && icon}
           </LinearGradient>
         </TouchableOpacity>
       )}

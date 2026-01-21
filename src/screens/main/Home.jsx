@@ -36,7 +36,8 @@ import {
   AutoSkeletonIgnoreView,
 } from 'react-native-auto-skeleton';
 import AppColors from '../../utils/Other/AppColors';
-import { ApiCall } from '../../utils/apicalls/ApiCalls';
+import { ApiCall, ApiCallFormData } from '../../utils/apicalls/ApiCalls';
+import ShowToast from '../../utils/Other/ShowToast';
 
 const Home = ({ navigation }) => {
   const [VisibleModal, SetVisibleModal] = useState(false);
@@ -47,8 +48,9 @@ const Home = ({ navigation }) => {
 
   const userId = getAuth()?.currentUser?.uid;
   const userDetail = useSelector(state => state?.auth.userData);
+  const token = useSelector(state => state?.auth.token);
 
-  console.log("userDetail", userDetail)
+  console.log("userDetail", token)
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
       getAllNewPost();
@@ -157,6 +159,7 @@ const Home = ({ navigation }) => {
     }
   };
 
+
   const sharePostAlert = async (postId, authorId) => {
     Alert.alert(
       'Share Post',
@@ -241,9 +244,7 @@ const Home = ({ navigation }) => {
           }}
           renderItem={({ item }) => {
             const isLiked = item?.like?.some(l => l._id === userDetail?._id);
-            const isJoined = !!joines?.[item?.postId]?.[userId];
-
-            console.log("item", item);
+            const isJoined = item.joinedUsers.some(res => res.joinedUsersId === userDetail?._id);
 
             return (
               <SocialMediaPost
