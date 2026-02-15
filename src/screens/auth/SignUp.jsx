@@ -65,11 +65,11 @@ const SignUp = ({ navigation }) => {
         }
       } catch (error) {
         console.log('Error', error);
-        ShowToast('error', error);
+        ShowToast('error', error?.response?.data?.message || 'Signup failed');
         setLoader(false);
       }
 
-     
+
     }
   };
 
@@ -77,7 +77,7 @@ const SignUp = ({ navigation }) => {
     <Container backgroundImage={AppImages.AUTHBG}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ gap: 20 }}>
-          <BackButtonWithHeader/>
+          <BackButtonWithHeader />
           <AppText
             title={'Create Your Account'}
             textSize={3}

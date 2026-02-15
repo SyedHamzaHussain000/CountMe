@@ -31,7 +31,7 @@ const AppTextInput = ({ keyboardType, onChangeText, password, placeholder, secur
           <AppText title={title} textSize={2} textColor={titleColour ? titleColour : AppColors.WHITE} />
         )
       }
-      <View style={{ backgroundColor: TextInputColour ? TextInputColour : AppColors.WHITE, flexDirection: 'row', borderRadius: borderRadius ? borderRadius : 10, paddingHorizontal: 10, width: responsiveWidth(width) }}>
+      <View style={{ backgroundColor: TextInputColour ? TextInputColour : AppColors.WHITE, flexDirection: 'row', borderRadius: borderRadius ? borderRadius : 10, paddingHorizontal: 10, width: responsiveWidth(width ? width : 90) }}>
 
         <TextInput
           placeholder={placeholder}

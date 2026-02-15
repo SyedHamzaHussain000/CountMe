@@ -1,5 +1,5 @@
 import 'react-native-get-random-values';
-import { View, Text } from 'react-native';
+import { View, Text, SafeAreaView } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import Routes from './routes/Routes';
@@ -17,14 +17,17 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <NavigationContainer>
-          <Routes />
-          <Toast />
-        </NavigationContainer>
-      </PersistGate>
-    </Provider>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <NavigationContainer>
+
+            <Routes />
+            <Toast />
+          </NavigationContainer>
+        </PersistGate>
+      </Provider>
+    </SafeAreaView>
   );
 };
 

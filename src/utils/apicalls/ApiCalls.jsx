@@ -7,69 +7,70 @@ import { BASE_URL } from '../BaseUrls/BaseUrl';
 
 
 
-export const ApiCall = async(method, endpoint, data, token = null) => {
-   try {
-       let config = {
-        method: method,
-        url: `${BASE_URL}${endpoint}`,
-            headers: { 
+export const ApiCall = async (method, endpoint, data, token = null) => {
+    try {
+        let config = {
+            method: method,
+            url: `${BASE_URL}${endpoint}`,
+            headers: {
                 'Content-Type': 'application/json',
                 ...(token && { Authorization: `Bearer ${token}` }) // add token only if exists
             },
-            data : data ? data : ''
-        };  
-            const res = await axios(config); // ✅ use axios or axios.request
+            data: data ? data : ''
+        };
+        const res = await axios(config); // ✅ use axios or axios.request
         return res
-    
+
     } catch (error) {
-     return error
-    } 
+        console.log(`error api call and api name is ${endpoint}`, error);
+        throw error;
+    }
 }
 
 
-export const ApiCallWithUserId = async(method, endpoint, userId,data, token= null) => {
+export const ApiCallWithUserId = async (method, endpoint, userId, data, token = null) => {
 
-   try {
-       let config = {
-        method: method,
-        url: `${BASE_URL}${endpoint}`,
-            headers: { 
+    try {
+        let config = {
+            method: method,
+            url: `${BASE_URL}${endpoint}`,
+            headers: {
                 'Content-Type': 'application/json',
                 ...(token && { Authorization: `Bearer ${token}` }) // add token only if exists
             },
-            data : data ? data : ''
-        }   
+            data: data ? data : ''
+        }
 
         const res = await axios(config)
-       return res.data
+        return res.data
     } catch (error) {
         console.log(`error api call by userid and api name is ${endpoint}`, error)
-        
-     return error
-    } 
+        throw error;
+    }
 }
 
 
 
 
-export const ApiCallFormData = async(method, endpoint, data, token = null) => {
-   try {
+export const ApiCallFormData = async (method, endpoint, data, token = null) => {
+    try {
 
 
 
-       let config = {
-        method: method,
-        url: `${BASE_URL}${endpoint}`,
-            headers: { 
+        let config = {
+            method: method,
+            url: `${BASE_URL}${endpoint}`,
+            headers: {
                 'Content-Type': 'multipart/form-data',
-                ...(token && { Authorization: `Bearer ${token}` }) 
+                ...(token && { Authorization: `Bearer ${token}` })
             },
-            data : data
-        };  
-            const res = await axios(config); 
+            data: data
+        };
+        const res = await axios(config);
         return res
-    
+
     } catch (error) {
-     return error.response.message
-    } 
+        console.log(`error api call formData and api name is ${endpoint}`, error);
+        throw error;
+    }
 }

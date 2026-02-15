@@ -6,7 +6,7 @@ export const UsersDbRef = database().ref('/Users');
 export const UserId = getAuth()?.currentUser?.uid
 
 
-// export const BASE_URL = "https://appsdemo.pro/CountMe/api/user/"
-// export const IMAGE_BASE_URL = "https://appsdemo.pro/CountMe/"
-export const BASE_URL = "https://clientdesiqntech.co/CountMe/api/user/"
-export const IMAGE_BASE_URL = "https://clientdesiqntech.co/CountMe/"
+// export const BASE_URL = "https://clientdesiqntech.co/CountMe/api/user/"
+// export const IMAGE_BASE_URL = "https://clientdesiqntech.co/CountMe/"
+export const BASE_URL = "https://stylitic-senselessly-olene.ngrok-free.dev/api/user/"
+export const IMAGE_BASE_URL = "https://stylitic-senselessly-olene.ngrok-free.dev/"

@@ -62,8 +62,9 @@ const Login = ({ navigation }) => {
 
       ShowToast('success', data.message);
     } catch (error) {
-      setLoader(false)
-      ShowToast('error', error?.response?.message);
+      console.log('Error', error);
+      ShowToast('error', error?.response?.data?.message || 'Signup failed');
+      setLoader(false);
     }
     // return;
 

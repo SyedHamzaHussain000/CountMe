@@ -15,9 +15,9 @@ import { setUserDetails } from '../../../redux/slices/AuthSlice';
 const OtpVerification = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
-  const { data } = route.params; 
-  const { email, Otp } = data.data;         
-  const signupToken = data.signupToken;     
+  const { data } = route.params;
+  const { email, Otp } = data.data;
+  const signupToken = data.signupToken;
 
 
 
@@ -33,21 +33,20 @@ const OtpVerification = ({ navigation, route }) => {
     setLoader(true);
 
     try {
-        if(Otp !== otp)
-        {
-            ShowToast('error', "Invalid otp")
-                setLoader(false);
-            return
-        }
+      if (Otp !== otp) {
+        ShowToast('error', "Invalid otp")
+        setLoader(false);
+        return
+      }
       const body = {
         addSignUpToken: signupToken,
         Otp: Number(otp),
       };
 
-        console.log("body", body)
+      console.log("body", body)
       const { data } = await ApiCall('POST', 'verifyOtp', body);
 
-      console.log("data",data)
+      console.log("data", data)
       setLoader(false);
 
       ShowToast('success', data.message);
@@ -60,14 +59,14 @@ const OtpVerification = ({ navigation, route }) => {
 
     } catch (error) {
       setLoader(false);
-      ShowToast('error', error?.response?.message || 'OTP Verification Failed');
+      ShowToast('error', error?.response?.data?.message || 'OTP Verification Failed');
     }
   };
 
   const ResendOtp = async () => {
     try {
       const body = { email: email };
-      const { data } = await ApiCall('POST', 'resendOtp', body);
+      const { data } = await ApiCall('POST', 'sendOtp', body);
 
       ShowToast('success', data.message);
     } catch (error) {

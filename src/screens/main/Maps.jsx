@@ -10,8 +10,13 @@ import {
   Linking,
   TouchableOpacity,
   Platform,
+  TextInput,
+  PermissionsAndroid,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+// Using built-in Geolocation (no Google Play Services dependency)
+import Geolocation from 'react-native-geolocation-service';
+
 import AppHeader from '../../components/AppCommonComponents/AppHeader';
 import AppImages from '../../assets/images/AppImages';
 import {
@@ -33,65 +38,103 @@ import { ApiCall } from '../../utils/apicalls/ApiCalls';
 const Maps = ({ navigation }) => {
   const mapRef = useRef();
   const [AllNearbyPosts, setAllNearbyPosts] = useState([]);
-
   const [postIndex, setPostIndex] = useState(0);
   const [AllPostJoinersState, setAllPostJoinersState] = useState([]);
   const [JoinerLoader, setJoinerLoader] = useState(false);
-
-
-  const data = [
-    { id: 1, name: 'Alex Hales', type: 'Organizer' },
-    { id: 2, name: 'Jhon', type: 'participant' },
-    { id: 3, name: 'Jhon', type: 'participant' },
-    { id: 4, name: 'Jhon', type: 'participant' },
-    { id: 5, name: 'Jhon', type: 'participant' },
-    { id: 6, name: 'Slot available', type: 'Join now' },
-  ];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [radius, setRadius] = useState(2000); // in meters
+  const [currentPosition, setCurrentPosition] = useState({
+    latitude: 38.7888, // Default fallback
+    longitude: 106.5349,
+  });
 
   useEffect(() => {
     const nav = navigation.addListener('focus', () => {
-      getNearbyLocations();
+      getCurrentLocation();
     });
-
     return nav;
   }, [navigation]);
 
-  // useEffect(() => {
-  //   getAllJoiners(AllNearbyPosts);
-  // }, [AllNearbyPosts]);
-
-  useEffect(() => {
-    if (AllNearbyPosts.length > 0) {
-      // Focus on the first post
-      animateToTheLocation(
-        parseFloat(AllNearbyPosts[0].latitude),
-        parseFloat(AllNearbyPosts[0].longitude),
-      );
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'ios') {
+      const auth = await Geolocation.requestAuthorization('whenInUse');
+      return auth === 'granted';
     }
-  }, [AllNearbyPosts]);
 
-  const getNearbyLocations = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    }
+    return false;
+  };
+
+  const getCurrentLocation = async () => {
+    setInitialLoading(true);
+    const hasPermission = await requestLocationPermission();
+
+    if (hasPermission) {
+      Geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          console.log("position", position);
+          setCurrentPosition({ latitude, longitude });
+          getNearbyLocations('', 2000, latitude, longitude);
+        },
+        (error) => {
+          console.log("Geolocation Error: ", error.code, error.message);
+          // Use fallback coordinates on timeout/error
+          getNearbyLocations();
+        },
+        { enableHighAccuracy: false, timeout: 30000, }
+      );
+    } else {
+      Alert.alert("Permission Denied", "Location permission is required to find activities near you.");
+      getNearbyLocations();
+    }
+  };
+
+  const getNearbyLocations = async (query = '', radius = 2000, lat = currentPosition.latitude, lng = currentPosition.longitude) => {
+    setLoading(true);
     try {
-      const res = await ApiCall('get', 'getNearbyActivityPosts?latitude=38.7888&longitude=106.5349');
+      const endpoint = `getNearbyActivityPosts?latitude=${lat}&longitude=${lng}&radius=${radius}${query ? `&query=${query}` : ''}`;
+      const res = await ApiCall('get', endpoint);
+
+      setLoading(false);
+      setInitialLoading(false);
       if (res?.data?.success) {
-        setAllNearbyPosts(res.data.data);
+        const posts = res.data.data;
+        // console.log("posts", posts)
+        if (posts.length > 0) {
+          setAllNearbyPosts(posts);
+          setPostIndex(0);
+          animateToTheLocation(
+            parseFloat(posts[0].latitude),
+            parseFloat(posts[0].longitude),
+          );
+        } else {
+          setAllNearbyPosts([]);
+          if (query) {
+            Alert.alert("Not Found", `This name of match is not present in the ${radius / 1000}KM`);
+          }
+        }
       } else {
         console.log('Error fetching nearby posts:', res);
       }
     } catch (error) {
+      setLoading(false);
+      setInitialLoading(false);
       console.log('Error in getNearbyLocations:', error);
     }
-  };
-
-  // 40.9651419
-  // -73.6751251
-  const getAllJoiners = async (AllNearbyPosts, i) => {
-    // setJoinerLoader(true);
-    // const getPostJoiners = await GetAllJoinerByPost(
-    //   AllNearbyPosts[i == 0 || i > 0 ? i : postIndex]?.postId,
-    // );
-    // setAllPostJoinersState(getPostJoiners);
-    // setJoinerLoader(false);
   };
 
   const animateToTheLocation = (lat, lng) => {
@@ -100,12 +143,27 @@ const Maps = ({ navigation }) => {
         {
           latitude: lat,
           longitude: lng,
-          latitudeDelta: 0.01, // zoom level (smaller = more zoom)
-          longitudeDelta: 0.01,
+          latitudeDelta: 0.012,
+          longitudeDelta: 0.012,
         },
-        2000, // duration in ms
+        1500,
       );
     }
+  };
+
+  const goToMatch = (direction) => {
+    if (AllNearbyPosts.length === 0) return;
+    let newIndex;
+    if (direction === 'next') {
+      newIndex = (postIndex + 1) % AllNearbyPosts.length;
+    } else {
+      newIndex = (postIndex - 1 + AllNearbyPosts.length) % AllNearbyPosts.length;
+    }
+    setPostIndex(newIndex);
+    animateToTheLocation(
+      parseFloat(AllNearbyPosts[newIndex].latitude),
+      parseFloat(AllNearbyPosts[newIndex].longitude),
+    );
   };
 
   const openMapDirection = (lat, lng) => {
@@ -133,6 +191,31 @@ const Maps = ({ navigation }) => {
         }}
       >
         <View>
+          {initialLoading && (
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 400,
+                zIndex: 10,
+                backgroundColor: 'rgba(0,0,0,0.4)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderBottomRightRadius: 30,
+                borderBottomLeftRadius: 30,
+              }}
+            >
+              <ActivityIndicator size="large" color={AppColors.WHITE} />
+              <AppText
+                title={'Fetching nearby activities...'}
+                textColor={AppColors.WHITE}
+                textSize={2}
+                style={{ marginTop: 10 }}
+              />
+            </View>
+          )}
           <MapView
             ref={mapRef}
             provider={PROVIDER_GOOGLE}
@@ -143,27 +226,45 @@ const Maps = ({ navigation }) => {
               borderBottomLeftRadius: 30,
               overflow: 'hidden',
             }}
-            region={{
-              latitude: 40.7579747,
-              longitude: -73.9855426,
-              latitudeDelta: 0.3,
-              longitudeDelta: 0.3,
+            initialRegion={{
+              latitude: currentPosition.latitude,
+              longitude: currentPosition.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
             }}
+            showsUserLocation={true}
+            showsMyLocationButton={true}
+
           >
+            {/* Current location marker */}
+            <Marker
+              coordinate={{
+                latitude: currentPosition.latitude,
+                longitude: currentPosition.longitude,
+              }}
+              title="You are here"
+              description="Your current location"
+              pinColor="red"
+            />
+
+            {/* Activity markers */}
             {AllNearbyPosts.length > 0 &&
               AllNearbyPosts.map((res, index) => {
+
+                console.log("response", res)
                 return (
                   <Marker
                     key={res._id || index}
                     coordinate={{
+
                       latitude: parseFloat(res.latitude),
                       longitude: parseFloat(res.longitude),
                     }}
                     title={res.caption}
                     description={res.locationName}
+                    pinColor={AppColors.PURPLE}
                     onPress={() => {
                       setPostIndex(index);
-                      // getAllJoiners(AllNearbyPosts, index);
                     }}
                   />
                 );
@@ -186,36 +287,131 @@ const Maps = ({ navigation }) => {
               borderBottomLeftRadius: 30,
             }}
           >
-            <View>
+            <View style={{ flex: 1, marginRight: 10 }}>
               <AppText
                 title={'Activities near me'}
                 textSize={2.5}
                 textFontWeight
               />
-              <AppText title={'200m - 300m'} textSize={2} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 5 }}>
+                <TextInput
+                  placeholder="Search sport name..."
+                  placeholderTextColor={AppColors.GRAY}
+                  style={{
+                    backgroundColor: AppColors.LIGHTGRAY,
+                    flex: 1,
+                    borderRadius: 10,
+                    paddingHorizontal: 15,
+                    height: 40,
+                    color: AppColors.BLACK
+                  }}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  onSubmitEditing={() => getNearbyLocations(searchQuery)}
+                />
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, gap: 8 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    const newRadius = Math.max(1000, radius - 1000);
+                    setRadius(newRadius);
+                    getNearbyLocations(searchQuery, newRadius);
+                  }}
+                  style={{
+                    backgroundColor: AppColors.PURPLE,
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ color: AppColors.WHITE, fontSize: 18, fontWeight: 'bold' }}>−</Text>
+                </TouchableOpacity>
+
+                <AppText title={`Radius: ${radius / 1000}KM`} textSize={2} />
+
+                <TouchableOpacity
+                  onPress={() => {
+                    const newRadius = Math.min(50000, radius + 1000);
+                    setRadius(newRadius);
+                    getNearbyLocations(searchQuery, newRadius);
+                  }}
+                  style={{
+                    backgroundColor: AppColors.PURPLE,
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ color: AppColors.WHITE, fontSize: 18, fontWeight: 'bold' }}>+</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <View
+            <TouchableOpacity
+              onPress={() => getNearbyLocations(searchQuery, radius)}
               style={{
-                height: responsiveHeight(5),
-                width: responsiveHeight(5),
+                height: responsiveHeight(6),
+                width: responsiveHeight(6),
                 backgroundColor: AppColors.YELLOWIS,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
               }}
             >
-              <SvgIcons.searchW />
-            </View>
+              {loading ? <ActivityIndicator size="small" color={AppColors.WHITE} /> : <SvgIcons.searchW />}
+            </TouchableOpacity>
           </View>
         </View>
 
         <View style={{ padding: 20, gap: 20 }}>
-          <AppText
-            title={'Activity Detail'}
-            textColor={AppColors.WHITE}
-            textSize={3}
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <TouchableOpacity
+              onPress={() => goToMatch('prev')}
+              style={{
+                backgroundColor: AppColors.YELLOWIS,
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text style={{ color: AppColors.WHITE, fontSize: 20, fontWeight: 'bold' }}>{"<"}</Text>
+            </TouchableOpacity>
+
+            <View style={{ alignItems: 'center' }}>
+              <AppText
+                title={'Activity Detail'}
+                textColor={AppColors.WHITE}
+                textSize={3}
+              />
+              {AllNearbyPosts.length > 0 && (
+                <AppText
+                  title={`${postIndex + 1} of ${AllNearbyPosts.length}`}
+                  textColor={AppColors.PINK}
+                  textSize={1.8}
+                />
+              )}
+            </View>
+
+            <TouchableOpacity
+              onPress={() => goToMatch('next')}
+              style={{
+                backgroundColor: AppColors.YELLOWIS,
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text style={{ color: AppColors.WHITE, fontSize: 20, fontWeight: 'bold' }}>{">"}  </Text>
+            </TouchableOpacity>
+          </View>
 
           <View
             style={{
